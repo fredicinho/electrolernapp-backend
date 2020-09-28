@@ -2,7 +2,7 @@
 # Build Stage
 FROM maven:3.6.3-jdk-11-slim AS MAVEN_BUILD
 ARG SPRING_ACTIVE_PROFILE
-MAINTAINER Jasmin
+MAINTAINER Oliver Werlen
 
 COPY pom.xml /build/
 
@@ -20,6 +20,6 @@ FROM openjdk:11-slim
 
 WORKDIR /app
 
-COPY --from=MAVEN_BUILD /build/target/demo*.jar /app/appdemo.jar
+COPY --from=MAVEN_BUILD /build/target/demo*.jar /app/springbootbackend.jar
 
 ENTRYPOINT ["java", "-jar", "appdemo.jar"]
