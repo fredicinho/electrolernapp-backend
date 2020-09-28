@@ -20,6 +20,6 @@ FROM openjdk:11-slim
 
 WORKDIR /app
 
-COPY --from=MAVEN_BUILD /build/target/demo*.jar /app/springbootbackend.jar
+COPY --from=MAVEN_BUILD /build/target/springbootbackend*.jar /app/springbootbackend.jar
 
 ENTRYPOINT ["java", "-jar", "springbootbackend.jar"]
