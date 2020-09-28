@@ -22,4 +22,4 @@ WORKDIR /app
 
 COPY --from=MAVEN_BUILD /build/target/demo*.jar /app/springbootbackend.jar
 
-ENTRYPOINT ["java", "-jar", "appdemo.jar"]
+ENTRYPOINT ["java", "-jar", "springbootbackend.jar"]
