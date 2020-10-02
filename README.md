@@ -11,6 +11,10 @@ api/v1/categories/{ID}
 
 ### Databaseinformations
 
-Pull Dockerimage: `docker pull mariadb`
+Pull Dockerimage: 
 
-Start Container: `docker run --name mariadb -v /home/localadmin/electrolernappDatabase/:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=electrolernapp2020 -d mariadb:10`
+`docker pull mariadb`
+
+Start Container: 
+
+`docker run --name mariadb -v /home/localadmin/electrolernappDatabase/:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=electrolernapp2020 -d mariadb:10`
