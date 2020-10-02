@@ -1,19 +1,17 @@
 services:
   db:
-    image: mysql:5.7
-    volumes:
-      - db_data:/var/lib/mysql
+    image: mariadb:10
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: ElectroLernApp%2020
+      MYSQL_ROOT_PASSWORD: electrolernapp2020
       MYSQL_DATABASE: db_electrolernapp
       MYSQL_USER: electrolernapp
-      MYSQL_PASSWORD: ElectroLernApp_2020
+      MYSQL_PASSWORD: electrolernapp2020
     ports:
-      # <Port exposed> : < MySQL Port running inside container>
-      - '3306:3306'
-    expose:
-      # Opens port 3306 on the container
-      - '3306'
-volumes:
-  db_data: {}
+      - 3306:3306
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8081:8080
