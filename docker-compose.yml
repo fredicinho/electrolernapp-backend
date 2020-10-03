@@ -1,6 +1,8 @@
+version: "3.8"
 services:
-  db:
+  mariadb:
     image: mariadb:10
+    container_name: mariadb
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: electrolernapp2020
@@ -9,9 +11,17 @@ services:
       MYSQL_PASSWORD: electrolernapp2020
     ports:
       - 3306:3306
+    volumes:
+      - db_data:/var/lib/mysql
 
   adminer:
-    image: adminer
+    image: adminer:latest
+    container_name: adminer
+    environment:
+      ADMINER_DEFAULT_SERVER: mariadb
     restart: always
     ports:
-      - 8081:8080
+      - 7777:8080
+
+volumes:
+  db_data:
