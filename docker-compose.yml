@@ -1,14 +1,14 @@
 version: "3.8"
 services:
   mariadb:
-    image: mariadb:10
+    image: 'bitnami/mariadb:latest'
     container_name: mariadb
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: electrolernapp2020
-      MYSQL_DATABASE: db_electrolernapp
-      MYSQL_USER: electrolernapp
-      MYSQL_PASSWORD: electrolernapp2020
+      MARIADB_ROOT_PASSWORD: electrolernapp2020
+      MARIADB_DATABASE: db_electrolernapp
+      MARIADB_USER: electrolernapp
+      MARIADB_PASSWORD: electrolernapp2020
     ports:
       - 3306:3306
     volumes:
