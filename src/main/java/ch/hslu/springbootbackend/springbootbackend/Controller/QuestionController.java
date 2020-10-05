@@ -33,7 +33,7 @@ public class QuestionController {
     }
 
     @GetMapping("/questions/{id}")
-    public ResponseEntity<Question> getQuestionById(@PathVariable(value = "id") Long questionid) throws ResourceNotFoundException {
+    public ResponseEntity<Question> getQuestionById(@PathVariable(value = "id") Integer questionid) throws ResourceNotFoundException {
         Question question = questionRepository.findById(questionid).orElseThrow(
                 () -> new ResourceNotFoundException("Question not found for this id :: " + questionid)
         );

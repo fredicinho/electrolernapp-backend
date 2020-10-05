@@ -1,16 +1,20 @@
 package ch.hslu.springbootbackend.springbootbackend.Entity;
 
-import javax.persistence.*;
 import java.util.LinkedList;
 import java.util.List;
+import javax.persistence.*;
 
 @Entity
-@Table(name = "question")
-public class Question extends AbstractEntity {
+public class Question{
+
+    public Question(){}
+    @Id
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    private Integer id;
 
     private String questionphrase;
 
-    @OneToMany(targetEntity = Answer.class)
+    @OneToMany(targetEntity = Answer.class, cascade = CascadeType.ALL)
     private List<Answer> possibleAnswers = new LinkedList<>();
 
     @OneToOne(targetEntity = Answer.class, cascade = CascadeType.ALL)

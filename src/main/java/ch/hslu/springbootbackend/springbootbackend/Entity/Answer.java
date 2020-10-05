@@ -3,8 +3,11 @@ package ch.hslu.springbootbackend.springbootbackend.Entity;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "answer")
-public class Answer extends AbstractEntity {
+public class Answer{
+
+    @Id
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    private Integer id;
 
     private String answerPhrase;
 
