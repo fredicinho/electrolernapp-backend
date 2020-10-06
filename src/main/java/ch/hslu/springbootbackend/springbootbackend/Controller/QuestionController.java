@@ -23,8 +23,9 @@ public class QuestionController {
     @GetMapping("/save")
     public String process(){
         Answer[] answers = {new Answer("how"), new Answer("how"), new Answer("how"), new Answer("how")};
-        questionRepository.saveAll(Arrays.asList(new Question("Whatever", answers)));
-        return "Done";
+        Question question = new Question("Whatever", answers);
+        questionRepository.saveAll(Arrays.asList(question));
+        return question.toString();
     }
 
     @GetMapping("/questions")

@@ -49,9 +49,8 @@ public class Question{
         for (Answer answer : answers
         ) {
             this.possibleAnswers.add(answer);
-
         }
-
+        this.correctAnswer = answers[0];
     }
 
 
