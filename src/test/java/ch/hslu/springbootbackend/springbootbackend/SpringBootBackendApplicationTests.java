@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 class SpringBootBackendApplicationTests {
 
+    /**
     @Test
     void contextLoads() {
     }
@@ -19,7 +20,7 @@ class SpringBootBackendApplicationTests {
 
     }
 
-    /**@Test
+    @Test
     void getJavaVersion(){
         assertEquals("11.0.2", System.getProperty("java.version"));
 
