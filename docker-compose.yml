@@ -23,5 +23,6 @@ services:
     ports:
       - 7777:8080
 
+
 volumes:
   db_data:
