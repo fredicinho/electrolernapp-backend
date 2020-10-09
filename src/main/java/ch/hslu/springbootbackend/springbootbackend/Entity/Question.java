@@ -9,7 +9,7 @@ public class Question{
 
     public Question(){}
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
 
     private String questionphrase;
@@ -19,7 +19,13 @@ public class Question{
 
     @OneToOne(targetEntity = Answer.class, cascade = CascadeType.ALL)
     private Answer correctAnswer;
+    public Integer getId() {
+        return id;
+    }
 
+    public void setId(Integer id) {
+        this.id = id;
+    }
     public String getQuestionphrase() {
         return questionphrase;
     }
@@ -44,20 +50,23 @@ public class Question{
         this.correctAnswer = correctAnswer;
     }
 
-    public Question(String questionphrase, Answer[] answers) {
+    public Question(String questionphrase, List<Answer> answers, Answer correctAnswer) {
         this.questionphrase = questionphrase;
-        for (Answer answer : answers
-        ) {
-            this.possibleAnswers.add(answer);
-        }
-        this.correctAnswer = answers[0];
+        this.setPossibleAnswers(answers);
+        this.setCorrectAnswer(correctAnswer);
     }
-
+    public Question(String questionphrase, List<Answer> answers, Answer correctAnswer, int id) {
+        this.questionphrase = questionphrase;
+        this.setPossibleAnswers(answers);
+        this.setCorrectAnswer(correctAnswer);
+        this.id = id;
+    }
 
     @Override
     public String toString() {
         return "Question{" +
-                "questionPhrase='" + questionphrase + '\'' +
+                "id=" + id +
+                ", questionphrase='" + questionphrase + '\'' +
                 ", possibleAnswers=" + possibleAnswers +
                 ", correctAnswer=" + correctAnswer +
                 '}';

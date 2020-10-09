@@ -7,7 +7,7 @@ import javax.persistence.*;
 public class Answer{
 
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
 
     private String answerPhrase;
@@ -26,6 +26,13 @@ public class Answer{
         this.answerPhrase = answerPhrase;
     }
 
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
     @Override
     public String toString() {
         return "Answer{" +
