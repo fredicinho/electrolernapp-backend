@@ -13,6 +13,7 @@ import java.util.List;
 
 // TODO: Wenn Controller mit der Zeit zu komplex/gross wird, Logik auf einen Service auslagern!!!!
 
+@CrossOrigin(origins = "http://localhost:80", maxAge = 3600)
 @RestController
 @RequestMapping("/api/v1")
 public class QuestionController {
