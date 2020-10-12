@@ -4,6 +4,7 @@ import ch.hslu.springbootbackend.springbootbackend.Controller.QuestionController
 import ch.hslu.springbootbackend.springbootbackend.Entity.Answer;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Question;
 import ch.hslu.springbootbackend.springbootbackend.Exception.ResourceNotFoundException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matcher;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -13,11 +14,19 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.SpringVersion;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
 import static java.util.Collections.singletonList;
@@ -105,11 +114,26 @@ class QuestionControllerTest {
         answers.add(answer2);
         Question question = new Question("A testcase", answers, answers.get(1), 1);
         when(questionController.newQuestion(question)).thenReturn(question);
+        String inputJson = asJsonString(question);
+        System.out.println(inputJson);
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post(path)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(inputJson)
+                .characterEncoding("utf-8"))
+                .andExpect(status().isOk())
+                .andReturn();
 
-        //post to be tested
-
+        //no checking if return is correct when status is ok
 
     }
+    public static String asJsonString(final Object obj) {
+        try {
+            return new ObjectMapper().writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
 
 }
