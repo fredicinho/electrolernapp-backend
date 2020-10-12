@@ -8,7 +8,7 @@ public class Answer{
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    private Integer id;
+    private Integer answer_id;
 
     private String answerPhrase;
 
@@ -27,11 +27,11 @@ public class Answer{
     }
 
     public Integer getId() {
-        return id;
+        return answer_id;
     }
 
     public void setId(Integer id) {
-        this.id = id;
+        this.answer_id = id;
     }
     @Override
     public String toString() {

@@ -1,9 +1,10 @@
 package ch.hslu.springbootbackend.springbootbackend.Controller;
 
-import ch.hslu.springbootbackend.springbootbackend.Exception.ResourceNotFoundException;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Question;
+import ch.hslu.springbootbackend.springbootbackend.Exception.ResourceNotFoundException;
 import ch.hslu.springbootbackend.springbootbackend.Repository.QuestionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,17 +20,20 @@ public class QuestionController {
     private QuestionRepository questionRepository;
 
     @GetMapping("/questions")
+    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
     public List<Question> getAllQuestions() {
         return questionRepository.findAll();
     }
 
     @PostMapping("/questions")
+    @PreAuthorize("hasRole('ADMIN')")
     public Question newQuestion(@RequestBody Question newQuestion) {
-        System.out.println(questionRepository.save(newQuestion));
         return questionRepository.save(newQuestion);
     }
     @GetMapping("/questions/{id}")
+    @PreAuthorize("hasRole('MODERATOR')")
     public Question getQuestionById(@PathVariable(value = "id") Integer questionId) throws ResourceNotFoundException {
+
         Question question = questionRepository.findById(questionId).orElseThrow(
                 () -> new ResourceNotFoundException("Question not found for this id :: " + questionId)
         );
