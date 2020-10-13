@@ -1,4 +1,4 @@
-package ch.hslu.springbootbackend.springbootbackend.Controller;
+package ch.hslu.springbootbackend.springbootbackend.controllers;
 
 import ch.hslu.springbootbackend.springbootbackend.Entity.Answer;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Question;
@@ -14,7 +14,6 @@ import java.util.List;
 
 // TODO: Wenn Controller mit der Zeit zu komplex/gross wird, Logik auf einen Service auslagern!!!!
 
-@CrossOrigin(origins = "http://localhost:80", maxAge = 3600)
 @RestController
 @RequestMapping("/api/v1")
 public class QuestionController {
@@ -24,6 +23,11 @@ public class QuestionController {
 
     @Autowired
     private AnswerRepository answerRepository;
+
+    @GetMapping("/all")
+    public String allAccess() {
+        return "Public Content.";
+    }
 
     @GetMapping("/questions")
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
@@ -59,5 +63,6 @@ public class QuestionController {
         );
         return question;
     }
+
 
 }
