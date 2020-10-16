@@ -8,6 +8,19 @@ import javax.persistence.Id;
 @Entity
 public class Category {
 
+    public Category(final String name, final String description) {
+        this.setName(name);
+        this.setDescription(description);
+    }
+
+    public Category(final int id, final String name, final String description) {
+        this.setId(id);
+        this.setName(name);
+        this.setDescription(description);
+    }
+
+    public Category(){}
+
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Integer id;

@@ -1,7 +1,10 @@
 package ch.hslu.springbootbackend.springbootbackend.Service;
+import ch.hslu.springbootbackend.Utils.QuestionType;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Answer;
+import ch.hslu.springbootbackend.springbootbackend.Entity.Category;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Question;
 import ch.hslu.springbootbackend.springbootbackend.Repository.AnswerRepository;
+import ch.hslu.springbootbackend.springbootbackend.Repository.CategoryRepository;
 import ch.hslu.springbootbackend.springbootbackend.Repository.QuestionRepository;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -22,8 +25,8 @@ public class CsvService {
 
     public static String TYPE = "text/csv";
 
-    // TODO: Change Headers for QuestionObject
-    static String[] HEADERs = { "QuestionPhrase", "Answer1", "Answer2", "Answer3", "Answer4", "Answer5", "CorrectAnswer" };
+    static String[] HEADER_QUESTION = { "QuestionPhrase", "Answer1", "Answer2", "Answer3", "Answer4", "Answer5", "CorrectAnswer" };
+    static String[] HEADER_CATEGORY = {"id", "NAME"};
 
     @Autowired
     AnswerRepository answerRepository;
@@ -31,26 +34,24 @@ public class CsvService {
     @Autowired
     QuestionRepository questionRepository;
 
-    public void save(MultipartFile file) {
+    @Autowired
+    CategoryRepository categoryRepository;
+
+    public boolean hasCSVFormat(MultipartFile file) {
+        if (!TYPE.equals(file.getContentType())) {
+            return false;
+        }
+        return true;
+    }
+
+    // Csv Question Service
+    public void saveNewQuestions(MultipartFile file) {
         try {
             List<Question> tutorials = csvToQuestions(file.getInputStream());
             questionRepository.saveAll(tutorials);
         } catch (IOException e) {
             throw new RuntimeException("fail to store csv data: " + e.getMessage());
         }
-    }
-
-    public List<Question> getAllTutorials() {
-        return questionRepository.findAll();
-    }
-
-    public boolean hasCSVFormat(MultipartFile file) {
-
-        if (!TYPE.equals(file.getContentType())) {
-            return false;
-        }
-
-        return true;
     }
 
     private List<Question> csvToQuestions(InputStream is) {
@@ -70,10 +71,12 @@ public class CsvService {
                 possibleAnswers.add(checkIfAnswerExists(csvRecord.get("Answer4")));
                 possibleAnswers.add(checkIfAnswerExists(csvRecord.get("Answer5")));
                 Answer correctAnswer = checkIfAnswerExists(csvRecord.get("CorrectAnswer"));
+                QuestionType questionType = QuestionType.valueOf(csvRecord.get("QuestionType"));
                 Question newQuestion = new Question(
                         csvRecord.get("QuestionPhrase"),
                         possibleAnswers,
-                        correctAnswer
+                        correctAnswer,
+                        questionType
                 );
                 newQuestions.add(newQuestion);
             }
@@ -91,6 +94,42 @@ public class CsvService {
         } else {
             return foundedAnswer.get(0);
         }
+    }
+
+    // CSV Categorie Service
+    public void saveNewCategories(MultipartFile file) {
+        try {
+            List<Category> categories = csvToCategory(file.getInputStream());
+            categoryRepository.saveAll(categories);
+        } catch (IOException e) {
+            throw new RuntimeException("fail to store csv data: " + e.getMessage());
+        }
+    }
+
+    private List<Category> csvToCategory(InputStream inputStream) {
+        try (BufferedReader fileReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+             CSVParser csvParser = new CSVParser(fileReader,
+                     CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim());) {
+
+            List<Category> newCategories = new ArrayList<>();
+
+            Iterable<CSVRecord> csvRecords = csvParser.getRecords();
+
+            for (CSVRecord csvRecord : csvRecords) {
+                if (checkIfCategoryExists(csvRecord.get("name"))) {
+                    newCategories.add(new Category(Integer.parseInt(csvRecord.get("id")), csvRecord.get("name"), ""));
+                }
+            }
+
+            return newCategories;
+
+        } catch (IOException e) {
+            throw new RuntimeException("fail to parse CSV file: " + e.getMessage());
+        }
+    }
+
+    private boolean checkIfCategoryExists(String categoryName) {
+        return categoryRepository.findByName(categoryName).isEmpty();
     }
 
 }

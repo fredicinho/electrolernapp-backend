@@ -1,5 +1,7 @@
 package ch.hslu.springbootbackend.springbootbackend.Entity;
 
+import ch.hslu.springbootbackend.Utils.QuestionType;
+
 import java.util.LinkedList;
 import java.util.List;
 import javax.persistence.*;
@@ -8,6 +10,7 @@ import javax.persistence.*;
 public class Question{
 
     public Question(){}
+
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
@@ -19,6 +22,17 @@ public class Question{
 
     @OneToOne(targetEntity = Answer.class, cascade = CascadeType.ALL)
     private Answer correctAnswer;
+
+    private QuestionType questionType;
+
+    public QuestionType getQuestionType() {
+        return questionType;
+    }
+
+    public void setQuestionType(QuestionType questionType) {
+        this.questionType = questionType;
+    }
+
     public Integer getId() {
         return id;
     }
@@ -51,16 +65,18 @@ public class Question{
         this.correctAnswer = correctAnswer;
     }
 
-    public Question(String questionphrase, List<Answer> answers, Answer correctAnswer) {
+    public Question(String questionphrase, List<Answer> answers, Answer correctAnswer, QuestionType questionType) {
         this.setQuestionphrase(questionphrase);
         this.setPossibleAnswers(answers);
         this.setCorrectAnswer(correctAnswer);
+        this.setQuestionType(questionType);
     }
-    public Question(String questionphrase, List<Answer> answers, Answer correctAnswer, int id) {
+    public Question(String questionphrase, List<Answer> answers, Answer correctAnswer, QuestionType questionType, int id) {
         this.setQuestionphrase(questionphrase);
         this.setPossibleAnswers(answers);
         this.setCorrectAnswer(correctAnswer);
-        this.id = id;
+        this.setQuestionType(questionType);
+        this.setId(id);
     }
 
     @Override
@@ -70,6 +86,7 @@ public class Question{
                 ", questionphrase='" + questionphrase + '\'' +
                 ", possibleAnswers=" + possibleAnswers +
                 ", correctAnswer=" + correctAnswer +
+                ", questionType=" + questionType +
                 '}';
     }
 }
