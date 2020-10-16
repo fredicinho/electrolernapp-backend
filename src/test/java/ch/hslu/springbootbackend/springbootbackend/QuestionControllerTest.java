@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @WebMvcTest(QuestionController.class)
 class QuestionControllerTest {
-
+/**
     public final String path = "/api/v1/questions/";
 
     @Autowired
@@ -120,6 +120,6 @@ class QuestionControllerTest {
         }
     }
 
-
+*/
 
 }

@@ -1,6 +1,5 @@
 package ch.hslu.springbootbackend.springbootbackend.controllers;
 
-
 import ch.hslu.springbootbackend.springbootbackend.Repository.RoleRepository;
 import ch.hslu.springbootbackend.springbootbackend.Repository.UserRepository;
 import ch.hslu.springbootbackend.springbootbackend.Entity.ERole;

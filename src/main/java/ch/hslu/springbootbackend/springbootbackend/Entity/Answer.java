@@ -2,7 +2,6 @@ package ch.hslu.springbootbackend.springbootbackend.Entity;
 
 import javax.persistence.*;
 
-//comment
 @Entity
 public class Answer{
 

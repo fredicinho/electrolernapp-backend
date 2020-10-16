@@ -5,24 +5,20 @@ import ch.hslu.springbootbackend.springbootbackend.Entity.Question;
 import ch.hslu.springbootbackend.springbootbackend.Exception.ResourceNotFoundException;
 import ch.hslu.springbootbackend.springbootbackend.Repository.AnswerRepository;
 import ch.hslu.springbootbackend.springbootbackend.Repository.QuestionRepository;
+import ch.hslu.springbootbackend.springbootbackend.Service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-
-// TODO: Wenn Controller mit der Zeit zu komplex/gross wird, Logik auf einen Service auslagern!!!!
-
 @RestController
+@CrossOrigin(origins = "http://localhost:80", maxAge = 3600)
 @RequestMapping("/api/v1")
 public class QuestionController {
 
     @Autowired
-    private QuestionRepository questionRepository;
-
-    @Autowired
-    private AnswerRepository answerRepository;
+    private QuestionService questionService;
 
     @GetMapping("/all")
     public String allAccess() {
@@ -32,36 +28,18 @@ public class QuestionController {
     @GetMapping("/questions")
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
     public List<Question> getAllQuestions() {
-        return questionRepository.findAll();
+        return questionService.getAllQuestions();
     }
 
     @PostMapping("/questions")
     @PreAuthorize("hasRole('ADMIN')")
     public Question newQuestion(@RequestBody Question newQuestion) {
-
-        List<Question> questions = questionRepository.findByQuestionphrase(newQuestion.getQuestionphrase());
-        if (!questions.isEmpty()) {
-            System.out.println("Question already exists!!!");
-            return questions.get(0);
-        }
-        for (Answer answer : newQuestion.getPossibleAnswers()) {
-            List<Answer> answers = answerRepository.findByAnswerPhrase(answer.getAnswerPhrase());
-            if (!answers.isEmpty()) {
-                System.out.println("Answer already exists!!!!");
-                // TODO: Replace the answer (in newQuestion) with the Answer which already exists!!!
-            }
-        }
-
-        return questionRepository.save(newQuestion);
+        return questionService.createNewQuestion(newQuestion);
     }
     @GetMapping("/questions/{id}")
     @PreAuthorize("hasRole('MODERATOR')")
     public Question getQuestionById(@PathVariable(value = "id") Integer questionId) throws ResourceNotFoundException {
-
-        Question question = questionRepository.findById(questionId).orElseThrow(
-                () -> new ResourceNotFoundException("Question not found for this id :: " + questionId)
-        );
-        return question;
+        return questionService.getById(questionId);
     }
 
 

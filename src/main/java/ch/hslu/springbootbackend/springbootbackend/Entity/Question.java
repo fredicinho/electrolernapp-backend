@@ -26,6 +26,7 @@ public class Question{
     public void setId(Integer id) {
         this.id = id;
     }
+
     public String getQuestionphrase() {
         return questionphrase;
     }
@@ -51,12 +52,12 @@ public class Question{
     }
 
     public Question(String questionphrase, List<Answer> answers, Answer correctAnswer) {
-        this.questionphrase = questionphrase;
+        this.setQuestionphrase(questionphrase);
         this.setPossibleAnswers(answers);
         this.setCorrectAnswer(correctAnswer);
     }
     public Question(String questionphrase, List<Answer> answers, Answer correctAnswer, int id) {
-        this.questionphrase = questionphrase;
+        this.setQuestionphrase(questionphrase);
         this.setPossibleAnswers(answers);
         this.setCorrectAnswer(correctAnswer);
         this.id = id;
