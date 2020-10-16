@@ -1,15 +1,19 @@
-package ch.hslu.springbootbackend.springbootbackend.Service;
+package ch.hslu.springbootbackend.springbootbackend.Service.CSV;
 import ch.hslu.springbootbackend.Utils.QuestionType;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Answer;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Category;
+import ch.hslu.springbootbackend.springbootbackend.Entity.CategorySet;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Question;
 import ch.hslu.springbootbackend.springbootbackend.Repository.AnswerRepository;
 import ch.hslu.springbootbackend.springbootbackend.Repository.CategoryRepository;
+import ch.hslu.springbootbackend.springbootbackend.Repository.CategorySetRepository;
 import ch.hslu.springbootbackend.springbootbackend.Repository.QuestionRepository;
+import ch.hslu.springbootbackend.springbootbackend.controllers.CsvController;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,23 +23,29 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CsvService {
+    private final Logger LOG = LoggerFactory.getLogger(CsvService.class);
 
     public static String TYPE = "text/csv";
 
     static String[] HEADER_QUESTION = { "QuestionPhrase", "Answer1", "Answer2", "Answer3", "Answer4", "Answer5", "CorrectAnswer" };
     static String[] HEADER_CATEGORY = {"id", "NAME"};
+    static String[] HEADER_CATEGORYSET = {"id", "categorieid", "title", "categorieSetNumber"};
 
-    @Autowired
-    AnswerRepository answerRepository;
+    private AnswerRepository answerRepository;
+    private QuestionRepository questionRepository;
+    private CategoryRepository categoryRepository;
+    private CategorySetRepository categorySetRepository;
 
-    @Autowired
-    QuestionRepository questionRepository;
-
-    @Autowired
-    CategoryRepository categoryRepository;
+    public CsvService(AnswerRepository answerRepository, QuestionRepository questionRepository, CategoryRepository categoryRepository, CategorySetRepository categorySetRepository) {
+        this.answerRepository = answerRepository;
+        this.questionRepository = questionRepository;
+        this.categoryRepository = categoryRepository;
+        this.categorySetRepository = categorySetRepository;
+    }
 
     public boolean hasCSVFormat(MultipartFile file) {
         if (!TYPE.equals(file.getContentType())) {
@@ -45,10 +55,10 @@ public class CsvService {
     }
 
     // Csv Question Service
-    public void saveNewQuestions(MultipartFile file) {
+    public List<Question> saveNewQuestions(MultipartFile file) {
         try {
             List<Question> tutorials = csvToQuestions(file.getInputStream());
-            questionRepository.saveAll(tutorials);
+            return questionRepository.saveAll(tutorials);
         } catch (IOException e) {
             throw new RuntimeException("fail to store csv data: " + e.getMessage());
         }
@@ -97,15 +107,16 @@ public class CsvService {
     }
 
     // CSV Categorie Service
-    public void saveNewCategories(MultipartFile file) {
+    public List<Category> saveNewCategories(MultipartFile file) {
         try {
             List<Category> categories = csvToCategory(file.getInputStream());
-            categoryRepository.saveAll(categories);
+            return categoryRepository.saveAll(categories);
         } catch (IOException e) {
             throw new RuntimeException("fail to store csv data: " + e.getMessage());
         }
     }
 
+    // TODO: For new Categories you dont have to pass the id. It will create one for themselves...
     private List<Category> csvToCategory(InputStream inputStream) {
         try (BufferedReader fileReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
              CSVParser csvParser = new CSVParser(fileReader,
@@ -130,6 +141,50 @@ public class CsvService {
 
     private boolean checkIfCategoryExists(String categoryName) {
         return categoryRepository.findByName(categoryName).isEmpty();
+    }
+
+    // CSV CategorieSet Service
+    public List<CategorySet> saveNewCategorieSets(MultipartFile file) {
+        try {
+            List<CategorySet> categorySets = csvToCategorySet(file.getInputStream());
+            return categorySetRepository.saveAll(categorySets);
+        } catch (IOException e) {
+            throw new RuntimeException("fail to store csv data: " + e.getMessage());
+        }
+    }
+
+    // TODO: For new CategorySets you dont have to pass the id. It will create one for themselves...
+    private List<CategorySet> csvToCategorySet(InputStream inputStream) {
+        try (BufferedReader fileReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+             CSVParser csvParser = new CSVParser(fileReader,
+                     CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim());) {
+
+            List<CategorySet> newCategorieSets = new ArrayList<>();
+
+            Iterable<CSVRecord> csvRecords = csvParser.getRecords();
+
+            for (CSVRecord csvRecord : csvRecords) {
+                int categoryId = Integer.parseInt(csvRecord.get("categorieid"));
+                List<Category> categoryOfCategorySet = categoryRepository.findById(categoryId);
+                if (categoryOfCategorySet.isEmpty()) {
+                    throw new IOException("The Category with the passed id = " + categoryId + " doesn't exists!");
+                }
+                if (checkIfCategorySetExists(csvRecord.get("title"), csvRecord.get("categorieSetNumber"))) {
+                    newCategorieSets.add(new CategorySet(Integer.parseInt(csvRecord.get("categorieSetId")), categoryOfCategorySet.get(0), csvRecord.get("title"), csvRecord.get("categorieSetNumber")));
+                }
+            }
+            return newCategorieSets;
+
+        } catch (IOException e) {
+            throw new RuntimeException("Fail to parse CSV file: " + e.getMessage());
+        }
+    }
+
+    private boolean checkIfCategorySetExists(String title, String categorySetNumber) {
+        List<CategorySet> sets = categorySetRepository.findByTitleAndCategorySetNumber(title, categorySetNumber);
+        LOG.info(sets.toString());
+        return !categorySetRepository.findByTitleAndCategorySetNumber(title, categorySetNumber).isEmpty();
+
     }
 
 }
