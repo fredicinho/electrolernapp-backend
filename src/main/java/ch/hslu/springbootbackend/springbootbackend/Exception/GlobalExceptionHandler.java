@@ -1,7 +1,7 @@
 package ch.hslu.springbootbackend.springbootbackend.Exception;
 
 import java.util.Date;
-import ch.hslu.springbootbackend.Utils.ErrorDetails;
+import ch.hslu.springbootbackend.springbootbackend.Utils.ErrorDetails;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

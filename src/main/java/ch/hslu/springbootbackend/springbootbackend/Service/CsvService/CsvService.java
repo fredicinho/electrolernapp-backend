@@ -1,0 +1,22 @@
+package ch.hslu.springbootbackend.springbootbackend.Service.CsvService;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.InputStream;
+import java.util.List;
+
+public interface CsvService {
+    String TYPE = "text/csv";
+
+
+    default boolean hasCSVFormat(MultipartFile file) {
+        if (!TYPE.equals(file.getContentType())) {
+            return false;
+        }
+        return true;
+    }
+
+    List saveNewEntities(MultipartFile file);
+
+    List parseCsv(InputStream inputStream);
+
+}

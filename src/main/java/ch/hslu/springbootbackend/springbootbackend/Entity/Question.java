@@ -1,6 +1,6 @@
 package ch.hslu.springbootbackend.springbootbackend.Entity;
 
-import ch.hslu.springbootbackend.Utils.QuestionType;
+import ch.hslu.springbootbackend.springbootbackend.Utils.QuestionType;
 
 import java.util.LinkedList;
 import java.util.List;

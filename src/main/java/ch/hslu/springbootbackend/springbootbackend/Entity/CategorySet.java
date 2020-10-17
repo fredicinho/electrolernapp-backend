@@ -17,7 +17,9 @@ public class CategorySet {
     @Id
     private Integer id;
 
+    // TODO: Für Migration muss "GeneratedValue" auskommentiert werden da IDs übernommen werden sollen!!!
     @OneToOne(targetEntity = Category.class, cascade = CascadeType.ALL)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Category category;
 
     private String title;
