@@ -49,7 +49,7 @@ public class MediaController {
     @GetMapping("/testGif")
     public ResponseEntity<byte[]> getGif() throws IOException {
 
-        var imgFile = new ClassPathResource("static/Medien/Bilder/000004_Frage_Bild.gif");
+        var imgFile = new ClassPathResource("Medien/Bilder/000004_Frage_Bild.gif");
         byte[] bytes = StreamUtils.copyToByteArray(imgFile.getInputStream());
 
         return ResponseEntity
@@ -61,7 +61,7 @@ public class MediaController {
     @GetMapping("/testJpg")
     public ResponseEntity<byte[]> getJpg() throws IOException {
 
-        var imgFile = new ClassPathResource("static/Medien/Bilder/000006_Frage_Bild.jpg");
+        var imgFile = new ClassPathResource("Medien/Bilder/000006_Frage_Bild.jpg");
         byte[] bytes = StreamUtils.copyToByteArray(imgFile.getInputStream());
 
         return ResponseEntity
