@@ -15,6 +15,9 @@ public class Question{
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
 
+    @OneToOne(targetEntity = CategorySet.class, cascade = CascadeType.ALL)
+    private CategorySet categorySet;
+
     private String questionphrase;
 
     @OneToMany(targetEntity = Answer.class, cascade = CascadeType.ALL)
@@ -65,18 +68,28 @@ public class Question{
         this.correctAnswer = correctAnswer;
     }
 
-    public Question(String questionphrase, List<Answer> answers, Answer correctAnswer, QuestionType questionType) {
+    public CategorySet getCategorySet() {
+        return categorySet;
+    }
+
+    public void setCategorySet(CategorySet categorySet) {
+        this.categorySet = categorySet;
+    }
+
+    public Question(String questionphrase, List<Answer> answers, Answer correctAnswer, QuestionType questionType, CategorySet categorySet) {
         this.setQuestionphrase(questionphrase);
         this.setPossibleAnswers(answers);
         this.setCorrectAnswer(correctAnswer);
         this.setQuestionType(questionType);
+        this.setCategorySet(categorySet);
     }
-    public Question(String questionphrase, List<Answer> answers, Answer correctAnswer, QuestionType questionType, int id) {
+    public Question(String questionphrase, List<Answer> answers, Answer correctAnswer, QuestionType questionType, CategorySet categorySet, int id) {
         this.setQuestionphrase(questionphrase);
         this.setPossibleAnswers(answers);
         this.setCorrectAnswer(correctAnswer);
         this.setQuestionType(questionType);
         this.setId(id);
+        this.setCategorySet(categorySet);
     }
 
     @Override
