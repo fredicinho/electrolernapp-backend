@@ -66,6 +66,6 @@ public class CsvCategorySetService implements CsvService {
     }
 
     private boolean checkIfCategorySetExists(String title, String categorySetNumber) {
-        return !categorySetRepository.findByTitleAndCategorySetNumber(title, categorySetNumber).isEmpty();
+        return categorySetRepository.findByTitleAndCategorySetNumber(title, categorySetNumber).isEmpty();
     }
 }

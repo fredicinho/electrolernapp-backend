@@ -1,16 +1,16 @@
 package ch.hslu.springbootbackend.springbootbackend.Service.CsvService;
 
-import ch.hslu.springbootbackend.springbootbackend.Entity.Answer;
-import ch.hslu.springbootbackend.springbootbackend.Entity.CategorySet;
-import ch.hslu.springbootbackend.springbootbackend.Entity.Question;
+import ch.hslu.springbootbackend.springbootbackend.Entity.*;
 import ch.hslu.springbootbackend.springbootbackend.Repository.AnswerRepository;
 import ch.hslu.springbootbackend.springbootbackend.Repository.CategorySetRepository;
+import ch.hslu.springbootbackend.springbootbackend.Repository.MediaRepository;
 import ch.hslu.springbootbackend.springbootbackend.Repository.QuestionRepository;
 import ch.hslu.springbootbackend.springbootbackend.Utils.QuestionType;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.hibernate.ObjectNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,24 +18,27 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
+
+import org.apache.commons.text.StringEscapeUtils;
 
 @Service
 public class CsvQuestionService implements CsvService {
 
+    private final Logger LOG = LoggerFactory.getLogger(CsvQuestionService.class);
     static String[] HEADER_QUESTION = {"chapterId", "QuestionPhrase", "Answer1", "Answer2", "Answer3", "Answer4", "Answer5", "CorrectAnswerAsLetter", "textIfCorrect", "textIfIncorrect", "questionImageId", "solutionImageId"};
 
     private final QuestionRepository questionRepository;
     private final AnswerRepository answerRepository;
     private final CategorySetRepository categorySetRepository;
+    private final MediaRepository mediaRepository;
+    private List<Answer> currentCreatedAnswers;
 
-    CsvQuestionService(QuestionRepository questionRepository, AnswerRepository answerRepository, CategorySetRepository categorySetRepository) {
+    CsvQuestionService(QuestionRepository questionRepository, AnswerRepository answerRepository, CategorySetRepository categorySetRepository, MediaRepository mediaRepository) {
         this.questionRepository = questionRepository;
         this.answerRepository = answerRepository;
         this.categorySetRepository = categorySetRepository;
+        this.mediaRepository = mediaRepository;
     }
 
     public List<Question> saveNewEntities(MultipartFile file) {
@@ -58,22 +61,45 @@ public class CsvQuestionService implements CsvService {
 
             Iterable<CSVRecord> csvRecords = csvParser.getRecords();
 
+            this.currentCreatedAnswers = new ArrayList<>();
+
             for (CSVRecord csvRecord : csvRecords) {
-                CategorySet categorySet = this.getCategorySet(Integer.parseInt(csvRecord.get("chapterId")));
+                CategorySet categorySet = null;
+                try {
+                    categorySet = this.getCategorySet(Integer.parseInt(csvRecord.get("chapterId")));
+                } catch (NumberFormatException ex) {
+                    LOG.warn("Couldn't parse the founded Chapter ID :: " + csvRecord.get("chapterId") + " of the Data :: " + csvRecord.toString());
+                    continue;
+                }
                 List<Answer> possibleAnswers = new ArrayList<>();
-                possibleAnswers.add(checkIfAnswerExists(csvRecord.get("Answer1")));
-                possibleAnswers.add(checkIfAnswerExists(csvRecord.get("Answer2")));
-                possibleAnswers.add(checkIfAnswerExists(csvRecord.get("Answer3")));
-                possibleAnswers.add(checkIfAnswerExists(csvRecord.get("Answer4")));
-                possibleAnswers.add(checkIfAnswerExists(csvRecord.get("Answer5")));
-                Answer correctAnswer = parseLetterToAnswer(csvRecord.get("CorrectAnswer"), possibleAnswers);
-                QuestionType questionType = QuestionType.valueOf("Multiple Choice");
+                for (int i = 1; i<=5; i++) {
+                    if (checkIfAnswerIsVoid(csvRecord.get("Answer" + i))) {
+                        break;
+                    } else {
+                        Answer newAnswer = checkIfAnswerExists(escapeAndEncodeString(csvRecord.get("Answer" + i)));
+                        possibleAnswers.add(newAnswer);
+                        currentCreatedAnswers.add(newAnswer);
+                    }
+                }
+                List<Answer> correctAnswers = parseLetterToAnswer(csvRecord.get("CorrectAnswerAsLetter"), possibleAnswers);
+                QuestionType questionType = QuestionType.fromString("Multiple Choice");
+                Media questionImage = null;
+                Media solutionImage = null;
+                if (this.checkIfMediaAvailableInCsv(csvRecord.get("questionImageId"))) {
+                    questionImage = this.getMediaById(Integer.parseInt(csvRecord.get("questionImageId")));
+                }
+                if (this.checkIfMediaAvailableInCsv(csvRecord.get("solutionImageId"))) {
+                    solutionImage = this.getMediaById(Integer.parseInt(csvRecord.get("solutionImageId")));
+                }
+
                 Question newQuestion = new Question(
-                        csvRecord.get("QuestionPhrase"),
+                        this.escapeAndEncodeString(csvRecord.get("QuestionPhrase")),
                         possibleAnswers,
-                        correctAnswer,
+                        correctAnswers,
                         questionType,
-                        categorySet
+                        categorySet,
+                        questionImage,
+                        solutionImage
                 );
                 newQuestions.add(newQuestion);
 
@@ -86,18 +112,31 @@ public class CsvQuestionService implements CsvService {
     }
 
     /**
-     * Checks if an Answer-Object with this answerphrase exists. If it exists it return the founded Answer. Else it creates a new one.
+     * Checks if an Answer-Object with this answerphrase exists inMemory or in Database.
+     * If it exists it return the founded Answer. Else it creates a new one.
      *
      * @param answerPhrase
      * @return Answer
      */
     private Answer checkIfAnswerExists(String answerPhrase) {
+        for (Answer answer : this.currentCreatedAnswers) {
+            if (answer.getAnswerPhrase() == answerPhrase) {
+                return answer;
+            }
+        }
         List<Answer> foundedAnswer = answerRepository.findByAnswerPhrase(answerPhrase);
         if (foundedAnswer.isEmpty()) {
             return new Answer(answerPhrase);
         } else {
             return foundedAnswer.get(0);
         }
+    }
+
+    private boolean checkIfAnswerIsVoid(String answerPhrase) {
+        if (answerPhrase == "VOID" || answerPhrase == "") {
+            return true;
+        }
+        return false;
     }
 
     private CategorySet getCategorySet(final int categorySetId) {
@@ -117,29 +156,50 @@ public class CsvQuestionService implements CsvService {
         }
     }
 
-    private Answer parseLetterToAnswer(String answerAsLetter, List<Answer> possibleAnswers) {
-        Answer correctAnswer = null;
-        switch (answerAsLetter) {
-            case "a":
-                correctAnswer = possibleAnswers.get(0);
-                break;
-            case "b":
-                correctAnswer = possibleAnswers.get(1);
-                break;
-            case "c":
-                correctAnswer = possibleAnswers.get(2);
-                break;
-            case "d":
-                correctAnswer = possibleAnswers.get(3);
-                break;
-            case "e":
-                correctAnswer = possibleAnswers.get(43);
-                break;
-            default:
-                throw new IllegalArgumentException("The correct Answerletter :: " + answerAsLetter + " is not available among the possible Answers!");
+    private List<Answer> parseLetterToAnswer(String answerAsLetter, List<Answer> possibleAnswers) {
+        List<Answer> correctAnswer = new LinkedList<>();
+        if (answerAsLetter.contains("a")) {
+            correctAnswer.add(possibleAnswers.get(0));
+        }
+        if (answerAsLetter.contains("b")) {
+            correctAnswer.add(possibleAnswers.get(1));
+        }
+        if (answerAsLetter.contains("c")) {
+            correctAnswer.add(possibleAnswers.get(2));
+        }
+        if (answerAsLetter.contains("d")) {
+            correctAnswer.add(possibleAnswers.get(3));
+        }
+        if (answerAsLetter.contains("e")) {
+            correctAnswer.add(possibleAnswers.get(4));
         }
 
         return correctAnswer;
+    }
+
+    private String escapeAndEncodeString(final String string) {
+        String escapedSpanTagInString = string.replaceAll("<(/|S)[^>]*>", "");
+        String escapedAndEncodedHTMLEntitiesInString = StringEscapeUtils.unescapeHtml4(escapedSpanTagInString);
+        return escapedAndEncodedHTMLEntitiesInString;
+    }
+
+    private Media getMediaById(final int mediaId) {
+        Optional<Media> foundedMedia = mediaRepository.findById(mediaId);
+        if (foundedMedia.isPresent()) {
+            return foundedMedia.get();
+        } else {
+            throw new NoSuchElementException("The Media with the id :: " + mediaId + " doesn't exists in the database!");
+        }
+    }
+
+    private boolean checkIfMediaAvailableInCsv(final String mediaId) {
+        try {
+            int idAsInteger = Integer.parseInt(mediaId);
+            return true;
+        } catch (NumberFormatException ex) {
+            LOG.info(ex.getMessage());
+            return false;
+        }
     }
 
 }

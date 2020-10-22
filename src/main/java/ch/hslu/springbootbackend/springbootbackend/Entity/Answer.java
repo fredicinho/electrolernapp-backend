@@ -9,6 +9,7 @@ public class Answer{
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer answer_id;
 
+    @Column(length=1000000)
     private String answerPhrase;
 
     public String getAnswerPhrase() {
