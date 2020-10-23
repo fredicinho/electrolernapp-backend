@@ -21,7 +21,7 @@ public class QuestionService {
 
 
     public Question createNewQuestion(Question newQuestion) {
-
+        
         List<Question> questions = questionRepository.findByQuestionphrase(newQuestion.getQuestionphrase());
 
         if (!questions.isEmpty()) {

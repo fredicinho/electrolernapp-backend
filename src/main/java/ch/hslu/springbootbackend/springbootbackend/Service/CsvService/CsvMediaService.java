@@ -14,6 +14,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class CsvMediaService implements CsvService {
@@ -48,7 +50,7 @@ public class CsvMediaService implements CsvService {
                 int mediaId = Integer.parseInt(csvRecord.get("mediaId"));
                 String mediaPath = csvRecord.get("path");
                 if (checkIfMediaExists(mediaId, mediaPath)) {
-                    newMedias.add(new Media(Integer.parseInt(csvRecord.get("mediaId")), csvRecord.get("path")));
+                    newMedias.add(new Media(mediaId, mediaPath, this.getTypeOfMedia(mediaPath)));
                 }
             }
 
@@ -61,5 +63,25 @@ public class CsvMediaService implements CsvService {
 
     private boolean checkIfMediaExists(final int mediaId, final String mediaPath) {
         return mediaRepository.findByIdAndPath(mediaId, mediaPath).isEmpty();
+    }
+
+    private String getTypeOfMedia(final String mediaPath) {
+        Pattern jpgPattern = Pattern.compile(".jpg", Pattern.CASE_INSENSITIVE);
+        if (jpgPattern.matcher(mediaPath).find()) {
+            return "JPG";
+        }
+        Pattern gifPattern = Pattern.compile(".gif", Pattern.CASE_INSENSITIVE);
+        if (gifPattern.matcher(mediaPath).find()) {
+            return "GIF";
+        }
+        Pattern pngPattern = Pattern.compile(".png", Pattern.CASE_INSENSITIVE);
+        if (pngPattern.matcher(mediaPath).find()) {
+            return "PNG";
+        }
+        Pattern movPattern = Pattern.compile(".mov", Pattern.CASE_INSENSITIVE);
+        if (movPattern.matcher(mediaPath).find()) {
+            return "MOV";
+        }
+        return "unknown";
     }
 }

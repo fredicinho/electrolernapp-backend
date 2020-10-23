@@ -10,16 +10,27 @@ public class Media {
 
     // TODO: Für Migration muss "GeneratedValue" auskommentiert werden da IDs übernommen werden sollen!!!
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     private String path;
 
+    private String type;
+
     public Media(){}
 
-    public Media(final int id, final String path){
+    public Media(final int id, final String path, final String type){
         this.setId(id);
         this.setPath(path);
+        this.setType(type);
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public int getId() {

@@ -16,18 +16,52 @@ public class Question{
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
 
+    @OneToOne(targetEntity = CategorySet.class, cascade = CascadeType.ALL)
+    private CategorySet categorySet;
+
+    @Column(length=1000000)
     private String questionphrase;
 
     @OneToMany(targetEntity = Answer.class, cascade = CascadeType.ALL)
     private List<Answer> possibleAnswers = new LinkedList<>();
 
-    @OneToOne(targetEntity = Answer.class, cascade = CascadeType.ALL)
-    private Answer correctAnswer;
+    @OneToMany(targetEntity = Answer.class, cascade = CascadeType.ALL)
+    private List<Answer> correctAnswers = new LinkedList<>();
 
     private QuestionType questionType;
 
     @OneToMany(mappedBy="question", cascade = CascadeType.ALL)
     private Set<Statistic> statistics;
+
+    @OneToOne(targetEntity = Media.class, cascade = CascadeType.ALL)
+    private Media questionImage;
+
+    @OneToOne(targetEntity = Media.class, cascade = CascadeType.ALL)
+    private Media answerImage;
+
+    public List<Answer> getCorrectAnswers() {
+        return correctAnswers;
+    }
+
+    public void setCorrectAnswers(List<Answer> correctAnswers) {
+        this.correctAnswers = correctAnswers;
+    }
+
+    public Media getQuestionImage() {
+        return questionImage;
+    }
+
+    public void setQuestionImage(Media questionImage) {
+        this.questionImage = questionImage;
+    }
+
+    public Media getAnswerImage() {
+        return answerImage;
+    }
+
+    public void setAnswerImage(Media answerImage) {
+        this.answerImage = answerImage;
+    }
 
     public QuestionType getQuestionType() {
         return questionType;
@@ -61,13 +95,15 @@ public class Question{
         this.possibleAnswers = possibleAnswers;
     }
 
-    public Answer getCorrectAnswer() {
-        return correctAnswer;
+    public CategorySet getCategorySet() {
+        return categorySet;
     }
 
-    public void setCorrectAnswer(Answer correctAnswer) {
-        this.correctAnswer = correctAnswer;
+    public void setCategorySet(CategorySet categorySet) {
+        this.categorySet = categorySet;
     }
+
+    public Question(String questionphrase, List<Answer> answers, List<Answer> correctAnswers, QuestionType questionType, CategorySet categorySet, Media questionImage, Media answerImage) {}
 
     public Set<Statistic> getStatistics() {
         return statistics;
@@ -80,25 +116,21 @@ public class Question{
     public Question(String questionphrase, List<Answer> answers, Answer correctAnswer, QuestionType questionType) {
         this.setQuestionphrase(questionphrase);
         this.setPossibleAnswers(answers);
-        this.setCorrectAnswer(correctAnswer);
+        this.setCorrectAnswers(correctAnswers);
         this.setQuestionType(questionType);
+        this.setCategorySet(categorySet);
+        this.setQuestionImage(questionImage);
+        this.setAnswerImage(answerImage);
     }
-    public Question(String questionphrase, List<Answer> answers, Answer correctAnswer, QuestionType questionType, int id) {
+    public Question(String questionphrase, List<Answer> answers, List<Answer> correctAnswers, QuestionType questionType, CategorySet categorySet, int id, Media questionImage, Media answerImage) {
         this.setQuestionphrase(questionphrase);
         this.setPossibleAnswers(answers);
-        this.setCorrectAnswer(correctAnswer);
+        this.setCorrectAnswers(correctAnswers);
         this.setQuestionType(questionType);
         this.setId(id);
+        this.setCategorySet(categorySet);
+        this.setQuestionImage(questionImage);
+        this.setAnswerImage(answerImage);
     }
 
-    @Override
-    public String toString() {
-        return "Question{" +
-                "id=" + id +
-                ", questionphrase='" + questionphrase + '\'' +
-                ", possibleAnswers=" + possibleAnswers +
-                ", correctAnswer=" + correctAnswer +
-                ", questionType=" + questionType +
-                '}';
-    }
 }

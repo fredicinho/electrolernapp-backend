@@ -1,6 +1,9 @@
 package ch.hslu.springbootbackend.springbootbackend.Entity;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 @Entity
 public class CategorySet {
@@ -21,6 +24,9 @@ public class CategorySet {
     @OneToOne(targetEntity = Category.class, cascade = CascadeType.ALL)
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Category category;
+
+    @OneToMany(targetEntity = Question.class, cascade = CascadeType.ALL)
+    private List<Question> questions = new LinkedList<>();
 
     private String title;
 
@@ -56,6 +62,14 @@ public class CategorySet {
 
     public void setCategorySetNumber(String categorySetNumber) {
         this.categorySetNumber = categorySetNumber;
+    }
+
+    public void insertQuestion(Question question) {
+        this.questions.add(question);
+    }
+
+    public void removeQuestion(Question question) {
+        this.questions.remove(question);
     }
 
     @Override
