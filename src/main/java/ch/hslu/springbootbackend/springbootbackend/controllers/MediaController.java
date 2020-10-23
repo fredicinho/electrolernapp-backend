@@ -3,6 +3,7 @@ package ch.hslu.springbootbackend.springbootbackend.controllers;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Media;
 import ch.hslu.springbootbackend.springbootbackend.Repository.MediaRepository;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StreamUtils;
@@ -23,13 +24,14 @@ public class MediaController {
         this.mediaRepository = mediaRepository;
     }
 
-    // TODO: Media Type needs to be defined in Database!!!
     @GetMapping("/{id}")
     public ResponseEntity<byte[]> getMedia(@PathVariable(value = "id") Integer imageId) {
         Optional<Media> result = mediaRepository.findById(imageId);
         if (result.get() != null) {
             Media foundedMedia = result.get();
-            var imgFile = new ClassPathResource("static/" + foundedMedia.getPath());
+            // TODO: Uncomented path for local development
+            // var imgFile = new FileSystemResource("/Users/fred/Downloads/Lernapp Elektro Data/" + foundedMedia.getPath());
+            var imgFile = new FileSystemResource("/var/" + foundedMedia.getPath());
             byte[] bytes = new byte[0];
             try {
                 bytes = StreamUtils.copyToByteArray(imgFile.getInputStream());
@@ -39,35 +41,27 @@ public class MediaController {
             }
             return ResponseEntity
                     .ok()
-                    .contentType(MediaType.IMAGE_JPEG)
+                    .contentType(this.getContentType(foundedMedia.getType()))
                     .body(bytes);
         }
 
         return ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/testGif")
-    public ResponseEntity<byte[]> getGif() throws IOException {
+    private MediaType getContentType(final String type) throws UnsupportedOperationException {
+        switch (type) {
+            case "JPG":
+                return MediaType.IMAGE_JPEG;
 
-        var imgFile = new ClassPathResource("Medien/Bilder/000004_Frage_Bild.gif");
-        byte[] bytes = StreamUtils.copyToByteArray(imgFile.getInputStream());
+            case "GIF":
+                return MediaType.IMAGE_GIF;
 
-        return ResponseEntity
-                .ok()
-                .contentType(MediaType.IMAGE_GIF)
-                .body(bytes);
-    }
+            case "PNG":
+                return MediaType.IMAGE_PNG;
 
-    @GetMapping("/testJpg")
-    public ResponseEntity<byte[]> getJpg() throws IOException {
-
-        var imgFile = new ClassPathResource("Medien/Bilder/000006_Frage_Bild.jpg");
-        byte[] bytes = StreamUtils.copyToByteArray(imgFile.getInputStream());
-
-        return ResponseEntity
-                .ok()
-                .contentType(MediaType.IMAGE_GIF)
-                .body(bytes);
+            default:
+                throw new UnsupportedOperationException("The Format :: " + type + " can't be retrieved by Spring right now...");
+        }
     }
 
 }
