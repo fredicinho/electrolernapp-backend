@@ -20,25 +20,27 @@ public class QuestionController {
     @Autowired
     private QuestionService questionService;
 
-    @GetMapping("/all")
-    public String allAccess() {
-        return "Public Content.";
-    }
-
     @GetMapping("")
-    //@PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_MODERATOR') or hasRole('ROLE_ADMIN')")
     public List<Question> getAllQuestions() {
         return questionService.getAllQuestions();
     }
 
+    @GetMapping("/mod")
+    @PreAuthorize("hasRole('ROLE_MODERATOR')")
+    public String modAccess() {
+        return "Mod Content.";
+    }
+
+
     @PostMapping("")
-    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public Question newQuestion(@RequestBody Question newQuestion) {
         return questionService.createNewQuestion(newQuestion);
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('MODERATOR')")
+    @PreAuthorize("hasRole('ROLE_MODERATOR')")
     public ResponseEntity<Question> getQuestionById(@PathVariable(value = "id") Integer questionId) {
         try {
             Question foundedQuestion = questionService.getById(questionId);

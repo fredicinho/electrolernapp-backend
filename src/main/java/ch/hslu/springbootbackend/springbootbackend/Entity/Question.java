@@ -2,9 +2,10 @@ package ch.hslu.springbootbackend.springbootbackend.Entity;
 
 import ch.hslu.springbootbackend.springbootbackend.Utils.QuestionType;
 
+import javax.persistence.*;
 import java.util.LinkedList;
 import java.util.List;
-import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 public class Question{
@@ -24,6 +25,9 @@ public class Question{
     private Answer correctAnswer;
 
     private QuestionType questionType;
+
+    @OneToMany(mappedBy="question", cascade = CascadeType.ALL)
+    private Set<Statistic> statistics;
 
     public QuestionType getQuestionType() {
         return questionType;
@@ -63,6 +67,14 @@ public class Question{
 
     public void setCorrectAnswer(Answer correctAnswer) {
         this.correctAnswer = correctAnswer;
+    }
+
+    public Set<Statistic> getStatistics() {
+        return statistics;
+    }
+
+    public void setStatistics(Set<Statistic> statistics) {
+        this.statistics = statistics;
     }
 
     public Question(String questionphrase, List<Answer> answers, Answer correctAnswer, QuestionType questionType) {
