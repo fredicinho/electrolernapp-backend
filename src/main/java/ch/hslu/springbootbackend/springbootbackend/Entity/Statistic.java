@@ -33,12 +33,10 @@ public class Statistic{
         this.date = new Date();
     }
 
-    public void assignToQuestion(Question question){
-        this.question = question;
-    }
-
-    public void assignToUser(User user){
-        this.user = user;
+    @PostPersist
+    public void assignToFks(){
+        this.question.getStatistics().add(this);
+        this.user.getStatistics().add(this);
     }
     public Integer getStatisticId() {
         return StatisticId;

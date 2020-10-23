@@ -15,6 +15,7 @@ import java.util.List;
 public class StatisticService {
 
 
+
     @Autowired
     StatisticRepository statisticRepository;
 
@@ -41,6 +42,8 @@ public class StatisticService {
     }
 
     public Statistic addNewStatistic(StatisticDTO statDTO){
+        System.out.println(userRepository.getOne(statDTO.getUserId()));
+        System.out.println(statDTO.toString());
         Statistic stat = new Statistic(statDTO.getPointsAchieved(), statDTO.isMarked(), userRepository.getOne(statDTO.getUserId()), questionRepository.getOne(statDTO.getQuestionId()));
         return statisticRepository.save(stat);
     }

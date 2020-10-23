@@ -1,5 +1,7 @@
 package ch.hslu.springbootbackend.springbootbackend.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -13,6 +15,7 @@ import java.util.Set;
 			@UniqueConstraint(columnNames = "username"),
 			@UniqueConstraint(columnNames = "email")
 		})
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,7 +41,7 @@ public class User {
 	private Set<Role> roles = new HashSet<>();
 
 
-	@OneToMany(mappedBy="user", cascade = CascadeType.ALL)
+	@OneToMany(targetEntity = Statistic.class, cascade = CascadeType.ALL)
 	private Set<Statistic> statistics;
 	public User() {
 	}

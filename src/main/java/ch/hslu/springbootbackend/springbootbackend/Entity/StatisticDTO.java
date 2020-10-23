@@ -59,4 +59,15 @@ public class StatisticDTO {
     }
 
 
+    @Override
+    public String toString() {
+        return "StatisticDTO{" +
+                "StatisticId=" + StatisticId +
+                ", date=" + date +
+                ", pointsAchieved=" + pointsAchieved +
+                ", isMarked=" + isMarked +
+                ", userId=" + userId +
+                ", questionId=" + questionId +
+                '}';
+    }
 }

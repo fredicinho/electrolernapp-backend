@@ -1,12 +1,15 @@
 package ch.hslu.springbootbackend.springbootbackend.Entity;
 
 import ch.hslu.springbootbackend.springbootbackend.Utils.QuestionType;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
 public class Question{
 
@@ -30,14 +33,25 @@ public class Question{
 
     private QuestionType questionType;
 
-    @OneToMany(mappedBy="question", cascade = CascadeType.ALL)
-    private Set<Statistic> statistics;
+    @OneToMany(targetEntity = Statistic.class, cascade = CascadeType.ALL)
+    private Set<Statistic> statistics = new HashSet<>();
 
     @OneToOne(targetEntity = Media.class, cascade = CascadeType.ALL)
     private Media questionImage;
 
     @OneToOne(targetEntity = Media.class, cascade = CascadeType.ALL)
     private Media answerImage;
+
+    public Question(String questionPhrase, List<Answer> possibleAnswers, List<Answer> correctAnswers, QuestionType questionType, CategorySet categorySet, Media questionImage, Media solutionImage) {
+        this.setQuestionphrase(questionPhrase);
+        this.setPossibleAnswers(possibleAnswers);
+        this.setCorrectAnswers(correctAnswers);
+        this.setQuestionType(questionType);
+        this.setCategorySet(categorySet);
+        this.setQuestionImage(questionImage);
+        this.setAnswerImage(solutionImage);
+    }
+
 
     public List<Answer> getCorrectAnswers() {
         return correctAnswers;
@@ -103,7 +117,6 @@ public class Question{
         this.categorySet = categorySet;
     }
 
-    public Question(String questionphrase, List<Answer> answers, List<Answer> correctAnswers, QuestionType questionType, CategorySet categorySet, Media questionImage, Media answerImage) {}
 
     public Set<Statistic> getStatistics() {
         return statistics;
