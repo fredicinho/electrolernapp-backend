@@ -1,4 +1,4 @@
-package ch.hslu.springbootbackend.springbootbackend.Entity;
+package ch.hslu.springbootbackend.springbootbackend.DTO;
 
 import java.util.Date;
 

@@ -1,7 +1,7 @@
 package ch.hslu.springbootbackend.springbootbackend.Service.EntityService;
 
 import ch.hslu.springbootbackend.springbootbackend.Entity.Statistic;
-import ch.hslu.springbootbackend.springbootbackend.Entity.StatisticDTO;
+import ch.hslu.springbootbackend.springbootbackend.DTO.StatisticDTO;
 import ch.hslu.springbootbackend.springbootbackend.Exception.ResourceNotFoundException;
 import ch.hslu.springbootbackend.springbootbackend.Repository.QuestionRepository;
 import ch.hslu.springbootbackend.springbootbackend.Repository.StatisticRepository;

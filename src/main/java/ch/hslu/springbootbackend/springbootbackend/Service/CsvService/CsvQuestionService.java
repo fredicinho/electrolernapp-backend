@@ -1,6 +1,9 @@
 package ch.hslu.springbootbackend.springbootbackend.Service.CsvService;
 
-import ch.hslu.springbootbackend.springbootbackend.Entity.*;
+import ch.hslu.springbootbackend.springbootbackend.Entity.Answer;
+import ch.hslu.springbootbackend.springbootbackend.Entity.CategorySet;
+import ch.hslu.springbootbackend.springbootbackend.Entity.Media;
+import ch.hslu.springbootbackend.springbootbackend.Entity.Question;
 import ch.hslu.springbootbackend.springbootbackend.Repository.AnswerRepository;
 import ch.hslu.springbootbackend.springbootbackend.Repository.CategorySetRepository;
 import ch.hslu.springbootbackend.springbootbackend.Repository.MediaRepository;
@@ -9,6 +12,7 @@ import ch.hslu.springbootbackend.springbootbackend.Utils.QuestionType;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -19,8 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
-
-import org.apache.commons.text.StringEscapeUtils;
 
 @Service
 public class CsvQuestionService implements CsvService {
@@ -64,9 +66,17 @@ public class CsvQuestionService implements CsvService {
             this.currentCreatedAnswers = new ArrayList<>();
 
             for (CSVRecord csvRecord : csvRecords) {
-                CategorySet categorySet = null;
+                List<CategorySet> categorySet = new ArrayList<>();
                 try {
-                    categorySet = this.getCategorySet(Integer.parseInt(csvRecord.get("chapterId")));
+                    Optional<CategorySet> categorySet1 = categorySetRepository.findById(Integer.valueOf(csvRecord.get("chapterId")));
+                    int id = Integer.parseInt(csvRecord.get("chapterId"));
+                    if(categorySet1.isPresent()){
+                        categorySet.add(categorySet1.get());
+                        categorySetRepository.save(categorySet.get(0));
+                    }else{
+                        LOG.warn("category set  "+Integer.parseInt(csvRecord.get("chapterId"))+ " not found");
+                    }
+
                 } catch (NumberFormatException ex) {
                     LOG.warn("Couldn't parse the founded Chapter ID :: " + csvRecord.get("chapterId") + " of the Data :: " + csvRecord.toString());
                     continue;
@@ -150,10 +160,8 @@ public class CsvQuestionService implements CsvService {
     }
 
     private void insertQuestionsIntoCategorySets(final List<Question> questions) {
-        for (Question question : questions) {
-            question.getCategorySet().insertQuestion(question);
-            categorySetRepository.save(question.getCategorySet());
-        }
+
+
     }
 
     private List<Answer> parseLetterToAnswer(String answerAsLetter, List<Answer> possibleAnswers) {

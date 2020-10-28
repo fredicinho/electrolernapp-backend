@@ -19,9 +19,6 @@ public class Question{
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
 
-    @OneToOne(targetEntity = CategorySet.class, cascade = CascadeType.ALL)
-    private CategorySet categorySet;
-
     @Column(length=1000000)
     private String questionphrase;
 
@@ -42,7 +39,11 @@ public class Question{
     @OneToOne(targetEntity = Media.class, cascade = CascadeType.ALL)
     private Media answerImage;
 
-    public Question(String questionPhrase, List<Answer> possibleAnswers, List<Answer> correctAnswers, QuestionType questionType, CategorySet categorySet, Media questionImage, Media solutionImage) {
+
+    @ManyToMany(mappedBy = "questionsInSet")
+    private List<CategorySet> categorySet;
+
+    public Question(String questionPhrase, List<Answer> possibleAnswers, List<Answer> correctAnswers, QuestionType questionType, List<CategorySet> categorySet, Media questionImage, Media solutionImage) {
         this.setQuestionphrase(questionPhrase);
         this.setPossibleAnswers(possibleAnswers);
         this.setCorrectAnswers(correctAnswers);
@@ -50,6 +51,13 @@ public class Question{
         this.setCategorySet(categorySet);
         this.setQuestionImage(questionImage);
         this.setAnswerImage(solutionImage);
+    }
+
+    @PostPersist
+    private void addToCategorySet(){
+        for(int i =0; i < categorySet.size(); i++){
+            categorySet.get(i).insertQuestion(this);
+        }
     }
 
 
@@ -109,11 +117,11 @@ public class Question{
         this.possibleAnswers = possibleAnswers;
     }
 
-    public CategorySet getCategorySet() {
+    public List<CategorySet> getCategorySet() {
         return categorySet;
     }
 
-    public void setCategorySet(CategorySet categorySet) {
+    public void setCategorySet(List<CategorySet> categorySet) {
         this.categorySet = categorySet;
     }
 
@@ -135,7 +143,7 @@ public class Question{
         this.setQuestionImage(questionImage);
         this.setAnswerImage(answerImage);
     }
-    public Question(String questionphrase, List<Answer> answers, List<Answer> correctAnswers, QuestionType questionType, CategorySet categorySet, int id, Media questionImage, Media answerImage) {
+    public Question(String questionphrase, List<Answer> answers, List<Answer> correctAnswers, QuestionType questionType, List<CategorySet> categorySet, Integer id, Media questionImage, Media answerImage) {
         this.setQuestionphrase(questionphrase);
         this.setPossibleAnswers(answers);
         this.setCorrectAnswers(correctAnswers);

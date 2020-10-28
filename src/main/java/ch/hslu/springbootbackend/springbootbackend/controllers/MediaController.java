@@ -2,7 +2,8 @@ package ch.hslu.springbootbackend.springbootbackend.controllers;
 
 import ch.hslu.springbootbackend.springbootbackend.Entity.Media;
 import ch.hslu.springbootbackend.springbootbackend.Repository.MediaRepository;
-import org.springframework.core.io.ClassPathResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,15 +24,17 @@ public class MediaController {
     public MediaController(MediaRepository mediaRepository) {
         this.mediaRepository = mediaRepository;
     }
+    private final Logger LOG = LoggerFactory.getLogger(QuestionController.class);
 
     @GetMapping("/{id}")
     public ResponseEntity<byte[]> getMedia(@PathVariable(value = "id") Integer imageId) {
         Optional<Media> result = mediaRepository.findById(imageId);
+        LOG.warn(result.toString());
         if (result.get() != null) {
             Media foundedMedia = result.get();
             // TODO: Uncomented path for local development
-            // var imgFile = new FileSystemResource("/Users/fred/Downloads/Lernapp Elektro Data/" + foundedMedia.getPath());
-            var imgFile = new FileSystemResource("/var/" + foundedMedia.getPath());
+            var imgFile = new FileSystemResource("/Users/fred/Downloads/Lernapp Elektro Data/" + foundedMedia.getPath());
+            //var imgFile = new FileSystemResource("/var/" + foundedMedia.getPath());
             byte[] bytes = new byte[0];
             try {
                 bytes = StreamUtils.copyToByteArray(imgFile.getInputStream());

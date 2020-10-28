@@ -1,7 +1,6 @@
 package ch.hslu.springbootbackend.springbootbackend.Entity;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,34 +9,38 @@ public class CategorySet {
 
     public CategorySet(){};
 
-    public CategorySet(int id, Category category, String title, String categorySetNumber) {
-        this.id = id;
+    public CategorySet(Integer id, Category category, String title, String categorySetNumber) {
+        this.categorySetId = id;
         this.category = category;
         this.title = title;
         this.categorySetNumber = categorySetNumber;
     }
 
     @Id
-    private Integer id;
+    private Integer categorySetId;
 
     // TODO: Für Migration muss "GeneratedValue" auskommentiert werden da IDs übernommen werden sollen!!!
     @OneToOne(targetEntity = Category.class, cascade = CascadeType.ALL)
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    //@GeneratedValue(strategy= GenerationType.IDENTITY)
     private Category category;
-
-    @OneToMany(targetEntity = Question.class, cascade = CascadeType.ALL)
-    private List<Question> questions = new LinkedList<>();
 
     private String title;
 
     private String categorySetNumber;
 
-    public Integer getId() {
-        return id;
+    @ManyToMany
+    @JoinTable(
+            name = "categorySet_question",
+            joinColumns = @JoinColumn(name = "categorySetId"),
+            inverseJoinColumns = @JoinColumn(name = "questionId"))
+    private List<Question> questionsInSet = new LinkedList<>();
+
+    public Integer getCategorySetId() {
+        return categorySetId;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setCategorySetId(Integer id) {
+        this.categorySetId = id;
     }
 
     public Category getCategory() {
@@ -65,17 +68,25 @@ public class CategorySet {
     }
 
     public void insertQuestion(Question question) {
-        this.questions.add(question);
+        this.questionsInSet.add(question);
     }
 
     public void removeQuestion(Question question) {
-        this.questions.remove(question);
+        this.questionsInSet.remove(question);
     }
+    public List<Question> getQuestionsInSet() {
+        return questionsInSet;
+    }
+
+    public void setQuestionsInSet(List<Question> questions) {
+        this.questionsInSet = questions;
+    }
+
 
     @Override
     public String toString() {
         return "CategorySet{" +
-                "id=" + id +
+                "id=" + categorySetId +
                 ", category=" + category +
                 ", title='" + title + '\'' +
                 ", categorySetNumber='" + categorySetNumber + '\'' +

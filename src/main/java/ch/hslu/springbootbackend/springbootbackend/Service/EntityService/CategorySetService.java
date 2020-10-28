@@ -1,0 +1,40 @@
+package ch.hslu.springbootbackend.springbootbackend.Service.EntityService;
+
+import ch.hslu.springbootbackend.springbootbackend.Entity.CategorySet;
+import ch.hslu.springbootbackend.springbootbackend.DTO.CategorySetDTO;
+import ch.hslu.springbootbackend.springbootbackend.Exception.ResourceNotFoundException;
+import ch.hslu.springbootbackend.springbootbackend.Repository.CategorySetRepository;
+import ch.hslu.springbootbackend.springbootbackend.controllers.CategoryController;
+import ch.hslu.springbootbackend.springbootbackend.controllers.QuestionController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
+@Service
+public class CategorySetService {
+
+    @Autowired
+    CategorySetRepository categorySetRepository;
+
+    public CategorySet getCategorySetByTitleAndId(String title, Integer id) throws ResourceNotFoundException {
+        CategorySet categorySet = categorySetRepository.findByTitleAndCategorySetNumber(title, id).orElseThrow(
+                () -> new ResourceNotFoundException("Question not found for this id :: " + id + " "+ title)
+        );
+
+
+        return categorySet;
+    }
+
+
+    public CategorySetDTO getCategorySetDTOById(Integer id) throws ResourceNotFoundException {
+        CategorySet categorySet = categorySetRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Question not found for this id :: " + id )
+        );
+        CategorySetDTO categorySetDTO = new CategorySetDTO(categorySet.getCategorySetId(), categorySet.getTitle(), categorySet.getCategorySetNumber());
+        categorySetDTO.add(linkTo(methodOn(CategoryController.class).getCategoryById(id)).withRel("questionsInSet"));
+        categorySetDTO.add(linkTo(methodOn(QuestionController.class).getQuestionsByCategorySet(id)).withRel("questionsInSet"));
+        return categorySetDTO;
+    }
+}
