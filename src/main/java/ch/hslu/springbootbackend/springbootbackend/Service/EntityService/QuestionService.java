@@ -46,20 +46,14 @@ public class QuestionService {
         List<Question> questions = questionRepository.findByQuestionphrase(newQuestion.getQuestionphrase());
 
         if (!questions.isEmpty()) {
-            System.out.println("Question already exists!!!");
             return questions.get(0);
         }
+        Question question = this.generateQuestionFromQuestionDTO(newQuestion);
+        question.setPossibleAnswers(this.checkIfAnswersExistsInDatabase(question.getPossibleAnswers()));
+        question.setCorrectAnswers(this.checkIfAnswersExistsInDatabase(question.getCorrectAnswers()));
 
-        for (int i = 0; i < newQuestion.getPossibleAnswers().size(); i++) {
-            Answer answer = checkIfAnswerExists(newQuestion.getPossibleAnswers().get(i).getAnswerPhrase());
-            if (answer.equals(newQuestion.getPossibleAnswers().get(i))) {
-            } else {
-                newQuestion.getPossibleAnswers().set(i, answer);
-            }
-        }
-
-
-            return questionRepository.save(this.generateQuestionFromQuestionDTO(newQuestion));
+        LOG.warn(question.toString());
+        return questionRepository.save(question);
     }
 
     public List<QuestionDTO> getAllQuestions() throws ResourceNotFoundException {
@@ -79,15 +73,6 @@ public class QuestionService {
             questions = questionRepository.findQuestionByCategorySet(categorySet);
         }
         return generateQuestionDTOFromQuestion(questions);
-    }
-
-    private Answer checkIfAnswerExists(String answerPhrase) {
-        Optional<Answer> foundedAnswer = answerRepository.findByAnswerPhrase(answerPhrase);
-        if (foundedAnswer.isPresent()) {
-            return foundedAnswer.get();
-        } else {
-            return new Answer(answerPhrase);
-        }
     }
 
     private QuestionDTO generateQuestionDTOFromQuestion(int questionId) throws ResourceNotFoundException {
@@ -119,7 +104,14 @@ public class QuestionService {
     public Question generateQuestionFromQuestionDTO(QuestionDTO questionDTO){
         Question question = null;
         try {
-            question = new Question(questionDTO.getQuestionphrase(), questionDTO.getPossibleAnswers(), questionDTO.getCorrectAnswers(), questionDTO.getQuestionType(), this.getCategorySets(questionDTO.getCategorySetIds()), this.getImage(questionDTO.getQuestionImageId()), this.getImage(questionDTO.getAnswerImageId()));
+            question = new Question(
+                    questionDTO.getQuestionphrase(),
+                    questionDTO.getPossibleAnswers(),
+                    questionDTO.getCorrectAnswers(),
+                    questionDTO.getQuestionType(),
+                    this.getCategorySets(questionDTO.getCategorySetIds()),
+                    this.getImage(questionDTO.getQuestionImageId()),
+                    this.getImage(questionDTO.getAnswerImageId()));
         } catch (ResourceNotFoundException e) {
             e.printStackTrace();
         }return question;
@@ -164,6 +156,23 @@ public class QuestionService {
         }else{
             return false;
         }
+    }
+
+    private List<Answer> checkIfAnswersExistsInDatabase(List<Answer> answerList){
+    List<Answer> list = new ArrayList<>();
+        for(Answer answer:answerList){
+        Optional<Answer> newAnswer = answerRepository.findByAnswerPhrase(answer.getAnswerPhrase());
+        if(newAnswer.isPresent()){
+            answer = newAnswer.get();
+            answerRepository.save(answer);
+            list.add(answer);
+        }else {
+            answer = new Answer(answer.getAnswerPhrase());
+            list.add(answer);
+            answerRepository.save(answer);
+        }
+        }
+        return list;
     }
 
 }

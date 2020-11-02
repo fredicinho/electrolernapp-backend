@@ -4,6 +4,7 @@ import ch.hslu.springbootbackend.springbootbackend.Utils.QuestionType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,6 +17,7 @@ public class Question{
     public Question(){}
 
     @Id
+    @NotNull
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
 

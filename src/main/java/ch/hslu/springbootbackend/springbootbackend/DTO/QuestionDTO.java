@@ -5,12 +5,19 @@ import ch.hslu.springbootbackend.springbootbackend.Utils.QuestionType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.hateoas.RepresentationModel;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 public class QuestionDTO extends RepresentationModel<QuestionDTO> {
 
+    @Id
+    @NotNull
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Integer id;
 
     private String questionphrase;

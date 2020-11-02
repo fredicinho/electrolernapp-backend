@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +13,7 @@ public class Answer extends RepresentationModel<Answer> {
 
     @JsonIgnore
     @Id
+    @NotNull
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer answer_id;
 
