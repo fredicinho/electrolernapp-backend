@@ -25,14 +25,18 @@ public class QuestionDTO extends RepresentationModel<QuestionDTO> {
     private List<Answer> correctAnswers = new LinkedList<>();
 
     private QuestionType questionType;
+
     @JsonIgnore
     private List<Integer> statisticsIds = new ArrayList<>();
+
     @JsonIgnore
     private List<Integer> categorySetIds = new ArrayList<>();
+
     @JsonIgnore
-    private int questionImageId;
+    private int questionImageId = 0;
+
     @JsonIgnore
-    private int answerImageId;
+    private int answerImageId= 0;
 
     public QuestionDTO(){};
     public QuestionDTO(Integer id, String questionphrase, QuestionType questionType) {

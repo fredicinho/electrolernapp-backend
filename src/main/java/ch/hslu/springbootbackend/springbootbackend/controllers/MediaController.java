@@ -2,13 +2,17 @@ package ch.hslu.springbootbackend.springbootbackend.controllers;
 
 import ch.hslu.springbootbackend.springbootbackend.Entity.Media;
 import ch.hslu.springbootbackend.springbootbackend.Repository.MediaRepository;
+import ch.hslu.springbootbackend.springbootbackend.payload.response.MessageResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -19,7 +23,9 @@ import java.util.Optional;
 @RequestMapping("/api/v1/medias")
 public class MediaController {
 
+    @Autowired
     private MediaRepository mediaRepository;
+
 
     public MediaController(MediaRepository mediaRepository) {
         this.mediaRepository = mediaRepository;
@@ -49,6 +55,16 @@ public class MediaController {
         }
 
         return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/medias")
+    public ResponseEntity<MessageResponse> uploadMediaFile(@RequestParam("file") MultipartFile file) {
+        String message = "";
+
+
+
+        message = "Please upload a csv file!";
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse(message));
     }
 
     private MediaType getContentType(final String type) throws UnsupportedOperationException {

@@ -142,24 +142,11 @@ public class Question{
         this.statistics = statistics;
     }
 
-    public Question(String questionphrase, List<Answer> answers, Answer correctAnswer, QuestionType questionType) {
+    public Question(String questionphrase, List<Answer> answers, List<Answer>  correctAnswers, QuestionType questionType) {
         this.setQuestionphrase(questionphrase);
         this.setPossibleAnswers(answers);
         this.setCorrectAnswers(correctAnswers);
         this.setQuestionType(questionType);
-        this.setCategorySet(categorySet);
-        this.setQuestionImage(questionImage);
-        this.setAnswerImage(answerImage);
-    }
-    public Question(String questionphrase, List<Answer> answers, List<Answer> correctAnswers, QuestionType questionType, List<CategorySet> categorySet, Integer id, Media questionImage, Media answerImage) {
-        this.setQuestionphrase(questionphrase);
-        this.setPossibleAnswers(answers);
-        this.setCorrectAnswers(correctAnswers);
-        this.setQuestionType(questionType);
-        this.setId(id);
-        this.setCategorySet(categorySet);
-        this.setQuestionImage(questionImage);
-        this.setAnswerImage(answerImage);
     }
 
 }

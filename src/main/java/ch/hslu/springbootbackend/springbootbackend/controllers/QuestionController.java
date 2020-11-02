@@ -62,7 +62,6 @@ public class QuestionController {
     @PostMapping("")
     //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public Question newQuestion(@RequestBody QuestionDTO newQuestion) {
-        LOG.warn(newQuestion.toString());
         return questionService.createNewQuestion(newQuestion);
     }
 

@@ -51,8 +51,7 @@ public class QuestionService {
         Question question = this.generateQuestionFromQuestionDTO(newQuestion);
         question.setPossibleAnswers(this.checkIfAnswersExistsInDatabase(question.getPossibleAnswers()));
         question.setCorrectAnswers(this.checkIfAnswersExistsInDatabase(question.getCorrectAnswers()));
-
-        LOG.warn(question.toString());
+        //LOG.warn(question.toString());
         return questionRepository.save(question);
     }
 
@@ -102,19 +101,18 @@ public class QuestionService {
     }
 
     public Question generateQuestionFromQuestionDTO(QuestionDTO questionDTO){
+        LOG.warn("category" + questionDTO.getCategorySetIds().toString());
+        LOG.warn("imge" + String.valueOf(questionDTO.getQuestionImageId()));
         Question question = null;
-        try {
-            question = new Question(
-                    questionDTO.getQuestionphrase(),
-                    questionDTO.getPossibleAnswers(),
-                    questionDTO.getCorrectAnswers(),
-                    questionDTO.getQuestionType(),
-                    this.getCategorySets(questionDTO.getCategorySetIds()),
-                    this.getImage(questionDTO.getQuestionImageId()),
-                    this.getImage(questionDTO.getAnswerImageId()));
-        } catch (ResourceNotFoundException e) {
-            e.printStackTrace();
-        }return question;
+        question = new Question(
+                questionDTO.getQuestionphrase(),
+                questionDTO.getPossibleAnswers(),
+                questionDTO.getCorrectAnswers(),
+                questionDTO.getQuestionType(),
+                this.getCategorySets(questionDTO.getCategorySetIds()),
+                null,
+                null);
+        return question;
     }
 
     private List<Statistic> getStatistics(List<Integer> statisticIds){
@@ -129,14 +127,14 @@ public class QuestionService {
     }
 
     private List<CategorySet> getCategorySets(List<Integer> categorySetIds){
-        List<CategorySet> stat = new ArrayList<>();
+        List<CategorySet> categorySets = new ArrayList<>();
         for(Integer categorySetId :categorySetIds){
             Optional<CategorySet> categorySetOptional = categorySetRepository.findById(categorySetId);
             if(categorySetOptional.isPresent()){
-                stat.add(categorySetOptional.get());
+                categorySets.add(categorySetOptional.get());
             }
         }
-        return stat;
+        return categorySets;
     }
 
     private Media getImage(int imageId) throws ResourceNotFoundException {
