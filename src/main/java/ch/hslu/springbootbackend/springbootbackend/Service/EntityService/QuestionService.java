@@ -1,13 +1,9 @@
 package ch.hslu.springbootbackend.springbootbackend.Service.EntityService;
 
 import ch.hslu.springbootbackend.springbootbackend.DTO.QuestionDTO;
-import ch.hslu.springbootbackend.springbootbackend.Entity.Answer;
-import ch.hslu.springbootbackend.springbootbackend.Entity.CategorySet;
-import ch.hslu.springbootbackend.springbootbackend.Entity.Question;
+import ch.hslu.springbootbackend.springbootbackend.Entity.*;
 import ch.hslu.springbootbackend.springbootbackend.Exception.ResourceNotFoundException;
-import ch.hslu.springbootbackend.springbootbackend.Repository.AnswerRepository;
-import ch.hslu.springbootbackend.springbootbackend.Repository.CategorySetRepository;
-import ch.hslu.springbootbackend.springbootbackend.Repository.QuestionRepository;
+import ch.hslu.springbootbackend.springbootbackend.Repository.*;
 import ch.hslu.springbootbackend.springbootbackend.controllers.MediaController;
 import ch.hslu.springbootbackend.springbootbackend.controllers.QuestionController;
 import ch.hslu.springbootbackend.springbootbackend.controllers.StatisticController;
@@ -30,16 +26,22 @@ public class QuestionService {
     QuestionRepository questionRepository;
 
     @Autowired
-    AnswerRepository answerRepository;
+    CategorySetRepository categorySetRepository;
 
     @Autowired
-    CategorySetRepository categorySetRepository;
+    StatisticRepository statisticRepository;
+
+    @Autowired
+    MediaRepository mediaRepository;
+
+    @Autowired
+    AnswerRepository answerRepository;
 
     private final Logger LOG = LoggerFactory.getLogger(QuestionController.class);
 
 
 
-    public Question createNewQuestion(Question newQuestion) {
+    public Question createNewQuestion(QuestionDTO newQuestion) {
         
         List<Question> questions = questionRepository.findByQuestionphrase(newQuestion.getQuestionphrase());
 
@@ -47,6 +49,7 @@ public class QuestionService {
             System.out.println("Question already exists!!!");
             return questions.get(0);
         }
+
         for (int i = 0; i < newQuestion.getPossibleAnswers().size(); i++) {
             Answer answer = checkIfAnswerExists(newQuestion.getPossibleAnswers().get(i).getAnswerPhrase());
             if (answer.equals(newQuestion.getPossibleAnswers().get(i))) {
@@ -55,7 +58,8 @@ public class QuestionService {
             }
         }
 
-        return questionRepository.save(newQuestion);
+
+            return questionRepository.save(this.generateQuestionFromQuestionDTO(newQuestion));
     }
 
     public List<QuestionDTO> getAllQuestions() throws ResourceNotFoundException {
@@ -78,18 +82,22 @@ public class QuestionService {
     }
 
     private Answer checkIfAnswerExists(String answerPhrase) {
-        List<Answer> foundedAnswer = answerRepository.findByAnswerPhrase(answerPhrase);
-        if (foundedAnswer.isEmpty()) {
-            return new Answer(answerPhrase);
+        Optional<Answer> foundedAnswer = answerRepository.findByAnswerPhrase(answerPhrase);
+        if (foundedAnswer.isPresent()) {
+            return foundedAnswer.get();
         } else {
-            return foundedAnswer.get(0);
+            return new Answer(answerPhrase);
         }
     }
 
     private QuestionDTO generateQuestionDTOFromQuestion(int questionId) throws ResourceNotFoundException {
         Question question = questionRepository.findById(questionId).orElseThrow(
                 () -> new ResourceNotFoundException("Question not found for this id :: " + questionId ));
-        QuestionDTO questionDTO = new QuestionDTO(questionId, question.getQuestionphrase(), question.getQuestionType(), question.getPossibleAnswers(), question.getCorrectAnswers());
+        QuestionDTO questionDTO = new QuestionDTO(questionId, question.getQuestionphrase(), question.getQuestionType());
+        questionDTO.setPossibleAnswers(answerRepository.findAnswersByQuestionPossibleList(question));
+        questionDTO.setCorrectAnswers(answerRepository.findAnswersByQuestionCorrectList(question));
+        //questionDTO.add(linkTo(methodOn(AnswerController.class).getPossibleAnswersByQuestion(questionId)).withRel("possibleAnswers"));
+        //questionDTO.add(linkTo(methodOn(AnswerController.class).getCorrectAnswersByQuestion(questionId)).withRel("correctAnswers"));
         questionDTO.add(linkTo(methodOn(StatisticController.class).getStatisticByQuestionId(questionId)).withRel("statistics"));
 
         if(checkIfQuestionImageExists(question)){
@@ -106,6 +114,42 @@ public class QuestionService {
             questionDTO.add(generateQuestionDTOFromQuestion(question.getId()));
         }
         return questionDTO;
+    }
+
+    public Question generateQuestionFromQuestionDTO(QuestionDTO questionDTO){
+        Question question = null;
+        try {
+            question = new Question(questionDTO.getQuestionphrase(), questionDTO.getPossibleAnswers(), questionDTO.getCorrectAnswers(), questionDTO.getQuestionType(), this.getCategorySets(questionDTO.getCategorySetIds()), this.getImage(questionDTO.getQuestionImageId()), this.getImage(questionDTO.getAnswerImageId()));
+        } catch (ResourceNotFoundException e) {
+            e.printStackTrace();
+        }return question;
+    }
+
+    private List<Statistic> getStatistics(List<Integer> statisticIds){
+        List<Statistic> stat = new ArrayList<>();
+        for(Integer statisticId :statisticIds){
+            Optional<Statistic> statisticOptional = statisticRepository.findById(statisticId);
+            if(statisticOptional.isPresent()){
+                stat.add(statisticOptional.get());
+            }
+        }
+        return stat;
+    }
+
+    private List<CategorySet> getCategorySets(List<Integer> categorySetIds){
+        List<CategorySet> stat = new ArrayList<>();
+        for(Integer categorySetId :categorySetIds){
+            Optional<CategorySet> categorySetOptional = categorySetRepository.findById(categorySetId);
+            if(categorySetOptional.isPresent()){
+                stat.add(categorySetOptional.get());
+            }
+        }
+        return stat;
+    }
+
+    private Media getImage(int imageId) throws ResourceNotFoundException {
+        return mediaRepository.findById(imageId).orElseThrow(
+                () -> new ResourceNotFoundException("Image not found for this id :: " + imageId ));
     }
     private boolean checkIfAnswerImageExists(Question question){
         if(question.getAnswerImage() != null){

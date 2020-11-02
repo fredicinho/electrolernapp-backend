@@ -22,10 +22,10 @@ public class Question{
     @Column(length=1000000)
     private String questionphrase;
 
-    @OneToMany(targetEntity = Answer.class, cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "questionPossibleList")
     private List<Answer> possibleAnswers = new LinkedList<>();
 
-    @OneToMany(targetEntity = Answer.class, cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "questionCorrectList")
     private List<Answer> correctAnswers = new LinkedList<>();
 
     private QuestionType questionType;
@@ -57,6 +57,12 @@ public class Question{
     private void addToCategorySet(){
         for(int i =0; i < categorySet.size(); i++){
             categorySet.get(i).insertQuestion(this);
+        }
+        for(int i =0; i < possibleAnswers.size(); i++){
+            possibleAnswers.get(i).insertPossibleQuestion(this);
+        }
+        for(int i =0; i < correctAnswers.size(); i++){
+            correctAnswers.get(i).insertCorrectQuestion(this);
         }
     }
 

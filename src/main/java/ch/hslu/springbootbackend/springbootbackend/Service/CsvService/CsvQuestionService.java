@@ -47,7 +47,6 @@ public class CsvQuestionService implements CsvService {
         try {
             List<Question> questions = parseCsv(file.getInputStream());
             List<Question> persistedQuestions = questionRepository.saveAll(questions);
-            this.insertQuestionsIntoCategorySets(persistedQuestions);
             return persistedQuestions;
         } catch (IOException e) {
             throw new RuntimeException("fail to store csv data: " + e.getMessage());
@@ -83,13 +82,18 @@ public class CsvQuestionService implements CsvService {
                 }
                 List<Answer> possibleAnswers = new ArrayList<>();
                 for (int i = 1; i<=5; i++) {
-                    if (checkIfAnswerIsVoid(csvRecord.get("Answer" + i))) {
-                        break;
-                    } else {
-                        Answer newAnswer = checkIfAnswerExists(escapeAndEncodeString(csvRecord.get("Answer" + i)));
-                        possibleAnswers.add(newAnswer);
-                        currentCreatedAnswers.add(newAnswer);
+                    Answer answer;
+                    Optional<Answer> newAnswer = answerRepository.findByAnswerPhrase(escapeAndEncodeString(csvRecord.get("Answer" + i)));
+                    if(newAnswer.isPresent()){
+                        answer = newAnswer.get();
+                        answerRepository.save(answer);
+                    }else{
+                        answer = new Answer(escapeAndEncodeString(csvRecord.get("Answer" + i)));
+                        answerRepository.save(answer);
                     }
+                    possibleAnswers.add(answer);
+                    currentCreatedAnswers.add(answer);
+
                 }
                 List<Answer> correctAnswers = parseLetterToAnswer(csvRecord.get("CorrectAnswerAsLetter"), possibleAnswers);
                 QuestionType questionType = QuestionType.fromString("Multiple Choice");
@@ -112,7 +116,8 @@ public class CsvQuestionService implements CsvService {
                         solutionImage
                 );
                 newQuestions.add(newQuestion);
-
+                LOG.warn(newQuestion.toString());
+                questionRepository.save(newQuestion);
             }
 
             return newQuestions;
@@ -128,19 +133,7 @@ public class CsvQuestionService implements CsvService {
      * @param answerPhrase
      * @return Answer
      */
-    private Answer checkIfAnswerExists(String answerPhrase) {
-        for (Answer answer : this.currentCreatedAnswers) {
-            if (answer.getAnswerPhrase() == answerPhrase) {
-                return answer;
-            }
-        }
-        List<Answer> foundedAnswer = answerRepository.findByAnswerPhrase(answerPhrase);
-        if (foundedAnswer.isEmpty()) {
-            return new Answer(answerPhrase);
-        } else {
-            return foundedAnswer.get(0);
-        }
-    }
+
 
     private boolean checkIfAnswerIsVoid(String answerPhrase) {
         if (answerPhrase == "VOID" || answerPhrase == "") {
@@ -159,10 +152,6 @@ public class CsvQuestionService implements CsvService {
 
     }
 
-    private void insertQuestionsIntoCategorySets(final List<Question> questions) {
-
-
-    }
 
     private List<Answer> parseLetterToAnswer(String answerAsLetter, List<Answer> possibleAnswers) {
         List<Answer> correctAnswer = new LinkedList<>();
@@ -205,7 +194,6 @@ public class CsvQuestionService implements CsvService {
             int idAsInteger = Integer.parseInt(mediaId);
             return true;
         } catch (NumberFormatException ex) {
-            LOG.info(ex.getMessage());
             return false;
         }
     }
