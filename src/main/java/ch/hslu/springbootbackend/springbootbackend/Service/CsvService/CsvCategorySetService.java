@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CsvCategorySetService implements CsvService {
@@ -50,12 +51,12 @@ public class CsvCategorySetService implements CsvService {
 
             for (CSVRecord csvRecord : csvRecords) {
                 int categoryId = Integer.parseInt(csvRecord.get("categorieid"));
-                List<Category> categoryOfCategorySet = categoryRepository.findById(categoryId);
-                if (categoryOfCategorySet.isEmpty()) {
+                Optional<Category> categoryOfCategorySet = categoryRepository.findById(categoryId);
+                if (!categoryOfCategorySet.isPresent()) {
                     throw new IOException("The Category with the passed id = " + categoryId + " doesn't exists!");
                 }
                 if (checkIfCategorySetExists(csvRecord.get("title"), csvRecord.get("categorieSetNumber"))) {
-                    newCategorieSets.add(new CategorySet(Integer.parseInt(csvRecord.get("categorieSetId")), categoryOfCategorySet.get(0), csvRecord.get("title"), csvRecord.get("categorieSetNumber")));
+                    newCategorieSets.add(new CategorySet(Integer.parseInt(csvRecord.get("categorieSetId")), categoryOfCategorySet.get(), csvRecord.get("title"), csvRecord.get("categorieSetNumber")));
                 }
             }
             return newCategorieSets;

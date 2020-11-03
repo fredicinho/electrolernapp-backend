@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -32,4 +33,23 @@ public class CategoryService {
         return allCategoryDTOs;
 
      }
+
+     public CategoryDTO getOneCategory(int categoryId){
+        CategoryDTO categoryDTO;
+        Category category;
+        Optional<Category> categoryOptional = categoryRepository.findById(categoryId);
+        if(categoryOptional.isPresent()){
+            category = categoryOptional.get();
+            categoryDTO = new CategoryDTO(categoryId, category.getName(), category.getDescription());
+            categoryDTO.add(linkTo(methodOn(CategorySetController.class).getCategorySetByCategoryId(category.getId())).withRel("categorySetInCategory"));
+
+        }else{
+            categoryDTO = null;
+        }
+        return categoryDTO;
+
+     }
+
+
+
 }
