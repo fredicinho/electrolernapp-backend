@@ -46,8 +46,8 @@ public class CsvQuestionService implements CsvService {
     public List<Question> saveNewEntities(MultipartFile file) {
         try {
             List<Question> questions = parseCsv(file.getInputStream());
-            List<Question> persistedQuestions = questionRepository.saveAll(questions);
-            return persistedQuestions;
+            //List<Question> persistedQuestions = questionRepository.saveAll(questions);
+            return questions;
         } catch (IOException e) {
             throw new RuntimeException("fail to store csv data: " + e.getMessage());
         }
@@ -62,7 +62,6 @@ public class CsvQuestionService implements CsvService {
 
             Iterable<CSVRecord> csvRecords = csvParser.getRecords();
 
-            this.currentCreatedAnswers = new ArrayList<>();
 
             for (CSVRecord csvRecord : csvRecords) {
                 List<CategorySet> categorySet = new ArrayList<>();
@@ -92,7 +91,7 @@ public class CsvQuestionService implements CsvService {
                         answerRepository.save(answer);
                     }
                     possibleAnswers.add(answer);
-                    currentCreatedAnswers.add(answer);
+
 
                 }
                 List<Answer> correctAnswers = parseLetterToAnswer(csvRecord.get("CorrectAnswerAsLetter"), possibleAnswers);
@@ -120,7 +119,7 @@ public class CsvQuestionService implements CsvService {
                 );
                 newQuestions.add(newQuestion);
                 LOG.warn(newQuestion.toString());
-                //questionRepository.save(newQuestion);
+                questionRepository.save(newQuestion);
             }
 
             return newQuestions;

@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Entity
+@SequenceGenerator(name="seq", initialValue=2, allocationSize=100)
 public class CategorySet {
 
     public CategorySet(){};
@@ -21,9 +22,8 @@ public class CategorySet {
 
     // TODO: Für Migration muss "GeneratedValue" auskommentiert werden da IDs übernommen werden sollen!!!
     @OneToOne(targetEntity = Category.class, cascade = CascadeType.ALL)
-    //@GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(strategy= GenerationType.SEQUENCE, generator = "sec")
     private Category category;
-
     private String title;
 
     private String categorySetNumber;
