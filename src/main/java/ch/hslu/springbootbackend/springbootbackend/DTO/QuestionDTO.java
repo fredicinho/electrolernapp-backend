@@ -2,7 +2,7 @@ package ch.hslu.springbootbackend.springbootbackend.DTO;
 
 import ch.hslu.springbootbackend.springbootbackend.Entity.Answer;
 import ch.hslu.springbootbackend.springbootbackend.Utils.QuestionType;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.GeneratedValue;
@@ -26,16 +26,19 @@ public class QuestionDTO extends RepresentationModel<QuestionDTO> {
 
     private QuestionType questionType;
 
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private Long userId;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<Integer> statisticsIds = new ArrayList<>();
 
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<Integer> categorySetIds = new ArrayList<>();
 
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private int questionImageId = 0;
 
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private int answerImageId= 0;
 
     public QuestionDTO(){};
@@ -125,6 +128,14 @@ public class QuestionDTO extends RepresentationModel<QuestionDTO> {
 
     public void setCategorySetIds(List<Integer> categorySetIds) {
         this.categorySetIds = categorySetIds;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     @Override

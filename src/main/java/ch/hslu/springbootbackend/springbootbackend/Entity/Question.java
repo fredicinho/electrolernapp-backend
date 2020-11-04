@@ -4,7 +4,6 @@ import ch.hslu.springbootbackend.springbootbackend.Utils.QuestionType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,7 +16,6 @@ public class Question{
     public Question(){}
 
     @Id
-    @NotNull
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
 
@@ -32,6 +30,9 @@ public class Question{
 
     private QuestionType questionType;
 
+    @ManyToOne(targetEntity = User.class, cascade = CascadeType.ALL)
+    private User createdByUser;
+
     @OneToMany(targetEntity = Statistic.class, cascade = CascadeType.ALL)
     private Set<Statistic> statistics = new HashSet<>();
 
@@ -45,14 +46,28 @@ public class Question{
     @ManyToMany(mappedBy = "questionsInSet")
     private List<CategorySet> categorySet;
 
-    public Question(String questionPhrase, List<Answer> possibleAnswers, List<Answer> correctAnswers, QuestionType questionType, List<CategorySet> categorySet, Media questionImage, Media solutionImage) {
-        this.setQuestionphrase(questionPhrase);
-        this.setPossibleAnswers(possibleAnswers);
-        this.setCorrectAnswers(correctAnswers);
-        this.setQuestionType(questionType);
-        this.setCategorySet(categorySet);
-        this.setQuestionImage(questionImage);
-        this.setAnswerImage(solutionImage);
+
+    public Question(String questionphrase, List<Answer> possibleAnswers, List<Answer> correctAnswers, QuestionType questionType, User createdBy, Set<Statistic> statistics, Media questionImage, Media answerImage, List<CategorySet> categorySet) {
+        this.questionphrase = questionphrase;
+        this.possibleAnswers = possibleAnswers;
+        this.correctAnswers = correctAnswers;
+        this.questionType = questionType;
+        this.createdByUser = createdBy;
+        this.statistics = statistics;
+        this.questionImage = questionImage;
+        this.answerImage = answerImage;
+        this.categorySet = categorySet;
+    }
+
+    public Question(String questionphrase, List<Answer> possibleAnswers, List<Answer> correctAnswers, QuestionType questionType, User user, List<CategorySet> categorySets, Media questionImage, Media answerImage) {
+        this.questionphrase = questionphrase;
+        this.possibleAnswers = possibleAnswers;
+        this.correctAnswers = correctAnswers;
+        this.questionType = questionType;
+        this.createdByUser = user;
+        this.questionImage = questionImage;
+        this.answerImage = answerImage;
+        this.categorySet = categorySets;
     }
 
     @PostPersist
@@ -65,6 +80,9 @@ public class Question{
         }
         for(int i =0; i < correctAnswers.size(); i++){
             correctAnswers.get(i).insertCorrectQuestion(this);
+        }
+        if(this.createdByUser != null){
+            this.createdByUser.getCreatedQuestions().add(this);
         }
     }
 
@@ -140,6 +158,14 @@ public class Question{
 
     public void setStatistics(Set<Statistic> statistics) {
         this.statistics = statistics;
+    }
+
+    public User getCreatedByUser() {
+        return createdByUser;
+    }
+
+    public void setCreatedByUser(User createdByUser) {
+        this.createdByUser = createdByUser;
     }
 
     public Question(String questionphrase, List<Answer> answers, List<Answer>  correctAnswers, QuestionType questionType) {

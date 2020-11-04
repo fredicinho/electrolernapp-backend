@@ -1,7 +1,6 @@
 package ch.hslu.springbootbackend.springbootbackend.controllers;
 
 import ch.hslu.springbootbackend.springbootbackend.DTO.QuestionDTO;
-import ch.hslu.springbootbackend.springbootbackend.Entity.Question;
 import ch.hslu.springbootbackend.springbootbackend.Exception.ResourceNotFoundException;
 import ch.hslu.springbootbackend.springbootbackend.Service.EntityService.QuestionService;
 import org.slf4j.Logger;
@@ -61,8 +60,19 @@ public class QuestionController {
 
     @PostMapping("")
     //@PreAuthorize("hasRole('ROLE_ADMIN')")
-    public Question newQuestion(@RequestBody QuestionDTO newQuestion) {
-        return questionService.createNewQuestion(newQuestion);
+    public ResponseEntity<QuestionDTO> newQuestion(@RequestBody QuestionDTO newQuestion) {
+        try {
+            QuestionDTO questionDTO = questionService.createNewQuestion(newQuestion);
+            return ResponseEntity
+                    .ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(questionDTO);
+        } catch (ResourceNotFoundException e) {
+            LOG.warn("Resource was not found: " + e.getMessage());
+            return ResponseEntity.
+                    notFound()
+                    .build();
+        }
     }
 
     @GetMapping("/{id}")
@@ -72,7 +82,6 @@ public class QuestionController {
         try {
             QuestionDTO foundedQuestion = questionService.getById(questionId);
             LOG.warn(foundedQuestion.toString());
-
             return ResponseEntity
                     .ok()
                     .contentType(MediaType.APPLICATION_JSON)
@@ -90,6 +99,18 @@ public class QuestionController {
         List<QuestionDTO> questionDTOS = new ArrayList<>();
         try {
             questionDTOS = questionService.getByCategorySetId(categorySetId);
+        } catch (ResourceNotFoundException e) {
+            e.printStackTrace();
+        }
+        return questionDTOS;
+    }
+
+
+    @GetMapping("/userId")
+    public List<QuestionDTO> getQuestionByUserId(@RequestParam long userId) {
+        List<QuestionDTO> questionDTOS = new ArrayList<>();
+        try {
+            questionDTOS = questionService.getByUserId(userId);
         } catch (ResourceNotFoundException e) {
             e.printStackTrace();
         }

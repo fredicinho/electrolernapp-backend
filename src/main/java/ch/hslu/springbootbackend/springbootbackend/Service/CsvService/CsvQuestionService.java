@@ -111,13 +111,14 @@ public class CsvQuestionService implements CsvService {
                         possibleAnswers,
                         correctAnswers,
                         questionType,
+                        null,
                         categorySet,
                         questionImage,
                         solutionImage
                 );
                 newQuestions.add(newQuestion);
                 LOG.warn(newQuestion.toString());
-                questionRepository.save(newQuestion);
+                //questionRepository.save(newQuestion);
             }
 
             return newQuestions;

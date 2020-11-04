@@ -1,12 +1,15 @@
 package ch.hslu.springbootbackend.springbootbackend.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -16,7 +19,7 @@ import java.util.Set;
 			@UniqueConstraint(columnNames = "email")
 		})
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class User {
+public class User extends RepresentationModel<User> {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -39,6 +42,9 @@ public class User {
 				joinColumns = @JoinColumn(name = "user_id"),
 				inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Set<Role> roles = new HashSet<>();
+
+	@OneToMany(targetEntity = Question.class, cascade = CascadeType.ALL)
+	private List<Question> createdQuestions = new ArrayList<>();
 
 
 	@OneToMany(targetEntity = Statistic.class, cascade = CascadeType.ALL)
@@ -97,5 +103,13 @@ public class User {
 
 	public void setRoles(Set<Role> roles) {
 		this.roles = roles;
+	}
+
+	public List<Question> getCreatedQuestions() {
+		return createdQuestions;
+	}
+
+	public void setCreatedQuestions(List<Question> createdQuestions) {
+		this.createdQuestions = createdQuestions;
 	}
 }
