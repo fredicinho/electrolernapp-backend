@@ -26,6 +26,7 @@ public class QuestionDTO extends RepresentationModel<QuestionDTO> {
 
     private QuestionType questionType;
 
+    private int pointsToAchieve;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Long userId;
 
@@ -42,13 +43,14 @@ public class QuestionDTO extends RepresentationModel<QuestionDTO> {
     private int answerImageId= 0;
 
     public QuestionDTO(){};
-    public QuestionDTO(Integer id, String questionphrase, QuestionType questionType) {
+    public QuestionDTO(Integer id, String questionphrase, QuestionType questionType, int pointsToAchieve) {
         this.id = id;
         this.questionphrase = questionphrase;
         this.questionType = questionType;
+        this.pointsToAchieve = pointsToAchieve;
     }
 
-    public QuestionDTO(String questionphrase, QuestionType questionType, List<Answer> possibleAnswer, List<Answer> correctAnswer, List<Integer> statisticsIds, int questionImageId, int answerImageId ) {
+    public QuestionDTO(String questionphrase, QuestionType questionType, List<Answer> possibleAnswer, List<Answer> correctAnswer, List<Integer> statisticsIds, int questionImageId, int answerImageId, int pointsToAchieve) {
         this.questionphrase = questionphrase;
         this.questionType = questionType;
         this.possibleAnswers = possibleAnswer;
@@ -56,6 +58,7 @@ public class QuestionDTO extends RepresentationModel<QuestionDTO> {
         this.statisticsIds = statisticsIds;
         this.questionImageId = questionImageId;
         this.answerImageId = answerImageId;
+        this.pointsToAchieve = pointsToAchieve;
     }
 
     public Integer getId() {
@@ -136,6 +139,14 @@ public class QuestionDTO extends RepresentationModel<QuestionDTO> {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public int getPointsToAchieve() {
+        return pointsToAchieve;
+    }
+
+    public void setPointsToAchieve(int pointsToAchieve) {
+        this.pointsToAchieve = pointsToAchieve;
     }
 
     @Override

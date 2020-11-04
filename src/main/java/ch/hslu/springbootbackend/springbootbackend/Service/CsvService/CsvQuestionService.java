@@ -99,6 +99,7 @@ public class CsvQuestionService implements CsvService {
                 QuestionType questionType = QuestionType.fromString("Multiple Choice");
                 Media questionImage = null;
                 Media solutionImage = null;
+                int pointsToAchieve = 2;
                 if (this.checkIfMediaAvailableInCsv(csvRecord.get("questionImageId"))) {
                     questionImage = this.getMediaById(Integer.parseInt(csvRecord.get("questionImageId")));
                 }
@@ -114,7 +115,8 @@ public class CsvQuestionService implements CsvService {
                         null,
                         categorySet,
                         questionImage,
-                        solutionImage
+                        solutionImage,
+                        pointsToAchieve
                 );
                 newQuestions.add(newQuestion);
                 LOG.warn(newQuestion.toString());

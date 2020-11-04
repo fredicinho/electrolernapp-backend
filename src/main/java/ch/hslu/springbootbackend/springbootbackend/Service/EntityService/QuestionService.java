@@ -48,16 +48,12 @@ public class QuestionService {
     public QuestionDTO createNewQuestion(QuestionDTO questionDTO) throws ResourceNotFoundException {
         
         List<Question> questions = questionRepository.findByQuestionphrase(questionDTO.getQuestionphrase());
-        LOG.warn(questionDTO.getCategorySetIds().toString());
-        LOG.warn(questionDTO.getUserId().toString());
-/*        if (!questions.isEmpty()) {
+        if (!questions.isEmpty()) {
             return this.generateQuestionDTOFromQuestion(questions.get(0).getId());
-        }*/
+        }
         Question question = this.generateQuestionFromQuestionDTO(questionDTO);
-        LOG.warn("in question"+question.getCategorySet().toString());
         question.setPossibleAnswers(this.checkIfAnswersExistsInDatabase(question.getPossibleAnswers()));
         question.setCorrectAnswers(this.checkIfAnswersExistsInDatabase(question.getCorrectAnswers()));
-        LOG.warn(question.toString());
         return this.generateQuestionDTOFromQuestion(questionRepository.save(question).getId());
     }
 
@@ -66,8 +62,6 @@ public class QuestionService {
     }
 
     public QuestionDTO getById(int questionId) throws ResourceNotFoundException {
-
-        LOG.warn("getByIdMethod");
         return this.generateQuestionDTOFromQuestion(questionId);
     }
 
@@ -96,8 +90,7 @@ public class QuestionService {
     private QuestionDTO generateQuestionDTOFromQuestion(int questionId) throws ResourceNotFoundException {
         Question question = questionRepository.findById(questionId).orElseThrow(
                 () -> new ResourceNotFoundException("Question not found for this id :: " + questionId ));
-        LOG.warn(question.toString());
-        QuestionDTO questionDTO = new QuestionDTO(questionId, question.getQuestionphrase(), question.getQuestionType());
+        QuestionDTO questionDTO = new QuestionDTO(questionId, question.getQuestionphrase(), question.getQuestionType(), question.getPointsToAchieve());
         questionDTO.setPossibleAnswers(answerRepository.findAnswersByQuestionPossibleList(question));
         questionDTO.setCorrectAnswers(answerRepository.findAnswersByQuestionCorrectList(question));
 
@@ -126,8 +119,6 @@ public class QuestionService {
 
     public Question generateQuestionFromQuestionDTO(QuestionDTO questionDTO) throws ResourceNotFoundException {
         Question question = null;
-        LOG.info("userId in generate "+questionDTO.getUserId().toString());
-        //LOG.info("categorySet in generate " + question.getCategorySet().toString());
         question = new Question(
                 questionDTO.getQuestionphrase(),
                 questionDTO.getPossibleAnswers(),
@@ -136,7 +127,9 @@ public class QuestionService {
                 this.getUser(questionDTO.getUserId()),
                 this.getCategorySets(questionDTO.getCategorySetIds()),
                 this.getImage(questionDTO.getQuestionImageId()),
-                this.getImage(questionDTO.getAnswerImageId()));
+                this.getImage(questionDTO.getAnswerImageId()),
+                questionDTO.getPointsToAchieve()
+                );
         return question;
     }
 

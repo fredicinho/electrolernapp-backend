@@ -30,6 +30,8 @@ public class Question{
 
     private QuestionType questionType;
 
+    private int pointsToAchieve;
+
     @ManyToOne(targetEntity = User.class, cascade = CascadeType.ALL)
     private User createdByUser;
 
@@ -47,19 +49,7 @@ public class Question{
     private List<CategorySet> categorySet;
 
 
-    public Question(String questionphrase, List<Answer> possibleAnswers, List<Answer> correctAnswers, QuestionType questionType, User createdBy, Set<Statistic> statistics, Media questionImage, Media answerImage, List<CategorySet> categorySet) {
-        this.questionphrase = questionphrase;
-        this.possibleAnswers = possibleAnswers;
-        this.correctAnswers = correctAnswers;
-        this.questionType = questionType;
-        this.createdByUser = createdBy;
-        this.statistics = statistics;
-        this.questionImage = questionImage;
-        this.answerImage = answerImage;
-        this.categorySet = categorySet;
-    }
-
-    public Question(String questionphrase, List<Answer> possibleAnswers, List<Answer> correctAnswers, QuestionType questionType, User user, List<CategorySet> categorySets, Media questionImage, Media answerImage) {
+    public Question(String questionphrase, List<Answer> possibleAnswers, List<Answer> correctAnswers, QuestionType questionType, User user, List<CategorySet> categorySets, Media questionImage, Media answerImage, int pointsToAchieve) {
         this.questionphrase = questionphrase;
         this.possibleAnswers = possibleAnswers;
         this.correctAnswers = correctAnswers;
@@ -68,8 +58,15 @@ public class Question{
         this.questionImage = questionImage;
         this.answerImage = answerImage;
         this.categorySet = categorySets;
+        this.pointsToAchieve = pointsToAchieve;
     }
-
+    public Question(String questionphrase, List<Answer> answers, List<Answer>  correctAnswers, QuestionType questionType, int pointsToAchieve) {
+        this.setQuestionphrase(questionphrase);
+        this.setPossibleAnswers(answers);
+        this.setCorrectAnswers(correctAnswers);
+        this.setQuestionType(questionType);
+        this.setPointsToAchieve(pointsToAchieve);
+    }
     @PostPersist
     private void addToCategorySet(){
         for(int i =0; i < categorySet.size(); i++){
@@ -168,11 +165,14 @@ public class Question{
         this.createdByUser = createdByUser;
     }
 
-    public Question(String questionphrase, List<Answer> answers, List<Answer>  correctAnswers, QuestionType questionType) {
-        this.setQuestionphrase(questionphrase);
-        this.setPossibleAnswers(answers);
-        this.setCorrectAnswers(correctAnswers);
-        this.setQuestionType(questionType);
+    public int getPointsToAchieve() {
+        return pointsToAchieve;
     }
+
+    public void setPointsToAchieve(int pointsToAchieve) {
+        this.pointsToAchieve = pointsToAchieve;
+    }
+
+
 
 }
