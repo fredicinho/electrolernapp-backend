@@ -39,8 +39,8 @@ public class MediaController {
         if (result.get() != null) {
             Media foundedMedia = result.get();
             // TODO: Uncomented path for local development
-            var imgFile = new FileSystemResource("/Users/fred/Downloads/Lernapp Elektro Data/" + foundedMedia.getPath());
-            //var imgFile = new FileSystemResource("/var/" + foundedMedia.getPath());
+            //var imgFile = new FileSystemResource("/Users/fred/Downloads/Lernapp Elektro Data/" + foundedMedia.getPath());
+            var imgFile = new FileSystemResource("/var/" + foundedMedia.getPath());
             byte[] bytes = new byte[0];
             try {
                 bytes = StreamUtils.copyToByteArray(imgFile.getInputStream());
