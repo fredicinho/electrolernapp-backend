@@ -173,6 +173,20 @@ public class Question{
         this.pointsToAchieve = pointsToAchieve;
     }
 
-
-
+    @Override
+    public String toString() {
+        return "Question{" +
+                "id=" + id +
+                ", questionphrase='" + questionphrase + '\'' +
+                ", possibleAnswers=" + possibleAnswers +
+                ", correctAnswers=" + correctAnswers +
+                ", questionType=" + questionType +
+                ", pointsToAchieve=" + pointsToAchieve +
+                ", createdByUser=" + createdByUser +
+                ", statistics=" + statistics +
+                ", questionImage=" + questionImage +
+                ", answerImage=" + answerImage +
+                ", categorySet=" + categorySet +
+                '}';
+    }
 }

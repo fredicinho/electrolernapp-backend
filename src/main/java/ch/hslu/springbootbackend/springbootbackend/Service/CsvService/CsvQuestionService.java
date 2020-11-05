@@ -58,43 +58,37 @@ public class CsvQuestionService implements CsvService {
              CSVParser csvParser = new CSVParser(fileReader,
                      CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim());) {
 
-            List<Question> newQuestions = new ArrayList<Question>();
+            List<Question> newQuestions = new ArrayList<>();
 
             Iterable<CSVRecord> csvRecords = csvParser.getRecords();
-
 
             for (CSVRecord csvRecord : csvRecords) {
                 List<CategorySet> categorySet = new ArrayList<>();
                 try {
-                    Optional<CategorySet> categorySet1 = categorySetRepository.findById(Integer.valueOf(csvRecord.get("chapterId")));
-                    int id = Integer.parseInt(csvRecord.get("chapterId"));
-                    if(categorySet1.isPresent()){
-                        categorySet.add(categorySet1.get());
-                        categorySetRepository.save(categorySet.get(0));
-                    }else{
-                        LOG.warn("category set  "+Integer.parseInt(csvRecord.get("chapterId"))+ " not found");
-                    }
-
+                    CategorySet foundedCategorySet = this.getCategorySet(Integer.parseInt(csvRecord.get("chapterId")));
+                    categorySet.add(foundedCategorySet);
                 } catch (NumberFormatException ex) {
                     LOG.warn("Couldn't parse the founded Chapter ID :: " + csvRecord.get("chapterId") + " of the Data :: " + csvRecord.toString());
                     continue;
                 }
+
                 List<Answer> possibleAnswers = new ArrayList<>();
-                for (int i = 1; i<=5; i++) {
-                    Answer answer;
-                    Optional<Answer> newAnswer = answerRepository.findByAnswerPhrase(escapeAndEncodeString(csvRecord.get("Answer" + i)));
-                    if(newAnswer.isPresent()){
-                        answer = newAnswer.get();
-                        answerRepository.save(answer);
-                    }else{
-                        answer = new Answer(escapeAndEncodeString(csvRecord.get("Answer" + i)));
-                        answerRepository.save(answer);
+                for (int i = 1; i <= 5; i++) {
+                    String answerPhrase = csvRecord.get("Answer" + i);
+                    if (this.checkIfAnswerIsEmpty(answerPhrase)) {
+                        continue;
                     }
-                    possibleAnswers.add(answer);
-
-
+                    String escapedAndEncodedString = this.escapeAndEncodeString(answerPhrase);
+                    Optional<Answer> foundedAnswer = answerRepository.findByAnswerPhrase(escapedAndEncodedString);
+                    if (foundedAnswer.isPresent()) {
+                        possibleAnswers.add(foundedAnswer.get());
+                    } else {
+                        Answer newAnswerOfQuestion = new Answer(escapedAndEncodedString);
+                        possibleAnswers.add(answerRepository.save(newAnswerOfQuestion));
+                    }
                 }
-                List<Answer> correctAnswers = parseLetterToAnswer(csvRecord.get("CorrectAnswerAsLetter"), possibleAnswers);
+
+                List<Answer> correctAnswers = this.parseLettersToAnswers(csvRecord.get("CorrectAnswerAsLetter"), possibleAnswers);
                 QuestionType questionType = QuestionType.fromString("Multiple Choice");
                 Media questionImage = null;
                 Media solutionImage = null;
@@ -117,11 +111,11 @@ public class CsvQuestionService implements CsvService {
                         solutionImage,
                         pointsToAchieve
                 );
-                newQuestions.add(newQuestion);
-                LOG.warn(newQuestion.toString());
-                questionRepository.save(newQuestion);
-            }
 
+                LOG.warn(newQuestion.toString());
+                Question newPersistedQuestion = questionRepository.save(newQuestion);
+                newQuestions.add(newPersistedQuestion);
+            }
             return newQuestions;
         } catch (IOException e) {
             throw new RuntimeException("fail to parse CSV file: " + e.getMessage());
@@ -137,8 +131,8 @@ public class CsvQuestionService implements CsvService {
      */
 
 
-    private boolean checkIfAnswerIsVoid(String answerPhrase) {
-        if (answerPhrase == "VOID" || answerPhrase == "") {
+    private boolean checkIfAnswerIsEmpty(String answerPhrase) {
+        if (answerPhrase.equalsIgnoreCase("VOID") || answerPhrase.equalsIgnoreCase("")) {
             return true;
         }
         return false;
@@ -155,29 +149,28 @@ public class CsvQuestionService implements CsvService {
     }
 
 
-    private List<Answer> parseLetterToAnswer(String answerAsLetter, List<Answer> possibleAnswers) {
-        List<Answer> correctAnswer = new LinkedList<>();
-        if (answerAsLetter.contains("a")) {
-            correctAnswer.add(possibleAnswers.get(0));
+    private List<Answer> parseLettersToAnswers(String answersAsLetters, List<Answer> possibleAnswers) {
+        List<Answer> correctAnswers = new ArrayList<>();
+        if (answersAsLetters.contains("a")) {
+            correctAnswers.add(possibleAnswers.get(0));
         }
-        if (answerAsLetter.contains("b")) {
-            correctAnswer.add(possibleAnswers.get(1));
+        if (answersAsLetters.contains("b")) {
+            correctAnswers.add(possibleAnswers.get(1));
         }
-        if (answerAsLetter.contains("c")) {
-            correctAnswer.add(possibleAnswers.get(2));
+        if (answersAsLetters.contains("c")) {
+            correctAnswers.add(possibleAnswers.get(2));
         }
-        if (answerAsLetter.contains("d")) {
-            correctAnswer.add(possibleAnswers.get(3));
+        if (answersAsLetters.contains("d")) {
+            correctAnswers.add(possibleAnswers.get(3));
         }
-        if (answerAsLetter.contains("e")) {
-            correctAnswer.add(possibleAnswers.get(4));
+        if (answersAsLetters.contains("e")) {
+            correctAnswers.add(possibleAnswers.get(4));
         }
-
-        return correctAnswer;
+        return correctAnswers;
     }
 
     private String escapeAndEncodeString(final String string) {
-        String escapedSpanTagInString = string.replaceAll("<(/|S)[^>]*>", "");
+        String escapedSpanTagInString = string.replaceAll("<(/|S|B)[^>]*>", "");
         String escapedAndEncodedHTMLEntitiesInString = StringEscapeUtils.unescapeHtml4(escapedSpanTagInString);
         return escapedAndEncodedHTMLEntitiesInString;
     }
