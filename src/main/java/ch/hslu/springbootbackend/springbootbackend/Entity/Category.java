@@ -1,9 +1,10 @@
 package ch.hslu.springbootbackend.springbootbackend.Entity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.ExamSet;
+
+import javax.persistence.*;
+import java.util.LinkedList;
+import java.util.List;
 
 @Entity
 public class Category {
@@ -29,6 +30,9 @@ public class Category {
 
     private String description;
 
+    @ManyToMany(mappedBy = "categoriesInExamSet")
+    private List<ExamSet> examSets = new LinkedList<>();
+
     public Integer getId() {
         return id;
     }
@@ -53,6 +57,13 @@ public class Category {
         this.description = description;
     }
 
+    public List<ExamSet> getExamSets() {
+        return examSets;
+    }
+
+    public void setExamSets(List<ExamSet> examSets) {
+        this.examSets = examSets;
+    }
     @Override
     public String toString() {
         return "Categorie{" +

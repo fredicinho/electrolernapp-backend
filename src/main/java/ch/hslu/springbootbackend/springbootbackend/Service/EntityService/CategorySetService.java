@@ -1,7 +1,7 @@
 package ch.hslu.springbootbackend.springbootbackend.Service.EntityService;
 
 import ch.hslu.springbootbackend.springbootbackend.DTO.CategorySetDTO;
-import ch.hslu.springbootbackend.springbootbackend.Entity.CategorySet;
+import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.CategorySet;
 import ch.hslu.springbootbackend.springbootbackend.Exception.ResourceNotFoundException;
 import ch.hslu.springbootbackend.springbootbackend.Repository.CategorySetRepository;
 import ch.hslu.springbootbackend.springbootbackend.controllers.CategoryController;

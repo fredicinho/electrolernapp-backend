@@ -1,16 +1,14 @@
 package ch.hslu.springbootbackend.springbootbackend.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(	name = "users",
@@ -43,12 +41,23 @@ public class User extends RepresentationModel<User> {
 				inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Set<Role> roles = new HashSet<>();
 
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@OneToMany(targetEntity = Question.class, cascade = CascadeType.ALL)
 	private List<Question> createdQuestions = new ArrayList<>();
 
-
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@OneToMany(targetEntity = Statistic.class, cascade = CascadeType.ALL)
 	private Set<Statistic> statistics;
+
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(
+			name = "schoolClass_user",
+			joinColumns = @JoinColumn(name = "userId"),
+			inverseJoinColumns = @JoinColumn(name = "schoolClassId"))
+	private List<SchoolClass> inSchoolClasses = new LinkedList<>();
+
+
 	public User() {
 	}
 
@@ -56,6 +65,17 @@ public class User extends RepresentationModel<User> {
 		this.username = username;
 		this.email = email;
 		this.password = password;
+	}
+	@PostPersist
+	private void assignFKs(){
+		for(int i =0; i < getInSchoolClasses().size(); i++){
+			getInSchoolClasses().get(i).insertUser(this);
+		}
+	}
+
+
+	public void insertSchoolClass(SchoolClass schoolClass){
+		this.getInSchoolClasses().add(schoolClass);
 	}
 
 	public Set<Statistic> getStatistics() {
@@ -112,4 +132,13 @@ public class User extends RepresentationModel<User> {
 	public void setCreatedQuestions(List<Question> createdQuestions) {
 		this.createdQuestions = createdQuestions;
 	}
+
+	public List<SchoolClass> getInSchoolClasses() {
+		return inSchoolClasses;
+	}
+
+	public void setInSchoolClasses(List<SchoolClass> inSchoolClasses) {
+		this.inSchoolClasses = inSchoolClasses;
+	}
+
 }

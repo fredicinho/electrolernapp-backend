@@ -1,4 +1,7 @@
-package ch.hslu.springbootbackend.springbootbackend.Entity;
+package ch.hslu.springbootbackend.springbootbackend.Entity.Sets;
+
+import ch.hslu.springbootbackend.springbootbackend.Entity.Category;
+import ch.hslu.springbootbackend.springbootbackend.Entity.Question;
 
 import javax.persistence.*;
 import java.util.LinkedList;
@@ -18,11 +21,10 @@ public class CategorySet {
     }
 
     @Id
+    @GeneratedValue(strategy= GenerationType.SEQUENCE, generator = "sec")
     private Integer categorySetId;
 
-    // TODO: Für Migration muss "GeneratedValue" auskommentiert werden da IDs übernommen werden sollen!!!
     @OneToOne(targetEntity = Category.class, cascade = CascadeType.ALL)
-    @GeneratedValue(strategy= GenerationType.SEQUENCE, generator = "sec")
     private Category category;
     private String title;
 

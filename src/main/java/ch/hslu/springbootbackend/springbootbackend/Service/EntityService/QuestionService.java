@@ -2,6 +2,8 @@ package ch.hslu.springbootbackend.springbootbackend.Service.EntityService;
 
 import ch.hslu.springbootbackend.springbootbackend.DTO.QuestionDTO;
 import ch.hslu.springbootbackend.springbootbackend.Entity.*;
+import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.CategorySet;
+import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.ExamSet;
 import ch.hslu.springbootbackend.springbootbackend.Exception.ResourceNotFoundException;
 import ch.hslu.springbootbackend.springbootbackend.Repository.*;
 import ch.hslu.springbootbackend.springbootbackend.controllers.MediaController;
@@ -41,6 +43,9 @@ public class QuestionService {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    ExamSetRepository examSetRepository;
+
     private final Logger LOG = LoggerFactory.getLogger(QuestionController.class);
 
 
@@ -72,6 +77,17 @@ public class QuestionService {
         if(categorySetOptional.isPresent()){
             CategorySet categorySet = categorySetOptional.get();
             questions = questionRepository.findQuestionByCategorySet(categorySet);
+        }
+        return generateQuestionDTOFromQuestion(questions);
+    }
+
+    public List<QuestionDTO> getByExamSet(Integer examSetId)throws ResourceNotFoundException {
+        //return questionRepository.findAll();//questionRepository.find(categorySetId);
+        Optional<ExamSet> examSetOptional = examSetRepository.findById(examSetId);
+        List<Question> questions = new ArrayList<>();
+        if(examSetOptional.isPresent()){
+            ExamSet examSet = examSetOptional.get();
+            questions = questionRepository.findQuestionByExamSets(examSet);
         }
         return generateQuestionDTOFromQuestion(questions);
     }

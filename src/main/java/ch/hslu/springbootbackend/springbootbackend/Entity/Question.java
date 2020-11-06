@@ -1,5 +1,7 @@
 package ch.hslu.springbootbackend.springbootbackend.Entity;
 
+import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.CategorySet;
+import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.ExamSet;
 import ch.hslu.springbootbackend.springbootbackend.Utils.QuestionType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -49,6 +51,10 @@ public class Question{
     private List<CategorySet> categorySet;
 
 
+    @ManyToMany(mappedBy = "questionsInExamSet")
+    private List<ExamSet> examSets;
+
+
     public Question(String questionphrase, List<Answer> possibleAnswers, List<Answer> correctAnswers, QuestionType questionType, User user, List<CategorySet> categorySets, Media questionImage, Media answerImage, int pointsToAchieve) {
         this.questionphrase = questionphrase;
         this.possibleAnswers = possibleAnswers;
@@ -68,7 +74,7 @@ public class Question{
         this.setPointsToAchieve(pointsToAchieve);
     }
     @PostPersist
-    private void addToCategorySet(){
+    private void assignFKs(){
         for(int i =0; i < categorySet.size(); i++){
             categorySet.get(i).insertQuestion(this);
         }
@@ -172,6 +178,15 @@ public class Question{
     public void setPointsToAchieve(int pointsToAchieve) {
         this.pointsToAchieve = pointsToAchieve;
     }
+
+    public List<ExamSet> getExamSets() {
+        return examSets;
+    }
+
+    public void setExamSets(List<ExamSet> examSets) {
+        this.examSets = examSets;
+    }
+
 
     @Override
     public String toString() {

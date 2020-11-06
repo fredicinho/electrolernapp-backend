@@ -1,7 +1,7 @@
 package ch.hslu.springbootbackend.springbootbackend.Service.CsvService;
 
 import ch.hslu.springbootbackend.springbootbackend.Entity.Category;
-import ch.hslu.springbootbackend.springbootbackend.Entity.CategorySet;
+import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.CategorySet;
 import ch.hslu.springbootbackend.springbootbackend.Repository.CategoryRepository;
 import ch.hslu.springbootbackend.springbootbackend.Repository.CategorySetRepository;
 import org.apache.commons.csv.CSVFormat;

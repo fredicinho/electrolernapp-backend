@@ -1,7 +1,7 @@
 package ch.hslu.springbootbackend.springbootbackend.Service.CsvService;
 
 import ch.hslu.springbootbackend.springbootbackend.Entity.Answer;
-import ch.hslu.springbootbackend.springbootbackend.Entity.CategorySet;
+import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.CategorySet;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Media;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Question;
 import ch.hslu.springbootbackend.springbootbackend.Repository.AnswerRepository;

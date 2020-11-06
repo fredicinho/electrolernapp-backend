@@ -105,6 +105,18 @@ public class QuestionController {
         return questionDTOS;
     }
 
+    @GetMapping("/examSet")
+    public List<QuestionDTO> getQuestionsByExamSet(@RequestParam int examSetId) {
+        List<QuestionDTO> questionDTOS = new ArrayList<>();
+        try {
+            questionDTOS = questionService.getByExamSet(examSetId);
+        } catch (ResourceNotFoundException e) {
+            e.printStackTrace();
+        }
+        return questionDTOS;
+    }
+
+
 
     @GetMapping("/userId")
     public List<QuestionDTO> getQuestionByUserId(@RequestParam long userId) {

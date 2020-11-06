@@ -1,6 +1,6 @@
 package ch.hslu.springbootbackend.springbootbackend.Repository;
 
-import ch.hslu.springbootbackend.springbootbackend.Entity.CategorySet;
+import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.CategorySet;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

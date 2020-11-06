@@ -6,16 +6,13 @@ public class CategorySetDTO extends RepresentationModel<CategorySetDTO> {
     public CategorySetDTO(Integer categorySetId, String title, String categorySetNumber){
         this.categorySetId = categorySetId;
         this.title = title;
+        this.categorySetNumber = categorySetNumber;
     }
     private Integer categorySetId;
-
-    //private Category category;
 
     private String title;
 
     private String categorySetNumber;
-
-    //private List<Long> questionsInSet = new LinkedList<>();
 
     public Integer getCategorySetId() {
         return categorySetId;
