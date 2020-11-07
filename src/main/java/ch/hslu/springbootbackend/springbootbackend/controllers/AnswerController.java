@@ -2,9 +2,9 @@ package ch.hslu.springbootbackend.springbootbackend.controllers;
 
 import ch.hslu.springbootbackend.springbootbackend.Entity.Answer;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Question;
-import ch.hslu.springbootbackend.springbootbackend.Exception.ResourceNotFoundException;
 import ch.hslu.springbootbackend.springbootbackend.Repository.AnswerRepository;
 import ch.hslu.springbootbackend.springbootbackend.Service.EntityService.QuestionService;
+import ch.hslu.springbootbackend.springbootbackend.Strategy.DTOParserQuestion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +22,15 @@ public class AnswerController {
 
     private final Logger LOG = LoggerFactory.getLogger(QuestionController.class);
 
+
     @Autowired
     AnswerRepository answerRepository;
 
     @Autowired
     QuestionService questionService;
+
+    @Autowired
+    DTOParserQuestion dtoParserQuestion;
 
     @GetMapping("/{id}")
     public ResponseEntity<Answer> getByAnswerId(@PathVariable(value = "id") Integer answerId) {
@@ -46,14 +50,14 @@ public class AnswerController {
         }
     }
 
-    public List<Answer> getPossibleAnswersByQuestion(@RequestParam int questionId) throws ResourceNotFoundException {
-        Question question = questionService.generateQuestionFromQuestionDTO(questionService.getById(questionId));
+    public List<Answer> getPossibleAnswersByQuestion(@RequestParam int questionId){
+        Question question = (Question) dtoParserQuestion.generateObjectFromDTO(questionService.getById(questionId));
         return answerRepository.findAnswersByQuestionPossibleList(question);
     }
 
-    public List<Answer> getCorrectAnswersByQuestion(@RequestParam int questionId) throws ResourceNotFoundException {
+    public List<Answer> getCorrectAnswersByQuestion(@RequestParam int questionId){
         LOG.warn("peterpan");
-        Question question = questionService.generateQuestionFromQuestionDTO(questionService.getById(questionId));
+        Question question = (Question) dtoParserQuestion.generateObjectFromDTO(questionService.getById(questionId));
         return answerRepository.findAnswersByQuestionPossibleList(question);
     }
 }

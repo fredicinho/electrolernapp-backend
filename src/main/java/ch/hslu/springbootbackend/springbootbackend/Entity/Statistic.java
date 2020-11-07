@@ -8,7 +8,7 @@ import java.util.Date;
 public class Statistic{
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    private Integer StatisticId;
+    private Integer statisticId;
     private Date date;
     private int pointsAchieved;
     private boolean isMarked;
@@ -21,11 +21,10 @@ public class Statistic{
     @JoinColumn(name="FK_questionId", nullable=false)
     private Question question;
 
-    public Statistic(int pointsAchieved, boolean isMarked, User user, Question question) {
+    public Statistic(Date date, int pointsAchieved, boolean isMarked) {
+        this.date = date;
         this.pointsAchieved = pointsAchieved;
         this.isMarked = isMarked;
-        this.user = user;
-        this.question = question;
     }
 
     @PrePersist
@@ -38,12 +37,14 @@ public class Statistic{
         this.question.getStatistics().add(this);
         this.user.getStatistics().add(this);
     }
+
+    public Statistic(){};
     public Integer getStatisticId() {
-        return StatisticId;
+        return statisticId;
     }
 
     public void setStatisticId(Integer statisticId) {
-        StatisticId = statisticId;
+        this.statisticId = statisticId;
     }
 
     public Date getDate() {

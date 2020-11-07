@@ -40,6 +40,7 @@ public class SchoolClassDTO extends RepresentationModel<SchoolClassDTO> {
         this.description = description;
     }
 
+
     public String getName() {
         return name;
     }

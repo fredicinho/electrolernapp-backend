@@ -50,7 +50,7 @@ public class CategorySetService {
         List<CategorySetDTO> categorySetDTOS = new ArrayList<>();
         for(CategorySet categorySet:list) {
             CategorySetDTO categorySetDTO = new CategorySetDTO(categorySet.getCategorySetId(), categorySet.getTitle(), categorySet.getCategorySetNumber());
-            categorySetDTO.add(linkTo(methodOn(CategoryController.class).getCategoryById(categorySet.getCategorySetId())).withRel("questionsInSet"));
+            categorySetDTO.add(linkTo(methodOn(CategoryController.class).getCategoryById(categorySet.getCategorySetId())).withRel("category"));
             categorySetDTO.add(linkTo(methodOn(QuestionController.class).getQuestionsByCategorySet(categorySet.getCategorySetId())).withRel("questionsInSet"));
             categorySetDTOS.add(categorySetDTO);
         }

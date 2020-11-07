@@ -1,15 +1,15 @@
 package ch.hslu.springbootbackend.springbootbackend.Service.EntityService;
 
 import ch.hslu.springbootbackend.springbootbackend.DTO.QuestionDTO;
-import ch.hslu.springbootbackend.springbootbackend.Entity.*;
+import ch.hslu.springbootbackend.springbootbackend.Entity.Answer;
+import ch.hslu.springbootbackend.springbootbackend.Entity.Question;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.CategorySet;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.ExamSet;
+import ch.hslu.springbootbackend.springbootbackend.Entity.User;
 import ch.hslu.springbootbackend.springbootbackend.Exception.ResourceNotFoundException;
 import ch.hslu.springbootbackend.springbootbackend.Repository.*;
-import ch.hslu.springbootbackend.springbootbackend.controllers.MediaController;
+import ch.hslu.springbootbackend.springbootbackend.Strategy.DTOParserQuestion;
 import ch.hslu.springbootbackend.springbootbackend.controllers.QuestionController;
-import ch.hslu.springbootbackend.springbootbackend.controllers.StatisticController;
-import ch.hslu.springbootbackend.springbootbackend.controllers.UserController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +18,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Service
 public class QuestionService {
@@ -46,28 +43,34 @@ public class QuestionService {
     @Autowired
     ExamSetRepository examSetRepository;
 
+    @Autowired
+    DTOParserQuestion dtoParserQuestion;
+
     private final Logger LOG = LoggerFactory.getLogger(QuestionController.class);
 
 
+    private boolean ressourceExists = false;
 
-    public QuestionDTO createNewQuestion(QuestionDTO questionDTO) throws ResourceNotFoundException {
-        
+
+    public QuestionDTO createNewQuestion(QuestionDTO questionDTO){
+
         List<Question> questions = questionRepository.findByQuestionphrase(questionDTO.getQuestionphrase());
         if (!questions.isEmpty()) {
-            return this.generateQuestionDTOFromQuestion(questions.get(0).getId());
+            ressourceExists = true;
+            return dtoParserQuestion.generateDTOFromObject(questions.get(0).getId());
         }
-        Question question = this.generateQuestionFromQuestionDTO(questionDTO);
+        Question question = (Question)dtoParserQuestion.generateObjectFromDTO(questionDTO);
         question.setPossibleAnswers(this.checkIfAnswersExistsInDatabase(question.getPossibleAnswers()));
         question.setCorrectAnswers(this.checkIfAnswersExistsInDatabase(question.getCorrectAnswers()));
-        return this.generateQuestionDTOFromQuestion(questionRepository.save(question).getId());
+        return (QuestionDTO) dtoParserQuestion.generateDTOFromObject(questionRepository.save(question).getId());
     }
 
-    public List<QuestionDTO> getAllQuestions() throws ResourceNotFoundException {
-        return generateQuestionDTOFromQuestion(questionRepository.findAll());
+    public List<QuestionDTO> getAllQuestions(){
+        return (List<QuestionDTO>) dtoParserQuestion.generateDTOsFromObjects(questionRepository.findAll());
     }
 
-    public QuestionDTO getById(int questionId) throws ResourceNotFoundException {
-        return this.generateQuestionDTOFromQuestion(questionId);
+    public QuestionDTO getById(int questionId){
+        return dtoParserQuestion.generateDTOFromObject(questionId);
     }
 
     public List<QuestionDTO> getByCategorySetId(Integer categorySetId) throws ResourceNotFoundException {
@@ -78,10 +81,10 @@ public class QuestionService {
             CategorySet categorySet = categorySetOptional.get();
             questions = questionRepository.findQuestionByCategorySet(categorySet);
         }
-        return generateQuestionDTOFromQuestion(questions);
+        return (List<QuestionDTO>)dtoParserQuestion.generateDTOsFromObjects(questions);
     }
 
-    public List<QuestionDTO> getByExamSet(Integer examSetId)throws ResourceNotFoundException {
+    public List<QuestionDTO> getByExamSet(Integer examSetId){
         //return questionRepository.findAll();//questionRepository.find(categorySetId);
         Optional<ExamSet> examSetOptional = examSetRepository.findById(examSetId);
         List<Question> questions = new ArrayList<>();
@@ -89,7 +92,7 @@ public class QuestionService {
             ExamSet examSet = examSetOptional.get();
             questions = questionRepository.findQuestionByExamSets(examSet);
         }
-        return generateQuestionDTOFromQuestion(questions);
+        return (List<QuestionDTO>)dtoParserQuestion.generateDTOsFromObjects(questions);
     }
 
     public List<QuestionDTO> getByUserId(Long userId) throws ResourceNotFoundException {
@@ -100,130 +103,29 @@ public class QuestionService {
             User user = userOptional.get();
             questions = questionRepository.findQuestionByCreatedByUser(user);
         }
-        return generateQuestionDTOFromQuestion(questions);
+        return (List<QuestionDTO>)dtoParserQuestion.generateDTOsFromObjects(questions);
     }
 
-    private QuestionDTO generateQuestionDTOFromQuestion(int questionId) throws ResourceNotFoundException {
-        Question question = questionRepository.findById(questionId).orElseThrow(
-                () -> new ResourceNotFoundException("Question not found for this id :: " + questionId ));
-        QuestionDTO questionDTO = new QuestionDTO(questionId, question.getQuestionphrase(), question.getQuestionType(), question.getPointsToAchieve());
-        questionDTO.setPossibleAnswers(answerRepository.findAnswersByQuestionPossibleList(question));
-        questionDTO.setCorrectAnswers(answerRepository.findAnswersByQuestionCorrectList(question));
-
-        //questionDTO.add(linkTo(methodOn(AnswerController.class).getPossibleAnswersByQuestion(questionId)).withRel("possibleAnswers"));
-        //questionDTO.add(linkTo(methodOn(AnswerController.class).getCorrectAnswersByQuestion(questionId)).withRel("correctAnswers"));
-        questionDTO.add(linkTo(methodOn(StatisticController.class).getStatisticByQuestionId(questionId)).withRel("statistics"));
-
-        if(checkIfQuestionImageExists(question)){
-            questionDTO.add(linkTo(methodOn(MediaController.class).getMedia(question.getQuestionImage().getId())).withRel("questionImage"));
-        }
-        if(checkIfAnswerImageExists(question)){
-            questionDTO.add(linkTo(methodOn(MediaController.class).getMedia(question.getAnswerImage().getId())).withRel("answerImage"));
-        }
-        if(checkIfUserExists(question)){
-            questionDTO.add(linkTo(methodOn(UserController.class).getUserById(question.getCreatedByUser().getId())).withRel("createdBy"));
-        }
-        return questionDTO;
-    }
-    private List<QuestionDTO> generateQuestionDTOFromQuestion(List<Question> questions) throws ResourceNotFoundException {
-        List<QuestionDTO> questionDTO = new ArrayList<>();
-        for(Question question:questions){
-            questionDTO.add(generateQuestionDTOFromQuestion(question.getId()));
-        }
-        return questionDTO;
-    }
-
-    public Question generateQuestionFromQuestionDTO(QuestionDTO questionDTO) throws ResourceNotFoundException {
-        Question question = null;
-        question = new Question(
-                questionDTO.getQuestionphrase(),
-                questionDTO.getPossibleAnswers(),
-                questionDTO.getCorrectAnswers(),
-                questionDTO.getQuestionType(),
-                this.getUser(questionDTO.getUserId()),
-                this.getCategorySets(questionDTO.getCategorySetIds()),
-                this.getImage(questionDTO.getQuestionImageId()),
-                this.getImage(questionDTO.getAnswerImageId()),
-                questionDTO.getPointsToAchieve()
-                );
-        return question;
-    }
-
-    private List<Statistic> getStatistics(List<Integer> statisticIds){
-        List<Statistic> stat = new ArrayList<>();
-        for(Integer statisticId :statisticIds){
-            Optional<Statistic> statisticOptional = statisticRepository.findById(statisticId);
-            if(statisticOptional.isPresent()){
-                stat.add(statisticOptional.get());
-            }
-        }
-        return stat;
-    }
-
-    private List<CategorySet> getCategorySets(List<Integer> categorySetIds){
-        List<CategorySet> categorySets = new ArrayList<>();
-        for(Integer categorySetId :categorySetIds){
-            Optional<CategorySet> categorySetOptional = categorySetRepository.findById(categorySetId);
-            if(categorySetOptional.isPresent()){
-                categorySets.add(categorySetOptional.get());
-            }
-        }
-        return categorySets;
-    }
-
-    private User getUser(long userId) throws ResourceNotFoundException {
-        return userRepository.findById(userId).orElseThrow(
-                () -> new ResourceNotFoundException("User not found for this id :: " + userId ));
-    }
-
-    private Media getImage(int imageId) throws ResourceNotFoundException {
-        return mediaRepository.findById(imageId).orElseThrow(
-                () -> new ResourceNotFoundException("Image not found for this id :: " + imageId ));
-    }
-    private boolean checkIfAnswerImageExists(Question question){
-        if(question.getAnswerImage() != null){
-            return true;
-        }else{
-            return false;
-        }
-    }
-    private boolean checkIfQuestionImageExists(Question question){
-        if(question.getQuestionImage() != null){
-            return true;
-        }else{
-            return false;
-        }
-    }
-    private boolean checkIfUserExists(Question question){
-        if(question.getCreatedByUser() != null){
-            return true;
-        }else{
-            return false;
-        }
-    }
     private List<Answer> checkIfAnswersExistsInDatabase(List<Answer> answerList){
-    List<Answer> list = new ArrayList<>();
+        List<Answer> list = new ArrayList<>();
         for(Answer answer:answerList){
-        Optional<Answer> newAnswer = answerRepository.findByAnswerPhrase(answer.getAnswerPhrase());
-        if(newAnswer.isPresent()){
-            answer = newAnswer.get();
-            answerRepository.save(answer);
-            list.add(answer);
-        }else {
-            answer = new Answer(answer.getAnswerPhrase());
-            list.add(answer);
-            answerRepository.save(answer);
-        }
+            Optional<Answer> newAnswer = answerRepository.findByAnswerPhrase(answer.getAnswerPhrase());
+            if(newAnswer.isPresent()){
+                answer = newAnswer.get();
+                answerRepository.save(answer);
+                list.add(answer);
+            }else {
+                answer = new Answer(answer.getAnswerPhrase());
+                list.add(answer);
+                answerRepository.save(answer);
+            }
         }
         return list;
     }
-    private boolean checkIfUserExists(long userId){
-        Optional<User> userOptional = userRepository.findById(userId);
-        if(userOptional.isPresent()){
-            return true;
-        }else{
-            return false;
-        }
+
+    public boolean ressourceExists() {
+        return ressourceExists;
     }
+
 
 }

@@ -1,17 +1,16 @@
 package ch.hslu.springbootbackend.springbootbackend.controllers;
 
 import ch.hslu.springbootbackend.springbootbackend.DTO.SchoolClassDTO;
-import ch.hslu.springbootbackend.springbootbackend.Exception.ResourceNotFoundException;
 import ch.hslu.springbootbackend.springbootbackend.Repository.UserRepository;
 import ch.hslu.springbootbackend.springbootbackend.Service.EntityService.SchoolClassService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -29,15 +28,21 @@ public class SchoolClassController {
 
     @PostMapping("")
     //@PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<SchoolClassDTO> newSchoolClass(@RequestBody SchoolClassDTO schoolClassDTO) {
-        try {
-            SchoolClassDTO schoolClassDTO1 = schoolClassService.createNewSchoolClass(schoolClassDTO);
-            return ResponseEntity
-                    .ok()
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(schoolClassDTO1);
-        } catch (ResourceNotFoundException e) {
-            LOG.warn("Resource was not found: " + e.getMessage());
+    public ResponseEntity<SchoolClassDTO> newSchoolClass(@RequestBody SchoolClassDTO newSchoolClass) {
+            SchoolClassDTO schoolClassDTO = schoolClassService.createNewSchoolClass(newSchoolClass);
+        if(schoolClassDTO != null) {
+            if(schoolClassService.ressourceExists()){
+                return ResponseEntity
+                        .status(HttpStatus.CONFLICT)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(schoolClassDTO);
+            }else
+                return ResponseEntity
+                        .status(HttpStatus.CREATED)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(schoolClassDTO);
+        }
+        else{
             return ResponseEntity.
                     notFound()
                     .build();
@@ -46,12 +51,8 @@ public class SchoolClassController {
 
     @GetMapping("/user")
     public List<SchoolClassDTO> getSchoolClassesByUser(@RequestParam long userId) {
-        List<SchoolClassDTO> schoolClassDTOS = new ArrayList<>();
-        try {
-            schoolClassDTOS = schoolClassService.getAllSchoolClassesFromUser(userId);
-        } catch (ResourceNotFoundException e) {
-            e.printStackTrace();
-        }
+        List<SchoolClassDTO> schoolClassDTOS = schoolClassService.getAllSchoolClassesFromUser(userId);
+
         return schoolClassDTOS;
     }
 }

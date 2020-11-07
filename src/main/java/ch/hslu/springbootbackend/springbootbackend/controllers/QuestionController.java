@@ -6,6 +6,7 @@ import ch.hslu.springbootbackend.springbootbackend.Service.EntityService.Questio
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,11 +28,7 @@ public class QuestionController {
     @GetMapping("")
     public List<QuestionDTO> getAllQuestions() {
         List<QuestionDTO> questions = new ArrayList<>();
-        try {
-            questions = questionService.getAllQuestions();
-        } catch (ResourceNotFoundException e) {
-            e.printStackTrace();
-        }
+        questions = questionService.getAllQuestions();
         return questions;
     }
 
@@ -61,37 +58,41 @@ public class QuestionController {
     @PostMapping("")
     //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<QuestionDTO> newQuestion(@RequestBody QuestionDTO newQuestion) {
-        try {
+
             QuestionDTO questionDTO = questionService.createNewQuestion(newQuestion);
-            return ResponseEntity
-                    .ok()
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(questionDTO);
-        } catch (ResourceNotFoundException e) {
-            LOG.warn("Resource was not found: " + e.getMessage());
-            return ResponseEntity.
-                    notFound()
-                    .build();
-        }
+            if(questionDTO != null) {
+                if(questionService.ressourceExists()){
+                    return ResponseEntity
+                            .status(HttpStatus.CONFLICT)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .body(questionDTO);
+                }else
+                     return ResponseEntity
+                            .status(HttpStatus.CREATED)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .body(questionDTO);
+            }
+            else{
+                return ResponseEntity.
+                        notFound()
+                        .build();
+            }
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<QuestionDTO> getQuestionById(@PathVariable(value = "id") Integer questionId) {
         //LOG.warn(foundedQuestion.toString());
-
-        try {
             QuestionDTO foundedQuestion = questionService.getById(questionId);
-            LOG.warn(foundedQuestion.toString());
-            return ResponseEntity
-                    .ok()
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(foundedQuestion);
-        } catch (ResourceNotFoundException ex) {
-            LOG.warn("Resource was not found: " + ex.getMessage());
-            return ResponseEntity.
-                    notFound()
-                    .build();
-        }
+            if(foundedQuestion != null) {
+                return ResponseEntity
+                        .ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(foundedQuestion);
+            }else {
+                return ResponseEntity.
+                        notFound()
+                        .build();
+            }
     }
 
     @GetMapping("/categorySet")
@@ -107,12 +108,8 @@ public class QuestionController {
 
     @GetMapping("/examSet")
     public List<QuestionDTO> getQuestionsByExamSet(@RequestParam int examSetId) {
-        List<QuestionDTO> questionDTOS = new ArrayList<>();
-        try {
-            questionDTOS = questionService.getByExamSet(examSetId);
-        } catch (ResourceNotFoundException e) {
-            e.printStackTrace();
-        }
+        List<QuestionDTO> questionDTOS = questionService.getByExamSet(examSetId);
+
         return questionDTOS;
     }
 

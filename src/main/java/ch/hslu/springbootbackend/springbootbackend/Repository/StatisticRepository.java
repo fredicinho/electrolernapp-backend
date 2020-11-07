@@ -9,7 +9,7 @@ import java.util.List;
 @Repository
 public interface StatisticRepository extends JpaRepository<Statistic, Integer> {
 
-    List<Statistic> findByUserId(int userId);
+    List<Statistic> findByUserId(long userId);
     List<Statistic> findByQuestionId(int questionId);
-    List<Statistic> findByUserAndQuestion(int userId, int questionId);
+    List<Statistic> findByUserAndQuestion(long userId, int questionId);
 }

@@ -1,10 +1,10 @@
 package ch.hslu.springbootbackend.springbootbackend.controllers;
 
-import ch.hslu.springbootbackend.springbootbackend.Repository.RoleRepository;
-import ch.hslu.springbootbackend.springbootbackend.Repository.UserRepository;
 import ch.hslu.springbootbackend.springbootbackend.Entity.ERole;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Role;
 import ch.hslu.springbootbackend.springbootbackend.Entity.User;
+import ch.hslu.springbootbackend.springbootbackend.Repository.RoleRepository;
+import ch.hslu.springbootbackend.springbootbackend.Repository.UserRepository;
 import ch.hslu.springbootbackend.springbootbackend.payload.request.LoginRequest;
 import ch.hslu.springbootbackend.springbootbackend.payload.request.SignupRequest;
 import ch.hslu.springbootbackend.springbootbackend.payload.response.JwtResponse;
@@ -12,6 +12,7 @@ import ch.hslu.springbootbackend.springbootbackend.payload.response.MessageRespo
 import ch.hslu.springbootbackend.springbootbackend.security.jwt.JwtUtils;
 import ch.hslu.springbootbackend.springbootbackend.security.services.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.net.URI;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -118,6 +120,9 @@ public class AuthController {
 		user.setRoles(roles);
 		userRepository.save(user);
 
-		return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+		return ResponseEntity
+				.created(URI.create(user.getId().toString()))
+				.contentType(MediaType.APPLICATION_JSON)
+				.body(user);
 	}
 }

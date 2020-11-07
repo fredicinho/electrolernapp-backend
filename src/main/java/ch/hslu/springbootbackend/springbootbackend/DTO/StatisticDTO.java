@@ -1,21 +1,36 @@
 package ch.hslu.springbootbackend.springbootbackend.DTO;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.hateoas.RepresentationModel;
+
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
-public class StatisticDTO {
-    private Integer StatisticId;
+public class StatisticDTO extends RepresentationModel<StatisticDTO> {
+    private int statisticId;
     private Date date;
     private int pointsAchieved;
     private boolean isMarked;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @NotNull
     private long userId;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @NotNull
     private int questionId;
 
-    public Integer getStatisticId() {
-        return StatisticId;
+    public StatisticDTO(int statisticId, Date date, int pointsAchieved, boolean isMarked) {
+        this.statisticId = statisticId;
+        this.date = date;
+        this.pointsAchieved = pointsAchieved;
+        this.isMarked = isMarked;
     }
 
-    public void setStatisticId(Integer statisticId) {
-        StatisticId = statisticId;
+    public int getStatisticId() {
+        return statisticId;
+    }
+
+    public void setStatisticId(int statisticId) {
+        statisticId = statisticId;
     }
 
     public Date getDate() {
@@ -62,7 +77,7 @@ public class StatisticDTO {
     @Override
     public String toString() {
         return "StatisticDTO{" +
-                "StatisticId=" + StatisticId +
+                "StatisticId=" + statisticId +
                 ", date=" + date +
                 ", pointsAchieved=" + pointsAchieved +
                 ", isMarked=" + isMarked +

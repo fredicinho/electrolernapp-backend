@@ -1,12 +1,14 @@
 package ch.hslu.springbootbackend.springbootbackend.controllers;
 
-import ch.hslu.springbootbackend.springbootbackend.Entity.Statistic;
 import ch.hslu.springbootbackend.springbootbackend.DTO.StatisticDTO;
 import ch.hslu.springbootbackend.springbootbackend.Exception.ResourceNotFoundException;
 import ch.hslu.springbootbackend.springbootbackend.Service.EntityService.StatisticService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,31 +25,42 @@ public class StatisticController {
 
     @GetMapping("/User/{id}")
     //@PreAuthorize("hasRole('ROLE_USER')")
-    public List<Statistic> getStatisticByUserid(@PathVariable(value = "id") Integer userId) throws ResourceNotFoundException {
-            List<Statistic> foundStatistic = statisticService.getByUserId(userId);
-            return foundStatistic;
+    public List<StatisticDTO> getStatisticByUserid(@PathVariable(value = "id") long userId) throws ResourceNotFoundException {
+            return statisticService.getByUserId(userId);
     }
 
     @GetMapping("/UserAndQuestion/")
     //@PreAuthorize("hasRole('ROLE_USER')")
-    public List<Statistic> getStatisticByUserAndQuestion(@RequestParam Integer userId
+    public List<StatisticDTO> getStatisticByUserAndQuestion(@RequestParam Integer userId
                                                         , @RequestParam Integer questionId) throws ResourceNotFoundException {
-        List<Statistic> foundStatistic = statisticService.getByUserAndQuestion(userId, questionId);
-        return foundStatistic;
+        return statisticService.getByUserAndQuestion(userId, questionId);
+
     }
 
     @GetMapping("/Question/{id}")
     //will be only available for teacher
     //@PreAuthorize("hasRole('ROLE_USER')")
-    public List<Statistic> getStatisticByQuestionId(@PathVariable(value = "id") Integer questionId) throws ResourceNotFoundException {
-            List<Statistic> foundStatistic = statisticService.getByQuestionId(questionId);
-            return foundStatistic;
+    public List<StatisticDTO> getStatisticByQuestionId(@PathVariable(value = "id") Integer questionId) throws ResourceNotFoundException {
+            return statisticService.getByQuestionId(questionId);
+
     }
 
     @PostMapping("")
     //@PreAuthorize("")
-    public Statistic addStatistic(@RequestBody StatisticDTO newStatistic) {
-        LOG.warn(newStatistic.toString());
-        return statisticService.addNewStatistic(newStatistic);
+    public ResponseEntity<StatisticDTO> addStatistic(@RequestBody StatisticDTO newStatistic) {
+
+            StatisticDTO statisticDTO = statisticService.addNewStatistic(newStatistic);
+            if(statisticDTO != null) {
+                return ResponseEntity
+                        .status(HttpStatus.CREATED)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(statisticDTO);
+            }else{
+                return ResponseEntity.
+                        notFound()
+                        .build();
+            }
+
+
     }
 }
