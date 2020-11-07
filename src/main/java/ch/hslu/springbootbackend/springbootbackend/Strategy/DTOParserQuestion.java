@@ -84,7 +84,7 @@ public class DTOParserQuestion implements DTOParserStrategy{
     }
 
     @Override
-    public Object generateDTOsFromObjects(List list) {
+    public List<QuestionDTO> generateDTOsFromObjects(List list) {
         List<QuestionDTO> questionDTOS = new ArrayList<>();
         for(Object questionDTO:list){
             Question question = (Question)questionDTO;

@@ -12,6 +12,7 @@ import ch.hslu.springbootbackend.springbootbackend.payload.response.MessageRespo
 import ch.hslu.springbootbackend.springbootbackend.security.jwt.JwtUtils;
 import ch.hslu.springbootbackend.springbootbackend.security.services.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -72,13 +73,13 @@ public class AuthController {
 	public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
 		if (userRepository.existsByUsername(signUpRequest.getUsername())) {
 			return ResponseEntity
-					.badRequest()
+					.status(HttpStatus.CONFLICT)
 					.body(new MessageResponse("Error: Username is already taken!"));
 		}
 
 		if (userRepository.existsByEmail(signUpRequest.getEmail())) {
 			return ResponseEntity
-					.badRequest()
+					.status(HttpStatus.CONFLICT)
 					.body(new MessageResponse("Error: Email is already in use!"));
 		}
 

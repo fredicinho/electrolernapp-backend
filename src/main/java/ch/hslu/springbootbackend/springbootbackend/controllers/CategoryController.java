@@ -38,4 +38,9 @@ public class CategoryController {
     public List<CategoryDTO> getAllCategories(){
         return categoryService.getAllCategories();
     }
+
+    @GetMapping("/examSet")
+    public List<CategoryDTO> getCategoriesByExamSet(@RequestParam int examSetId){
+        return categoryService.getCategoriesByExamSet(examSetId);
+    }
 }

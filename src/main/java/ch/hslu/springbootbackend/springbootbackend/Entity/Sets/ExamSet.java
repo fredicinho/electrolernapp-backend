@@ -5,6 +5,7 @@ import ch.hslu.springbootbackend.springbootbackend.Entity.Question;
 import ch.hslu.springbootbackend.springbootbackend.Entity.SchoolClass;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -37,6 +38,33 @@ public class ExamSet {
     private List<SchoolClass> schoolClassesInExamSet = new LinkedList<>();
 
     private boolean isOpen;
+    private Date startDate;
+    private Date endDate;
+
+    public ExamSet(){}
+
+    public ExamSet(List<Category> categoriesInExamSet, String title, List<Question> questionsInExamSet, List<SchoolClass> schoolClassesInExamSet, boolean isOpen, Date startDate, Date endDate) {
+        this.categoriesInExamSet = categoriesInExamSet;
+        this.title = title;
+        this.questionsInExamSet = questionsInExamSet;
+        this.schoolClassesInExamSet = schoolClassesInExamSet;
+        this.isOpen = isOpen;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
+
+    @PostPersist
+    private void setFks(){
+        for(int i =0; i < categoriesInExamSet.size(); i++){
+            categoriesInExamSet.get(i).insertIntoExamSet(this);
+        }
+        for(int i =0; i < questionsInExamSet.size(); i++){
+            questionsInExamSet.get(i).insertIntoExamSet(this);
+        }
+        for(int i =0; i < schoolClassesInExamSet.size(); i++){
+            schoolClassesInExamSet.get(i).insertExamSet(this);
+        }
+    }
 
     public Integer getExamSetId() {
         return examSetId;
@@ -79,6 +107,32 @@ public class ExamSet {
     public void insertCategory(Category category){
         this.categoriesInExamSet.add(category);
     }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+
+    public boolean isOpen() {
+        return isOpen;
+    }
+
+    public void setOpen(boolean open) {
+        isOpen = open;
+    }
+
 
 
 }

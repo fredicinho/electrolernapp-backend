@@ -32,6 +32,7 @@ public class SchoolClassController {
             SchoolClassDTO schoolClassDTO = schoolClassService.createNewSchoolClass(newSchoolClass);
         if(schoolClassDTO != null) {
             if(schoolClassService.ressourceExists()){
+                schoolClassService.setRessourceExists(false);
                 return ResponseEntity
                         .status(HttpStatus.CONFLICT)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -51,8 +52,18 @@ public class SchoolClassController {
 
     @GetMapping("/user")
     public List<SchoolClassDTO> getSchoolClassesByUser(@RequestParam long userId) {
-        List<SchoolClassDTO> schoolClassDTOS = schoolClassService.getAllSchoolClassesFromUser(userId);
+        return schoolClassService.getAllSchoolClassesFromUser(userId);
+    }
 
-        return schoolClassDTOS;
+    @GetMapping("/examSet")
+    public List<SchoolClassDTO> getSchoolClassesByExamSet(@RequestParam int examSetId) {
+        return schoolClassService.getAllSchoolClassesByExamSet(examSetId);
+
+
+    }
+
+    @GetMapping("/")
+    public List<SchoolClassDTO> getAllSchoolClasses() {
+        return schoolClassService.getAllSchoolClasses();
     }
 }

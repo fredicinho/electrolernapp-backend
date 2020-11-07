@@ -62,6 +62,7 @@ public class QuestionController {
             QuestionDTO questionDTO = questionService.createNewQuestion(newQuestion);
             if(questionDTO != null) {
                 if(questionService.ressourceExists()){
+                    questionService.setRessourceExists(false);
                     return ResponseEntity
                             .status(HttpStatus.CONFLICT)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -108,9 +109,7 @@ public class QuestionController {
 
     @GetMapping("/examSet")
     public List<QuestionDTO> getQuestionsByExamSet(@RequestParam int examSetId) {
-        List<QuestionDTO> questionDTOS = questionService.getByExamSet(examSetId);
-
-        return questionDTOS;
+        return questionService.getByExamSet(examSetId);
     }
 
 

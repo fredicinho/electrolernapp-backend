@@ -49,6 +49,7 @@ public class QuestionService {
     private final Logger LOG = LoggerFactory.getLogger(QuestionController.class);
 
 
+
     private boolean ressourceExists = false;
 
 
@@ -59,7 +60,7 @@ public class QuestionService {
             ressourceExists = true;
             return dtoParserQuestion.generateDTOFromObject(questions.get(0).getId());
         }
-        Question question = (Question)dtoParserQuestion.generateObjectFromDTO(questionDTO);
+        Question question = dtoParserQuestion.generateObjectFromDTO(questionDTO);
         question.setPossibleAnswers(this.checkIfAnswersExistsInDatabase(question.getPossibleAnswers()));
         question.setCorrectAnswers(this.checkIfAnswersExistsInDatabase(question.getCorrectAnswers()));
         return (QuestionDTO) dtoParserQuestion.generateDTOFromObject(questionRepository.save(question).getId());
@@ -125,6 +126,11 @@ public class QuestionService {
 
     public boolean ressourceExists() {
         return ressourceExists;
+    }
+
+
+    public void setRessourceExists(boolean ressourceExists) {
+        this.ressourceExists = ressourceExists;
     }
 
 

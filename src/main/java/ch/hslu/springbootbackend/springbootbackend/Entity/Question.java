@@ -84,9 +84,16 @@ public class Question{
         for(int i =0; i < correctAnswers.size(); i++){
             correctAnswers.get(i).insertCorrectQuestion(this);
         }
+        for(int i =0; i < examSets.size(); i++){
+            examSets.get(i).insertQuestion(this);
+        }
         if(this.createdByUser != null){
             this.createdByUser.getCreatedQuestions().add(this);
         }
+    }
+
+    public void insertIntoExamSet(ExamSet examSet){
+        this.examSets.add(examSet);
     }
 
 

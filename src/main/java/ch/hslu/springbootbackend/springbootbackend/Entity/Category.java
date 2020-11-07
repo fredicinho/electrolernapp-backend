@@ -8,6 +8,27 @@ import java.util.List;
 
 @Entity
 public class Category {
+    @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    private Integer id;
+
+    private String name;
+
+    private String description;
+
+    @ManyToMany(mappedBy = "categoriesInExamSet")
+    private List<ExamSet> examSets = new LinkedList<>();
+
+
+    @PostPersist
+    public void assignFks(){
+        for(int i =0; i < examSets.size(); i++){
+            examSets.get(i).insertCategory(this);
+        }
+    }
+    public void insertIntoExamSet(ExamSet examSet){
+        this.examSets.add(examSet);
+    }
 
     public Category(final String name, final String description) {
         this.setName(name);
@@ -22,16 +43,6 @@ public class Category {
 
     public Category(){}
 
-    @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
-    private Integer id;
-
-    private String name;
-
-    private String description;
-
-    @ManyToMany(mappedBy = "categoriesInExamSet")
-    private List<ExamSet> examSets = new LinkedList<>();
 
     public Integer getId() {
         return id;
