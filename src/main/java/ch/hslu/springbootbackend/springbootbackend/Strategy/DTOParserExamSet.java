@@ -4,11 +4,14 @@ import ch.hslu.springbootbackend.springbootbackend.DTO.ExamSetDTO;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Question;
 import ch.hslu.springbootbackend.springbootbackend.Entity.SchoolClass;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.ExamSet;
+import ch.hslu.springbootbackend.springbootbackend.Entity.User;
 import ch.hslu.springbootbackend.springbootbackend.Repository.ExamSetRepository;
 import ch.hslu.springbootbackend.springbootbackend.Repository.QuestionRepository;
 import ch.hslu.springbootbackend.springbootbackend.Repository.SchoolClassRepository;
+import ch.hslu.springbootbackend.springbootbackend.Repository.UserRepository;
 import ch.hslu.springbootbackend.springbootbackend.controllers.QuestionController;
 import ch.hslu.springbootbackend.springbootbackend.controllers.SchoolClassController;
+import ch.hslu.springbootbackend.springbootbackend.controllers.UserController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +32,8 @@ public class DTOParserExamSet implements DTOParserStrategy{
     QuestionRepository questionRepository;
     @Autowired
     SchoolClassRepository schoolClassRepository;
+    @Autowired
+    UserRepository userRepository;
 
 
     @Override
@@ -37,6 +42,7 @@ public class DTOParserExamSet implements DTOParserStrategy{
         ExamSetDTO examSetDTO = new ExamSetDTO(examSet.getExamSetId(), examSet.getTitle(), examSet.getStartDate(), examSet.getEndDate());
         examSetDTO.add(linkTo(methodOn(QuestionController.class).getQuestionsByExamSet(examSet.getExamSetId())).withRel("questionsInExamSet"));
         examSetDTO.add(linkTo(methodOn(SchoolClassController.class).getSchoolClassesByExamSet(examSet.getExamSetId())).withRel("classesInExamSet"));
+        examSetDTO.add(linkTo(methodOn(UserController.class).getUserById(examSet.getCreatedByUser().getId())).withRel("created by"));
         return examSetDTO;
     }
 
@@ -50,7 +56,8 @@ public class DTOParserExamSet implements DTOParserStrategy{
                 this.getQuestionsFromDatabase(examSetDTO.getQuestionsInExamSet()),
                 this.getSchoolClassesFromDatabase(examSetDTO.getSchoolClassesInExamSet()),
                 examSetDTO.getStartDate(),
-                examSetDTO.getEndDate()
+                examSetDTO.getEndDate(),
+                this.getUserFromDatabase(examSetDTO.getUserId())
             );
 
         return examSet;
@@ -87,6 +94,15 @@ public class DTOParserExamSet implements DTOParserStrategy{
             }
         }
         return schoolClasses;
+    }
+
+    private User getUserFromDatabase(long userId){
+        Optional<User> userOptional = userRepository.findById(userId);
+        if(userOptional.isPresent()){
+            return userOptional.get();
+        }else{
+            return null;
+        }
     }
 
 }

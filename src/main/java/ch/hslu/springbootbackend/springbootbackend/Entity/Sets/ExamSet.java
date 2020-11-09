@@ -2,6 +2,7 @@ package ch.hslu.springbootbackend.springbootbackend.Entity.Sets;
 
 import ch.hslu.springbootbackend.springbootbackend.Entity.Question;
 import ch.hslu.springbootbackend.springbootbackend.Entity.SchoolClass;
+import ch.hslu.springbootbackend.springbootbackend.Entity.User;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -31,17 +32,21 @@ public class ExamSet {
             inverseJoinColumns = @JoinColumn(name = "schoolClassId"))
     private List<SchoolClass> schoolClassesInExamSet = new LinkedList<>();
 
+    @ManyToOne(targetEntity = User.class, cascade = CascadeType.ALL)
+    private User createdByUser;
+
     private Date startDate;
     private Date endDate;
 
     public ExamSet(){}
 
-    public ExamSet(String title, List<Question> questionsInExamSet, List<SchoolClass> schoolClassesInExamSet, Date startDate, Date endDate) {
+    public ExamSet(String title, List<Question> questionsInExamSet, List<SchoolClass> schoolClassesInExamSet, Date startDate, Date endDate, User user) {
         this.title = title;
         this.questionsInExamSet = questionsInExamSet;
         this.schoolClassesInExamSet = schoolClassesInExamSet;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.createdByUser = user;
     }
 
     @PostPersist
@@ -52,6 +57,7 @@ public class ExamSet {
         for(int i =0; i < schoolClassesInExamSet.size(); i++){
             schoolClassesInExamSet.get(i).insertExamSet(this);
         }
+        this.createdByUser.getCreatedExamSets().add(this);
     }
 
     public Integer getExamSetId() {
@@ -106,9 +112,16 @@ public class ExamSet {
         return schoolClassesInExamSet;
     }
 
-
     public void setSchoolClassesInExamSet(List<SchoolClass> schoolClassesInExamSet) {
         this.schoolClassesInExamSet = schoolClassesInExamSet;
+    }
+
+    public User getCreatedByUser() {
+        return createdByUser;
+    }
+
+    public void setCreatedByUser(User createdByUser) {
+        this.createdByUser = createdByUser;
     }
 
 

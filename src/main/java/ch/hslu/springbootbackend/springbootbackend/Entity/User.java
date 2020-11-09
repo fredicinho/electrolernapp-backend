@@ -1,5 +1,6 @@
 package ch.hslu.springbootbackend.springbootbackend.Entity;
 
+import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.ExamSet;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.hateoas.RepresentationModel;
@@ -44,6 +45,10 @@ public class User extends RepresentationModel<User> {
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@OneToMany(targetEntity = Question.class, cascade = CascadeType.ALL)
 	private List<Question> createdQuestions = new ArrayList<>();
+
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+	@OneToMany(targetEntity = ExamSet.class, cascade = CascadeType.ALL)
+	private List<ExamSet> createdExamSets = new ArrayList<>();
 
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@OneToMany(targetEntity = Statistic.class, cascade = CascadeType.ALL)
@@ -139,6 +144,15 @@ public class User extends RepresentationModel<User> {
 
 	public void setInSchoolClasses(List<SchoolClass> inSchoolClasses) {
 		this.inSchoolClasses = inSchoolClasses;
+	}
+
+
+	public List<ExamSet> getCreatedExamSets() {
+		return createdExamSets;
+	}
+
+	public void setCreatedExamSets(List<ExamSet> createdExamSets) {
+		this.createdExamSets = createdExamSets;
 	}
 
 }
