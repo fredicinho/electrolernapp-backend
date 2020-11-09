@@ -112,8 +112,6 @@ public class QuestionController {
         return questionService.getByExamSet(examSetId);
     }
 
-
-
     @GetMapping("/userId")
     public List<QuestionDTO> getQuestionByUserId(@RequestParam long userId) {
         List<QuestionDTO> questionDTOS = new ArrayList<>();

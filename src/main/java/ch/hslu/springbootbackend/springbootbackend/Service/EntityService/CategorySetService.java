@@ -21,16 +21,6 @@ public class CategorySetService {
     @Autowired
     CategorySetRepository categorySetRepository;
 
-    public CategorySet getCategorySetByTitleAndId(String title, Integer id) throws ResourceNotFoundException {
-        CategorySet categorySet = categorySetRepository.findByTitleAndCategorySetNumber(title, id).orElseThrow(
-                () -> new ResourceNotFoundException("Question not found for this id :: " + id + " "+ title)
-        );
-
-
-        return categorySet;
-    }
-
-
     public CategorySetDTO getCategorySetDTOById(Integer id) throws ResourceNotFoundException {
         CategorySet categorySet = categorySetRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Question not found for this id :: " + id )

@@ -1,10 +1,9 @@
 package ch.hslu.springbootbackend.springbootbackend.Entity;
 
-import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.ExamSet;
-
-import javax.persistence.*;
-import java.util.LinkedList;
-import java.util.List;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 @Entity
 public class Category {
@@ -16,24 +15,6 @@ public class Category {
 
     private String description;
 
-    @ManyToMany(mappedBy = "categoriesInExamSet")
-    private List<ExamSet> examSets = new LinkedList<>();
-
-
-    @PostPersist
-    public void assignFks(){
-        for(int i =0; i < examSets.size(); i++){
-            examSets.get(i).insertCategory(this);
-        }
-    }
-    public void insertIntoExamSet(ExamSet examSet){
-        this.examSets.add(examSet);
-    }
-
-    public Category(final String name, final String description) {
-        this.setName(name);
-        this.setDescription(description);
-    }
 
     public Category(final int id, final String name, final String description) {
         this.setId(id);
@@ -68,13 +49,6 @@ public class Category {
         this.description = description;
     }
 
-    public List<ExamSet> getExamSets() {
-        return examSets;
-    }
-
-    public void setExamSets(List<ExamSet> examSets) {
-        this.examSets = examSets;
-    }
     @Override
     public String toString() {
         return "Categorie{" +

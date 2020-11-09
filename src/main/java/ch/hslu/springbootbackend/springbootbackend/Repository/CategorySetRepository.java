@@ -11,6 +11,6 @@ import java.util.Optional;
 public interface CategorySetRepository extends JpaRepository<CategorySet, Integer> {
     //Optional<CategorySet> findByCategoryId(Integer categorySetNumber);
     Optional<CategorySet> findByTitleAndCategorySetNumber(String title, String categorySetNumber);
-    Optional<CategorySet> findByTitleAndCategorySetNumber(String title, Integer categorySetNumber);
     List<CategorySet> findByCategoryId(Integer categoryId);
+    Optional<CategorySet> findByTitle(String title);
 }

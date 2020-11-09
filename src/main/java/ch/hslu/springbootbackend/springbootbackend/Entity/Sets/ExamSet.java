@@ -1,6 +1,5 @@
 package ch.hslu.springbootbackend.springbootbackend.Entity.Sets;
 
-import ch.hslu.springbootbackend.springbootbackend.Entity.Category;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Question;
 import ch.hslu.springbootbackend.springbootbackend.Entity.SchoolClass;
 
@@ -15,12 +14,6 @@ public class ExamSet {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Integer examSetId;
 
-    @ManyToMany
-    @JoinTable(
-            name = "examSet_categories",
-            joinColumns = @JoinColumn(name = "examSetId"),
-            inverseJoinColumns = @JoinColumn(name = "categoryId"))
-    private List<Category> categoriesInExamSet = new LinkedList<>();
     private String title;
 
     @ManyToMany
@@ -30,6 +23,7 @@ public class ExamSet {
             inverseJoinColumns = @JoinColumn(name = "questionId"))
     private List<Question> questionsInExamSet = new LinkedList<>();
 
+
     @ManyToMany
     @JoinTable(
             name = "examSet_schoolClass",
@@ -37,27 +31,21 @@ public class ExamSet {
             inverseJoinColumns = @JoinColumn(name = "schoolClassId"))
     private List<SchoolClass> schoolClassesInExamSet = new LinkedList<>();
 
-    private boolean isOpen;
     private Date startDate;
     private Date endDate;
 
     public ExamSet(){}
 
-    public ExamSet(List<Category> categoriesInExamSet, String title, List<Question> questionsInExamSet, List<SchoolClass> schoolClassesInExamSet, boolean isOpen, Date startDate, Date endDate) {
-        this.categoriesInExamSet = categoriesInExamSet;
+    public ExamSet(String title, List<Question> questionsInExamSet, List<SchoolClass> schoolClassesInExamSet, Date startDate, Date endDate) {
         this.title = title;
         this.questionsInExamSet = questionsInExamSet;
         this.schoolClassesInExamSet = schoolClassesInExamSet;
-        this.isOpen = isOpen;
         this.startDate = startDate;
         this.endDate = endDate;
     }
 
     @PostPersist
     private void setFks(){
-        for(int i =0; i < categoriesInExamSet.size(); i++){
-            categoriesInExamSet.get(i).insertIntoExamSet(this);
-        }
         for(int i =0; i < questionsInExamSet.size(); i++){
             questionsInExamSet.get(i).insertIntoExamSet(this);
         }
@@ -74,13 +62,6 @@ public class ExamSet {
         this.examSetId = examSetId;
     }
 
-    public List<Category> getCategoriesInExamSet() {
-        return categoriesInExamSet;
-    }
-
-    public void setCategoriesInExamSet(List<Category> category) {
-        this.categoriesInExamSet = category;
-    }
 
     public String getTitle() {
         return title;
@@ -104,9 +85,6 @@ public class ExamSet {
     public void insertQuestion(Question question){
         this.questionsInExamSet.add(question);
     }
-    public void insertCategory(Category category){
-        this.categoriesInExamSet.add(category);
-    }
 
     public Date getStartDate() {
         return startDate;
@@ -124,15 +102,14 @@ public class ExamSet {
         this.endDate = endDate;
     }
 
-
-    public boolean isOpen() {
-        return isOpen;
+    public List<SchoolClass> getSchoolClassesInExamSet() {
+        return schoolClassesInExamSet;
     }
 
-    public void setOpen(boolean open) {
-        isOpen = open;
-    }
 
+    public void setSchoolClassesInExamSet(List<SchoolClass> schoolClassesInExamSet) {
+        this.schoolClassesInExamSet = schoolClassesInExamSet;
+    }
 
 
 }

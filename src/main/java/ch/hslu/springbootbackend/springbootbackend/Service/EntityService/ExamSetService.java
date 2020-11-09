@@ -1,8 +1,12 @@
 package ch.hslu.springbootbackend.springbootbackend.Service.EntityService;
 
 import ch.hslu.springbootbackend.springbootbackend.DTO.ExamSetDTO;
+import ch.hslu.springbootbackend.springbootbackend.Entity.Question;
+import ch.hslu.springbootbackend.springbootbackend.Entity.SchoolClass;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.ExamSet;
 import ch.hslu.springbootbackend.springbootbackend.Repository.ExamSetRepository;
+import ch.hslu.springbootbackend.springbootbackend.Repository.QuestionRepository;
+import ch.hslu.springbootbackend.springbootbackend.Repository.SchoolClassRepository;
 import ch.hslu.springbootbackend.springbootbackend.Strategy.DTOParserExamSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +19,10 @@ public class ExamSetService {
 
     @Autowired
     ExamSetRepository examSetRepository;
+    @Autowired
+    SchoolClassRepository schoolClassRepository;
+    @Autowired
+    QuestionRepository questionRepository;
     @Autowired
     DTOParserExamSet dtoParserExamSet;
 
@@ -37,6 +45,34 @@ public class ExamSetService {
 
     public List<ExamSetDTO> getAllExamSets(){
         return dtoParserExamSet.generateDTOsFromObjects(examSetRepository.findAll());
+    }
+
+    public ExamSetDTO updateExamSetSchoolClassesIn(int examSetId, int schoolClassId){
+        Optional<ExamSet> examSetOptional = examSetRepository.findById(examSetId);
+        if(examSetOptional.isPresent()){
+            Optional<SchoolClass> schoolClassOptional = schoolClassRepository.findById(schoolClassId);
+            if(schoolClassOptional.isPresent()){
+                ExamSet examSet = examSetOptional.get();
+                if(!examSetRepository.findAllBySchoolClassesInExamSet(schoolClassOptional.get()).isPresent()) {
+                    examSet.getSchoolClassesInExamSet().add(schoolClassOptional.get());
+                    examSetRepository.save(examSet);
+                }
+            }
+        }
+        return dtoParserExamSet.generateDTOFromObject(examSetId);
+    }
+
+    public ExamSetDTO updateExamSetQuestionsIn(int examSetId, List<Integer> questionIds){
+        Optional<ExamSet> examSetOptional = examSetRepository.findById(examSetId);
+        if(examSetOptional.isPresent()){
+            List<Question> questionList = examSetOptional.get().getQuestionsInExamSet();
+            for(Integer questionId: questionIds){
+                Optional<Question> questionOptional = questionRepository.findById(questionId);
+                if(questionOptional.isPresent()) questionList.add(questionOptional.get());
+            }
+            examSetRepository.save(examSetOptional.get());
+        }
+        return dtoParserExamSet.generateDTOFromObject(examSetId);
     }
 
 

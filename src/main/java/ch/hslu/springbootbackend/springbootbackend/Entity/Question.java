@@ -48,11 +48,11 @@ public class Question{
 
 
     @ManyToMany(mappedBy = "questionsInSet")
-    private List<CategorySet> categorySet;
+    private List<CategorySet> categorySet = new LinkedList<>();
 
 
     @ManyToMany(mappedBy = "questionsInExamSet")
-    private List<ExamSet> examSets;
+    private List<ExamSet> examSets = new LinkedList<>();
 
 
     public Question(String questionphrase, List<Answer> possibleAnswers, List<Answer> correctAnswers, QuestionType questionType, User user, List<CategorySet> categorySets, Media questionImage, Media answerImage, int pointsToAchieve) {

@@ -1,15 +1,12 @@
 package ch.hslu.springbootbackend.springbootbackend.Strategy;
 
 import ch.hslu.springbootbackend.springbootbackend.DTO.ExamSetDTO;
-import ch.hslu.springbootbackend.springbootbackend.Entity.Category;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Question;
 import ch.hslu.springbootbackend.springbootbackend.Entity.SchoolClass;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.ExamSet;
-import ch.hslu.springbootbackend.springbootbackend.Repository.CategoryRepository;
 import ch.hslu.springbootbackend.springbootbackend.Repository.ExamSetRepository;
 import ch.hslu.springbootbackend.springbootbackend.Repository.QuestionRepository;
 import ch.hslu.springbootbackend.springbootbackend.Repository.SchoolClassRepository;
-import ch.hslu.springbootbackend.springbootbackend.controllers.CategoryController;
 import ch.hslu.springbootbackend.springbootbackend.controllers.QuestionController;
 import ch.hslu.springbootbackend.springbootbackend.controllers.SchoolClassController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +26,6 @@ public class DTOParserExamSet implements DTOParserStrategy{
     @Autowired
     ExamSetRepository examSetRepository;
     @Autowired
-    CategoryRepository categoryRepository;
-    @Autowired
     QuestionRepository questionRepository;
     @Autowired
     SchoolClassRepository schoolClassRepository;
@@ -39,9 +34,7 @@ public class DTOParserExamSet implements DTOParserStrategy{
     @Override
     public ExamSetDTO generateDTOFromObject(int id) {
         ExamSet examSet = examSetRepository.findById(id).orElseThrow();
-        ExamSetDTO examSetDTO = new ExamSetDTO(examSet.getExamSetId(), examSet.getTitle(), examSet.isOpen(), examSet.getStartDate(), examSet.getEndDate());
-
-        examSetDTO.add(linkTo(methodOn(CategoryController.class).getCategoriesByExamSet(examSet.getExamSetId())).withRel("categories"));
+        ExamSetDTO examSetDTO = new ExamSetDTO(examSet.getExamSetId(), examSet.getTitle(), examSet.getStartDate(), examSet.getEndDate());
         examSetDTO.add(linkTo(methodOn(QuestionController.class).getQuestionsByExamSet(examSet.getExamSetId())).withRel("questionsInExamSet"));
         examSetDTO.add(linkTo(methodOn(SchoolClassController.class).getSchoolClassesByExamSet(examSet.getExamSetId())).withRel("classesInExamSet"));
         return examSetDTO;
@@ -53,11 +46,9 @@ public class DTOParserExamSet implements DTOParserStrategy{
         ExamSetDTO examSetDTO = (ExamSetDTO) objectDTO;
 
         examSet = new ExamSet(
-                this.getCategoriesFromDatabase(examSetDTO.getCategoriesInExamSet()),
                 examSetDTO.getTitle(),
                 this.getQuestionsFromDatabase(examSetDTO.getQuestionsInExamSet()),
                 this.getSchoolClassesFromDatabase(examSetDTO.getSchoolClassesInExamSet()),
-                examSetDTO.isOpen(),
                 examSetDTO.getStartDate(),
                 examSetDTO.getEndDate()
             );
@@ -75,16 +66,6 @@ public class DTOParserExamSet implements DTOParserStrategy{
         return examSetDTOS;
     }
 
-    private List<Category> getCategoriesFromDatabase(List<Integer> list){
-        List<Category> categoryList = new LinkedList<>();
-        for(Integer categoryId :list){
-            Optional<Category> categoryOptional = categoryRepository.findById(categoryId);
-            if(categoryOptional.isPresent()){
-                categoryList.add(categoryOptional.get());
-            }
-        }
-        return categoryList;
-    }
 
     private List<Question> getQuestionsFromDatabase(List<Integer> list){
         List<Question> questionList = new LinkedList<>();
@@ -107,4 +88,5 @@ public class DTOParserExamSet implements DTOParserStrategy{
         }
         return schoolClasses;
     }
+
 }

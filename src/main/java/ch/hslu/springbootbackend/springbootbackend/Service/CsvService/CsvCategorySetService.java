@@ -39,7 +39,6 @@ public class CsvCategorySetService implements CsvService {
         }
     }
 
-    // TODO: For new CategorySets you dont have to pass the id. It will create one for themselves...
     public List<CategorySet> parseCsv(InputStream inputStream) {
         try (BufferedReader fileReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
              CSVParser csvParser = new CSVParser(fileReader,
@@ -55,9 +54,8 @@ public class CsvCategorySetService implements CsvService {
                 if (!categoryOfCategorySet.isPresent()) {
                     throw new IOException("The Category with the passed id = " + categoryId + " doesn't exists!");
                 }
-                if (checkIfCategorySetExists(csvRecord.get("title"), csvRecord.get("categorieSetNumber"))) {
-                    newCategorieSets.add(new CategorySet(Integer.parseInt(csvRecord.get("categorieSetId")), categoryOfCategorySet.get(), csvRecord.get("title"), csvRecord.get("categorieSetNumber")));
-                }
+                newCategorieSets.add(new CategorySet(Integer.parseInt(csvRecord.get("categorieSetId")), categoryOfCategorySet.get(), csvRecord.get("title"), csvRecord.get("categorieSetNumber")));
+
             }
             return newCategorieSets;
 

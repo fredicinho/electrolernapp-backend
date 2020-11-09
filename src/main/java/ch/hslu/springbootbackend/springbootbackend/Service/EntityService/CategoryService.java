@@ -2,7 +2,6 @@ package ch.hslu.springbootbackend.springbootbackend.Service.EntityService;
 
 import ch.hslu.springbootbackend.springbootbackend.DTO.CategoryDTO;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Category;
-import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.ExamSet;
 import ch.hslu.springbootbackend.springbootbackend.Repository.CategoryRepository;
 import ch.hslu.springbootbackend.springbootbackend.Repository.ExamSetRepository;
 import ch.hslu.springbootbackend.springbootbackend.controllers.CategorySetController;
@@ -10,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,18 +55,6 @@ public class CategoryService {
         }
         return categoryDTO;
 
-     }
-
-     public List<CategoryDTO> getCategoriesByExamSet(int examSetId){
-        Optional<ExamSet> examSet = examSetRepository.findById(examSetId);
-        List<CategoryDTO> categoryDTOS = new LinkedList<>();
-        if(examSet.isPresent()){
-            List<Category> categories = categoryRepository.findAllByExamSets(examSet.get());
-            for(Category category : categories){
-                categoryDTOS.add(new CategoryDTO(category.getId(), category.getName(), category.getDescription()));
-            }
-        }
-        return categoryDTOS;
      }
 
 

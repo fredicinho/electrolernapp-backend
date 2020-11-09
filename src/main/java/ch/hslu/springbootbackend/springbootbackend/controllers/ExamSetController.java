@@ -59,4 +59,20 @@ public class ExamSetController {
                 .body(examSetService.getExamSetById(examSetId));
     }
 
+    @PutMapping("/{id}/schoolClasses")
+    public ResponseEntity<ExamSetDTO> updateExamSetSchoolClassesIn(@PathVariable(value = "id") Integer examSetId, @RequestParam Integer schoolClassId) {
+        return ResponseEntity
+                .ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(examSetService.updateExamSetSchoolClassesIn(examSetId, schoolClassId));
+    }
+
+    @PutMapping("/{id}/questions")
+    public ResponseEntity<ExamSetDTO> updateExamSetQuestionsIn(@PathVariable(value = "id") Integer examSetId, @RequestBody List<Integer> questionIds) {
+        return ResponseEntity
+                .ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(examSetService.updateExamSetQuestionsIn(examSetId, questionIds));
+    }
+
 }

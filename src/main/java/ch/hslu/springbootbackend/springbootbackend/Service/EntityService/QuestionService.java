@@ -82,18 +82,22 @@ public class QuestionService {
             CategorySet categorySet = categorySetOptional.get();
             questions = questionRepository.findQuestionByCategorySet(categorySet);
         }
-        return (List<QuestionDTO>)dtoParserQuestion.generateDTOsFromObjects(questions);
+        return dtoParserQuestion.generateDTOsFromObjects(questions);
     }
 
     public List<QuestionDTO> getByExamSet(Integer examSetId){
-        //return questionRepository.findAll();//questionRepository.find(categorySetId);
         Optional<ExamSet> examSetOptional = examSetRepository.findById(examSetId);
         List<Question> questions = new ArrayList<>();
         if(examSetOptional.isPresent()){
             ExamSet examSet = examSetOptional.get();
             questions = questionRepository.findQuestionByExamSets(examSet);
         }
-        return (List<QuestionDTO>)dtoParserQuestion.generateDTOsFromObjects(questions);
+
+        List<QuestionDTO> questionDTOS = dtoParserQuestion.generateDTOsFromObjects(questions);
+        for(QuestionDTO questionDTO : questionDTOS){
+            questionDTO.setCorrectAnswers(null);
+        }
+        return questionDTOS;
     }
 
     public List<QuestionDTO> getByUserId(Long userId) throws ResourceNotFoundException {

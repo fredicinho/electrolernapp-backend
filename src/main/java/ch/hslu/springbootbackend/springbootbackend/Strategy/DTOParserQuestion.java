@@ -40,7 +40,6 @@ public class DTOParserQuestion implements DTOParserStrategy{
         QuestionDTO questionDTO = new QuestionDTO(id, question.getQuestionphrase(), question.getQuestionType(), question.getPointsToAchieve());
         questionDTO.setPossibleAnswers(answerRepository.findAnswersByQuestionPossibleList(question));
         questionDTO.setCorrectAnswers(answerRepository.findAnswersByQuestionCorrectList(question));
-
         //questionDTO.add(linkTo(methodOn(AnswerController.class).getPossibleAnswersByQuestion(questionId)).withRel("possibleAnswers"));
         //questionDTO.add(linkTo(methodOn(AnswerController.class).getCorrectAnswersByQuestion(questionId)).withRel("correctAnswers"));
         try {
