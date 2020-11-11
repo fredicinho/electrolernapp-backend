@@ -109,6 +109,7 @@ public class DTOParserExamResult implements DTOParserStrategy {
             }else{
                 Answer answer = new Answer(answerPhrase);
                 answerRepository.save(answer);
+                answers.add(answer);
             }
         }
         return answers;
@@ -120,12 +121,16 @@ public class DTOParserExamResult implements DTOParserStrategy {
             return maxPoints;
         }
         for(int i = 0; i < answerToCheck.size(); i++){
-            if(correctAnswer.contains(answerToCheck.get(i))){
+            if(correctAnswer.contains(answerToCheck.get(i).getAnswerPhrase())){
                 score = score+valuePerAnswer;
             }
-            if(!correctAnswer.contains(answerToCheck.get(i))){
+            if(!correctAnswer.contains(answerToCheck.get(i).getAnswerPhrase())){
                 score = score - valuePerAnswer;
             }
-        }return score;
+        }
+        if(score < 0){
+            score = 0;
+        }
+        return score;
     }
 }

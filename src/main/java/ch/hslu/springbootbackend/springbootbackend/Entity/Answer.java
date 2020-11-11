@@ -36,6 +36,7 @@ public class Answer extends RepresentationModel<Answer> {
             inverseJoinColumns = @JoinColumn(name = "questionId"))
     private List<Question> questionCorrectList = new ArrayList<>();
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "examQuestionSolution_answerToCheck",
