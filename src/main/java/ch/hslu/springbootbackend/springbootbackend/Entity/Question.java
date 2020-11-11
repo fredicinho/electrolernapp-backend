@@ -40,6 +40,10 @@ public class Question{
     @OneToMany(targetEntity = Statistic.class, cascade = CascadeType.ALL)
     private Set<Statistic> statistics = new HashSet<>();
 
+
+    @OneToMany(targetEntity = ExamResult.class, cascade = CascadeType.ALL)
+    private Set<ExamResult> examResults = new HashSet<>();
+
     @OneToOne(targetEntity = Media.class, cascade = CascadeType.ALL)
     private Media questionImage;
 
@@ -194,6 +198,13 @@ public class Question{
         this.examSets = examSets;
     }
 
+    public Set<ExamResult> getExamResults() {
+        return examResults;
+    }
+
+    public void setExamResults(Set<ExamResult> examResults) {
+        this.examResults = examResults;
+    }
 
     @Override
     public String toString() {

@@ -1,7 +1,9 @@
 package ch.hslu.springbootbackend.springbootbackend.controllers;
 
+import ch.hslu.springbootbackend.springbootbackend.DTO.ExamResultDTO;
 import ch.hslu.springbootbackend.springbootbackend.DTO.ExamSetDTO;
 import ch.hslu.springbootbackend.springbootbackend.Repository.ExamSetRepository;
+import ch.hslu.springbootbackend.springbootbackend.Service.EntityService.ExamResultService;
 import ch.hslu.springbootbackend.springbootbackend.Service.EntityService.ExamSetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +23,8 @@ public class ExamSetController {
     ExamSetRepository examSetRepository;
     @Autowired
     ExamSetService examSetService;
+    @Autowired
+    ExamResultService examResultService;
 
     @PostMapping("")
     //@PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -38,6 +42,23 @@ public class ExamSetController {
                         .status(HttpStatus.CREATED)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(examSetDTO);
+        }
+        else{
+            return ResponseEntity.
+                    notFound()
+                    .build();
+        }
+    }
+
+    @PostMapping("/check")
+    //@PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<ExamResultDTO> check(@RequestBody ExamResultDTO newExamResultDTO) {
+        ExamResultDTO examResultDTO = examResultService.saveNewExamResult(newExamResultDTO);
+        if(examResultDTO != null) {
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(examResultDTO);
         }
         else{
             return ResponseEntity.

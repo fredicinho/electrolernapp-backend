@@ -54,6 +54,10 @@ public class User extends RepresentationModel<User> {
 	@OneToMany(targetEntity = Statistic.class, cascade = CascadeType.ALL)
 	private Set<Statistic> statistics;
 
+
+	@OneToMany(targetEntity = ExamResult.class, cascade = CascadeType.ALL)
+	private Set<ExamResult> examResults;
+
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(
@@ -153,6 +157,15 @@ public class User extends RepresentationModel<User> {
 
 	public void setCreatedExamSets(List<ExamSet> createdExamSets) {
 		this.createdExamSets = createdExamSets;
+	}
+
+
+	public Set<ExamResult> getExamResults() {
+		return examResults;
+	}
+
+	public void setExamResults(Set<ExamResult> examResults) {
+		this.examResults = examResults;
 	}
 
 }

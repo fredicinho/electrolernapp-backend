@@ -1,8 +1,10 @@
 package ch.hslu.springbootbackend.springbootbackend.controllers;
 
 import ch.hslu.springbootbackend.springbootbackend.Entity.Answer;
+import ch.hslu.springbootbackend.springbootbackend.Entity.ExamResult;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Question;
 import ch.hslu.springbootbackend.springbootbackend.Repository.AnswerRepository;
+import ch.hslu.springbootbackend.springbootbackend.Repository.ExamResultRepository;
 import ch.hslu.springbootbackend.springbootbackend.Service.EntityService.QuestionService;
 import ch.hslu.springbootbackend.springbootbackend.Strategy.DTOParserQuestion;
 import org.slf4j.Logger;
@@ -12,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +32,8 @@ public class AnswerController {
     @Autowired
     QuestionService questionService;
 
+    @Autowired
+    ExamResultRepository examResultRepository;
     @Autowired
     DTOParserQuestion dtoParserQuestion;
 
@@ -48,6 +53,15 @@ public class AnswerController {
                     notFound()
                     .build();
         }
+    }
+
+    @GetMapping("/examSet")
+    public List<Answer> getAnswersByExamAnswer(@RequestParam int examAnswerId){
+        List<Answer> answers = new LinkedList<>();
+        Optional<ExamResult> examAnswerOptional = examResultRepository.findById(examAnswerId);
+        if(examAnswerOptional.isPresent()){
+            answers = answerRepository.findAllByExamResults(examAnswerOptional.get());
+        }return answers;
     }
 
     public List<Answer> getPossibleAnswersByQuestion(@RequestParam int questionId){

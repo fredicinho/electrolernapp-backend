@@ -1,13 +1,12 @@
 package ch.hslu.springbootbackend.springbootbackend.Entity.Sets;
 
+import ch.hslu.springbootbackend.springbootbackend.Entity.ExamResult;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Question;
 import ch.hslu.springbootbackend.springbootbackend.Entity.SchoolClass;
 import ch.hslu.springbootbackend.springbootbackend.Entity.User;
 
 import javax.persistence.*;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 @Entity
 public class ExamSet {
@@ -37,6 +36,9 @@ public class ExamSet {
 
     private Date startDate;
     private Date endDate;
+
+    @OneToMany(targetEntity = ExamResult.class, cascade = CascadeType.ALL)
+    private Set<ExamResult> examResults = new HashSet<>();
 
     public ExamSet(){}
 
@@ -122,6 +124,14 @@ public class ExamSet {
 
     public void setCreatedByUser(User createdByUser) {
         this.createdByUser = createdByUser;
+    }
+
+    public Set<ExamResult> getExamResults() {
+        return examResults;
+    }
+
+    public void setExamResults(Set<ExamResult> examResults) {
+        this.examResults = examResults;
     }
 
 

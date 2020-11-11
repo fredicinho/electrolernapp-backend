@@ -36,6 +36,13 @@ public class Answer extends RepresentationModel<Answer> {
             inverseJoinColumns = @JoinColumn(name = "questionId"))
     private List<Question> questionCorrectList = new ArrayList<>();
 
+    @ManyToMany
+    @JoinTable(
+            name = "examQuestionSolution_answerToCheck",
+            joinColumns = @JoinColumn(name = "answerId"),
+            inverseJoinColumns = @JoinColumn(name = "examQuestionId"))
+    private List<ExamResult> examResults = new ArrayList<>();
+
     public String getAnswerPhrase() {
         return answerPhrase;
     }
@@ -88,6 +95,16 @@ public class Answer extends RepresentationModel<Answer> {
     public void insertCorrectQuestion(Question question) {
         this.questionCorrectList.add(question);
     }
+    public void insertExamQuestionSolutions(ExamResult examResult) {
+        this.examResults.add(examResult);
+    }
+    public List<ExamResult> getExamResults() {
+        return examResults;
+    }
+    public void setExamResults(List<ExamResult> examResults) {
+        this.examResults = examResults;
+    }
+
 
     @Override
     public String toString() {
