@@ -7,6 +7,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class Answer extends RepresentationModel<Answer> {
@@ -112,5 +113,20 @@ public class Answer extends RepresentationModel<Answer> {
         return "Answer{" +
                 "answerPhrase='" + answerPhrase + '\'' +
                 '}';
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Answer answer = (Answer) o;
+        return answerPhrase.equals(answer.answerPhrase);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), answerPhrase);
     }
 }

@@ -51,14 +51,19 @@ public class DTOParserExamResult implements DTOParserStrategy {
     public ExamResult generateObjectFromDTO(Object objectDTO) {
         ExamResult examResult = null;
         ExamResultDTO examResultDTO = (ExamResultDTO) objectDTO;
-
-        examResult = new ExamResult(
-            examResultDTO.getExamResultId(),
-            this.getUserFromDatabase(examResultDTO.getUserId()),
-            this.getQuestionFromDatabase(examResultDTO.getQuestionId()),
-            this.getExamSetFromDatabase(examResultDTO.getExamSetId()),
-            this.getAnswersFromDatabase(examResultDTO.getSendedAnswers())
-        );
+        Optional<ExamResult> examResultOptional = getExistingExamResult(examResultDTO);
+        if(examResultOptional.isPresent()){
+            examResult = examResultOptional.get();
+            examResult.setAnswersToCheck(getAnswersFromDatabase(examResultDTO.getSendedAnswers()));
+        }else{
+            examResult = new ExamResult(
+                examResultDTO.getExamResultId(),
+                this.getUserFromDatabase(examResultDTO.getUserId()),
+                this.getQuestionFromDatabase(examResultDTO.getQuestionId()),
+                this.getExamSetFromDatabase(examResultDTO.getExamSetId()),
+                this.getAnswersFromDatabase(examResultDTO.getSendedAnswers())
+            );
+        }
 
         examResult.setPointsAchieved(this.calculateScore(examResult.getQuestion().getCorrectAnswers(), examResult.getAnswersToCheck(), examResult.getQuestion().getPointsToAchieve()));
         return examResult;
@@ -114,17 +119,18 @@ public class DTOParserExamResult implements DTOParserStrategy {
         }
         return answers;
     }
+    private Optional<ExamResult> getExistingExamResult(ExamResultDTO examResultDTO){
+        return examResultRepository.findAllByUserAndExamSetAndQuestion(this.getUserFromDatabase(examResultDTO.getUserId()), this.getExamSetFromDatabase(examResultDTO.getExamSetId()), this.getQuestionFromDatabase(examResultDTO.getQuestionId()));
+    }
+
     private double calculateScore(List<Answer> correctAnswer, List<Answer> answerToCheck, int maxPoints){
         double score = 0;
         double valuePerAnswer = maxPoints/correctAnswer.size();
-        if(correctAnswer.containsAll(answerToCheck) && correctAnswer.size() == answerToCheck.size()){
-            return maxPoints;
-        }
         for(int i = 0; i < answerToCheck.size(); i++){
-            if(correctAnswer.contains(answerToCheck.get(i).getAnswerPhrase())){
+            if(correctAnswer.contains(answerToCheck.get(i))){
                 score = score+valuePerAnswer;
             }
-            if(!correctAnswer.contains(answerToCheck.get(i).getAnswerPhrase())){
+            if(!correctAnswer.contains(answerToCheck.get(i))){
                 score = score - valuePerAnswer;
             }
         }

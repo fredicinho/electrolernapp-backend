@@ -26,6 +26,9 @@ public class ExamResultService {
 
     public ExamResultDTO saveNewExamResult(ExamResultDTO examResultDTO){
         ExamResult examResult = dtoParserExamResult.generateObjectFromDTO(examResultDTO);
+
         return dtoParserExamResult.generateDTOFromObject(examResultRepository.save(examResult).getId());
     }
+
+
 }
