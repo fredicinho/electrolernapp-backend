@@ -7,7 +7,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 public class StatisticDTO extends RepresentationModel<StatisticDTO> {
-    private int statisticId;
+    private final int statisticId;
     private Date date;
     private int pointsAchieved;
     private boolean isMarked;

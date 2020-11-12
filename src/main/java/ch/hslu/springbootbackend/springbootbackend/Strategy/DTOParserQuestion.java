@@ -100,25 +100,13 @@ public class DTOParserQuestion implements DTOParserStrategy{
                 () -> new ResourceNotFoundException("User not found for this id :: " + userId ));
     }
     private boolean checkIfAnswerImageExists(Question question){
-        if(question.getAnswerImage() != null){
-            return true;
-        }else{
-            return false;
-        }
+        return question.getAnswerImage() != null;
     }
     private boolean checkIfQuestionImageExists(Question question){
-        if(question.getQuestionImage() != null){
-            return true;
-        }else{
-            return false;
-        }
+        return question.getQuestionImage() != null;
     }
     private boolean checkIfUserExists(Question question){
-        if(question.getCreatedByUser() != null){
-            return true;
-        }else{
-            return false;
-        }
+        return question.getCreatedByUser() != null;
     }
     private List<CategorySet> getCategorySets(List<Integer> categorySetIds){
         List<CategorySet> categorySets = new ArrayList<>();

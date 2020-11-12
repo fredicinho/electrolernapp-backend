@@ -22,6 +22,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Service
@@ -54,9 +55,9 @@ public class CsvQuestionService implements CsvService {
     }
 
     public List<Question> parseCsv(InputStream is) {
-        try (BufferedReader fileReader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+        try (BufferedReader fileReader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
              CSVParser csvParser = new CSVParser(fileReader,
-                     CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim());) {
+                     CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim())) {
 
             List<Question> newQuestions = new ArrayList<>();
 
@@ -67,6 +68,7 @@ public class CsvQuestionService implements CsvService {
                 try {
                     CategorySet foundedCategorySet = this.getCategorySet(Integer.parseInt(csvRecord.get("chapterId")));
                     categorySet.add(foundedCategorySet);
+
                 } catch (NumberFormatException ex) {
                     LOG.warn("Couldn't parse the founded Chapter ID :: " + csvRecord.get("chapterId") + " of the Data :: " + csvRecord.toString());
                     continue;
@@ -111,8 +113,6 @@ public class CsvQuestionService implements CsvService {
                         solutionImage,
                         pointsToAchieve
                 );
-
-                LOG.warn(newQuestion.toString());
                 Question newPersistedQuestion = questionRepository.save(newQuestion);
                 newQuestions.add(newPersistedQuestion);
             }
@@ -132,10 +132,7 @@ public class CsvQuestionService implements CsvService {
 
 
     private boolean checkIfAnswerIsEmpty(String answerPhrase) {
-        if (answerPhrase.equalsIgnoreCase("VOID") || answerPhrase.equalsIgnoreCase("")) {
-            return true;
-        }
-        return false;
+        return answerPhrase.equalsIgnoreCase("VOID") || answerPhrase.equalsIgnoreCase("");
     }
 
     private CategorySet getCategorySet(final int categorySetId) {

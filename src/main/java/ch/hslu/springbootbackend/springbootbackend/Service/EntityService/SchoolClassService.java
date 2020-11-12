@@ -1,10 +1,12 @@
 package ch.hslu.springbootbackend.springbootbackend.Service.EntityService;
 
 import ch.hslu.springbootbackend.springbootbackend.DTO.SchoolClassDTO;
+import ch.hslu.springbootbackend.springbootbackend.Entity.Institution;
 import ch.hslu.springbootbackend.springbootbackend.Entity.SchoolClass;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.ExamSet;
 import ch.hslu.springbootbackend.springbootbackend.Entity.User;
 import ch.hslu.springbootbackend.springbootbackend.Repository.ExamSetRepository;
+import ch.hslu.springbootbackend.springbootbackend.Repository.InstitutionRepository;
 import ch.hslu.springbootbackend.springbootbackend.Repository.SchoolClassRepository;
 import ch.hslu.springbootbackend.springbootbackend.Repository.UserRepository;
 import ch.hslu.springbootbackend.springbootbackend.Strategy.DTOParserSchoolClass;
@@ -29,6 +31,8 @@ public class SchoolClassService {
     @Autowired
     ExamSetRepository examSetRepository;
 
+    @Autowired
+    InstitutionRepository institutionRepository;
     @Autowired
     DTOParserSchoolClass dtoParserSchoolClass;
 
@@ -67,6 +71,15 @@ public class SchoolClassService {
         Optional<ExamSet> examSetOptional = examSetRepository.findById(examSetId);
         if(examSetOptional.isPresent()){
             schoolClassDTOS = dtoParserSchoolClass.generateDTOsFromObjects(schoolClassRepository.findAllByExamSetsForSchoolClass(examSetOptional.get()));
+        }
+        return schoolClassDTOS;
+    }
+
+    public List<SchoolClassDTO> getAllSchoolClassesByInstitution(int institutionId) {
+        List<SchoolClassDTO> schoolClassDTOS = new LinkedList<>();
+        Optional<Institution> institutionOptional = institutionRepository.findById(institutionId);
+        if(institutionOptional.isPresent()){
+            schoolClassDTOS = dtoParserSchoolClass.generateDTOsFromObjects(schoolClassRepository.findAllByInstitution(institutionOptional.get()));
         }
         return schoolClassDTOS;
     }

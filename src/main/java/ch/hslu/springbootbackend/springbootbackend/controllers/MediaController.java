@@ -24,7 +24,7 @@ import java.util.Optional;
 public class MediaController {
 
     @Autowired
-    private MediaRepository mediaRepository;
+    private final MediaRepository mediaRepository;
 
 
     public MediaController(MediaRepository mediaRepository) {

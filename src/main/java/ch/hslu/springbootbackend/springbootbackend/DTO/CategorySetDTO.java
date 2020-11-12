@@ -12,7 +12,7 @@ public class CategorySetDTO extends RepresentationModel<CategorySetDTO> {
 
     private String title;
 
-    private String categorySetNumber;
+    private final String categorySetNumber;
 
     public Integer getCategorySetId() {
         return categorySetId;

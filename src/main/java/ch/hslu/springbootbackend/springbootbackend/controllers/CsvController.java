@@ -1,15 +1,16 @@
 package ch.hslu.springbootbackend.springbootbackend.controllers;
 
-import ch.hslu.springbootbackend.springbootbackend.Service.CsvService.*;
-import ch.hslu.springbootbackend.springbootbackend.Service.EntityService.QuestionService;
+import ch.hslu.springbootbackend.springbootbackend.Service.CsvService.CsvCategoryService;
+import ch.hslu.springbootbackend.springbootbackend.Service.CsvService.CsvCategorySetService;
+import ch.hslu.springbootbackend.springbootbackend.Service.CsvService.CsvMediaService;
+import ch.hslu.springbootbackend.springbootbackend.Service.CsvService.CsvQuestionService;
 import ch.hslu.springbootbackend.springbootbackend.payload.response.MessageResponse;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.slf4j.Logger;
 
 // TODO: Kann nur eine Mapping-Methode nehmen und als parameter noch die entity übergeben...
 // TODO: Somit müsste nur eine Methode implementiert werden!!
@@ -23,10 +24,10 @@ public class CsvController {
 
     private final Logger LOG = LoggerFactory.getLogger(CsvController.class);
 
-    private CsvQuestionService csvQuestionService;
-    private CsvCategoryService csvCategoryService;
-    private CsvCategorySetService csvCategorySetService;
-    private CsvMediaService csvMediaService;
+    private final CsvQuestionService csvQuestionService;
+    private final CsvCategoryService csvCategoryService;
+    private final CsvCategorySetService csvCategorySetService;
+    private final CsvMediaService csvMediaService;
 
     public CsvController(CsvQuestionService csvQuestionService, CsvCategoryService csvCategoryService, CsvCategorySetService csvCategorySetService, CsvMediaService csvMediaService) {
         this.csvQuestionService = csvQuestionService;

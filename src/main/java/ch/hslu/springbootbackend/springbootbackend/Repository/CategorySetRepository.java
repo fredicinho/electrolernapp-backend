@@ -13,4 +13,5 @@ public interface CategorySetRepository extends JpaRepository<CategorySet, Intege
     Optional<CategorySet> findByTitleAndCategorySetNumber(String title, String categorySetNumber);
     List<CategorySet> findByCategoryId(Integer categoryId);
     Optional<CategorySet> findByTitle(String title);
+    long deleteAllByTitle(String title);
 }

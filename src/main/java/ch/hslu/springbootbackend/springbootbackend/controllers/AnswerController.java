@@ -65,13 +65,13 @@ public class AnswerController {
     }
 
     public List<Answer> getPossibleAnswersByQuestion(@RequestParam int questionId){
-        Question question = (Question) dtoParserQuestion.generateObjectFromDTO(questionService.getById(questionId));
+        Question question = dtoParserQuestion.generateObjectFromDTO(questionService.getById(questionId));
         return answerRepository.findAnswersByQuestionPossibleList(question);
     }
 
     public List<Answer> getCorrectAnswersByQuestion(@RequestParam int questionId){
         LOG.warn("peterpan");
-        Question question = (Question) dtoParserQuestion.generateObjectFromDTO(questionService.getById(questionId));
+        Question question = dtoParserQuestion.generateObjectFromDTO(questionService.getById(questionId));
         return answerRepository.findAnswersByQuestionPossibleList(question);
     }
 }

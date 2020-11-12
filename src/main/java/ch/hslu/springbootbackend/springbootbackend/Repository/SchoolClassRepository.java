@@ -1,5 +1,6 @@
 package ch.hslu.springbootbackend.springbootbackend.Repository;
 
+import ch.hslu.springbootbackend.springbootbackend.Entity.Institution;
 import ch.hslu.springbootbackend.springbootbackend.Entity.SchoolClass;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.ExamSet;
 import ch.hslu.springbootbackend.springbootbackend.Entity.User;
@@ -14,4 +15,5 @@ public interface SchoolClassRepository extends JpaRepository<SchoolClass, Intege
     Optional<SchoolClass> findByName(String name);
     List<SchoolClass> findAllByUsersInClass(User user);
     List<SchoolClass> findAllByExamSetsForSchoolClass(ExamSet examSet);
+    List<SchoolClass> findAllByInstitution(Institution institution);
 }

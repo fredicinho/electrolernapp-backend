@@ -9,10 +9,7 @@ public interface CsvService {
 
 
     default boolean hasCSVFormat(MultipartFile file) {
-        if (!TYPE.equals(file.getContentType())) {
-            return false;
-        }
-        return true;
+        return TYPE.equals(file.getContentType());
     }
 
     List saveNewEntities(MultipartFile file);

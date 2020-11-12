@@ -9,9 +9,6 @@ import ch.hslu.springbootbackend.springbootbackend.Entity.User;
 import ch.hslu.springbootbackend.springbootbackend.Exception.ResourceNotFoundException;
 import ch.hslu.springbootbackend.springbootbackend.Repository.*;
 import ch.hslu.springbootbackend.springbootbackend.Strategy.DTOParserQuestion;
-import ch.hslu.springbootbackend.springbootbackend.controllers.QuestionController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,8 +43,6 @@ public class QuestionService {
     @Autowired
     DTOParserQuestion dtoParserQuestion;
 
-    private final Logger LOG = LoggerFactory.getLogger(QuestionController.class);
-
 
 
     private boolean ressourceExists = false;
@@ -63,11 +58,11 @@ public class QuestionService {
         Question question = dtoParserQuestion.generateObjectFromDTO(questionDTO);
         question.setPossibleAnswers(this.checkIfAnswersExistsInDatabase(question.getPossibleAnswers()));
         question.setCorrectAnswers(this.checkIfAnswersExistsInDatabase(question.getCorrectAnswers()));
-        return (QuestionDTO) dtoParserQuestion.generateDTOFromObject(questionRepository.save(question).getId());
+        return dtoParserQuestion.generateDTOFromObject(questionRepository.save(question).getId());
     }
 
     public List<QuestionDTO> getAllQuestions(){
-        return (List<QuestionDTO>) dtoParserQuestion.generateDTOsFromObjects(questionRepository.findAll());
+        return dtoParserQuestion.generateDTOsFromObjects(questionRepository.findAll());
     }
 
     public QuestionDTO getById(int questionId){
@@ -108,7 +103,7 @@ public class QuestionService {
             User user = userOptional.get();
             questions = questionRepository.findQuestionByCreatedByUser(user);
         }
-        return (List<QuestionDTO>)dtoParserQuestion.generateDTOsFromObjects(questions);
+        return dtoParserQuestion.generateDTOsFromObjects(questions);
     }
 
     private List<Answer> checkIfAnswersExistsInDatabase(List<Answer> answerList){

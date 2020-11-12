@@ -58,8 +58,10 @@ public class SchoolClassController {
     @GetMapping("/examSet")
     public List<SchoolClassDTO> getSchoolClassesByExamSet(@RequestParam int examSetId) {
         return schoolClassService.getAllSchoolClassesByExamSet(examSetId);
-
-
+    }
+    @GetMapping("/institution")
+    public List<SchoolClassDTO> getSchoolClassesByInstitution(@RequestParam int institutionId) {
+        return schoolClassService.getAllSchoolClassesByInstitution(institutionId);
     }
 
     @GetMapping("/")

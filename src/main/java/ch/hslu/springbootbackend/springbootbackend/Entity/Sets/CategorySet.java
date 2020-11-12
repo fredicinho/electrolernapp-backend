@@ -8,10 +8,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Entity
-@SequenceGenerator(name="seq", initialValue=2, allocationSize=100)
 public class CategorySet {
 
-    public CategorySet(){};
+    public CategorySet(){}
 
     public CategorySet(Integer id, Category category, String title, String categorySetNumber) {
         this.categorySetId = id;
@@ -19,15 +18,13 @@ public class CategorySet {
         this.title = title;
         this.categorySetNumber = categorySetNumber;
     }
-
     @Id
-    @GeneratedValue(strategy= GenerationType.SEQUENCE, generator = "sec")
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Integer categorySetId;
 
     @OneToOne(targetEntity = Category.class, cascade = CascadeType.ALL)
     private Category category;
     private String title;
-
     private String categorySetNumber;
 
     @ManyToMany

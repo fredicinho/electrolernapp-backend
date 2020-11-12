@@ -42,7 +42,8 @@ public class QuestionDTO extends RepresentationModel<QuestionDTO> {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private int answerImageId= 0;
 
-    public QuestionDTO(){};
+    public QuestionDTO(){}
+
     public QuestionDTO(Integer id, String questionphrase, QuestionType questionType, int pointsToAchieve) {
         this.id = id;
         this.questionphrase = questionphrase;

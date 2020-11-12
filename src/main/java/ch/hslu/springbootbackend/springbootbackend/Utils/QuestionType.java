@@ -3,7 +3,7 @@ package ch.hslu.springbootbackend.springbootbackend.Utils;
 public enum QuestionType {
     MC("Multiple Choice");
 
-    private String type;
+    private final String type;
 
     QuestionType(String type) {
         this.type = type;

@@ -25,6 +25,10 @@ public class SchoolClass {
     @ManyToMany(mappedBy = "inSchoolClasses")
     private List<User> usersInClass = new LinkedList<>();
 
+    @ManyToOne
+    @JoinColumn(name="Fk_institution", nullable=false)
+    private Institution institution;
+
     public SchoolClass(){}
 
     public SchoolClass(String name, String description) {

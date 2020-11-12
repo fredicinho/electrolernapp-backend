@@ -38,7 +38,8 @@ public class Statistic{
         this.user.getStatistics().add(this);
     }
 
-    public Statistic(){};
+    public Statistic(){}
+
     public Integer getStatisticId() {
         return statisticId;
     }
