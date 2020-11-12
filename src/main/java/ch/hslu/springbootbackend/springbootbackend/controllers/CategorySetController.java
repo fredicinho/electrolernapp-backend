@@ -12,7 +12,7 @@ import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api/v1/categorySet")
+@RequestMapping("/api/v1/categorysets")
 public class CategorySetController {
 
 @Autowired
@@ -21,6 +21,11 @@ public class CategorySetController {
     @GetMapping("/category/{id}")
     public List<CategorySetDTO> getCategorySetByCategoryId(@PathVariable(value = "id") Integer categoryId){
         return categorySetService.getCategorySetByCategoryId(categoryId);
+    }
+
+    @GetMapping("/")
+    public List<CategorySetDTO> getAllCategorySets() {
+        return categorySetService.getAllCategorySets();
     }
 
 
