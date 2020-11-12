@@ -18,8 +18,11 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @Service
 public class CategorySetService {
 
-    @Autowired
-    CategorySetRepository categorySetRepository;
+    private final CategorySetRepository categorySetRepository;
+
+    public CategorySetService(CategorySetRepository categorySetRepository) {
+        this.categorySetRepository = categorySetRepository;
+    }
 
     public CategorySetDTO getCategorySetDTOById(Integer id) throws ResourceNotFoundException {
         CategorySet categorySet = categorySetRepository.findById(id).orElseThrow(
@@ -45,6 +48,11 @@ public class CategorySetService {
             categorySetDTOS.add(categorySetDTO);
         }
         return categorySetDTOS;
+    }
+
+    public List<CategorySetDTO> getAllCategorySets() {
+        List<CategorySet> allCategorySets = categorySetRepository.findAll();
+        return this.generateCategorySetDTOFromCatagorySet(allCategorySets);
     }
 
 }
