@@ -28,6 +28,8 @@ public class SchoolClassDTO extends RepresentationModel<SchoolClassDTO> {
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<Long> usersInClass = new LinkedList<>();
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private Integer institutionId;
 
     public SchoolClassDTO(){}
     public SchoolClassDTO(Integer id, String name, String description) {
@@ -82,6 +84,14 @@ public class SchoolClassDTO extends RepresentationModel<SchoolClassDTO> {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public Integer getInstitutionId() {
+        return institutionId;
+    }
+
+    public void setInstitutionId(Integer institutionId) {
+        this.institutionId = institutionId;
     }
 
 

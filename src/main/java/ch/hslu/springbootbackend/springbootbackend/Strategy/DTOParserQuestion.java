@@ -37,7 +37,7 @@ public class DTOParserQuestion implements DTOParserStrategy{
     @Override
     public QuestionDTO generateDTOFromObject(int id) {
         Question question = questionRepository.findById(id).orElseThrow();
-        QuestionDTO questionDTO = new QuestionDTO(id, question.getQuestionphrase(), question.getQuestionType(), question.getPointsToAchieve());
+        QuestionDTO questionDTO = new QuestionDTO(id, question.getQuestionPhrase(), question.getQuestionType(), question.getPointsToAchieve());
         questionDTO.setPossibleAnswers(answerRepository.findAnswersByQuestionPossibleList(question));
         questionDTO.setCorrectAnswers(answerRepository.findAnswersByQuestionCorrectList(question));
         //questionDTO.add(linkTo(methodOn(AnswerController.class).getPossibleAnswersByQuestion(questionId)).withRel("possibleAnswers"));
@@ -66,7 +66,7 @@ public class DTOParserQuestion implements DTOParserStrategy{
         QuestionDTO questionDTO = (QuestionDTO) objectDTO;
         try {
             question = new Question(
-                    questionDTO.getQuestionphrase(),
+                    questionDTO.getQuestionPhrase(),
                     questionDTO.getPossibleAnswers(),
                     questionDTO.getCorrectAnswers(),
                     questionDTO.getQuestionType(),

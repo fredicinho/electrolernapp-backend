@@ -97,4 +97,13 @@ public class SchoolClass {
     public int getWriteInCode() {
         return writeInCode;
     }
+
+    public Institution getInstitution() {
+        return institution;
+    }
+
+    public void setInstitution(Institution institution) {
+        this.institution = institution;
+    }
+
 }

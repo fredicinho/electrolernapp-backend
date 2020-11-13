@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 public class ExamSetService {
@@ -27,12 +28,12 @@ public class ExamSetService {
     DTOParserExamSet dtoParserExamSet;
 
 
-    private boolean ressourceExists = false;
+    private AtomicBoolean ressourceExists = new AtomicBoolean();
 
     public ExamSetDTO createNewExamSet(ExamSetDTO examSetDTO) {
         Optional<ExamSet> examSetOptional = examSetRepository.findByTitle(examSetDTO.getTitle());
         if (examSetOptional.isPresent()) {
-            ressourceExists = true;
+            ressourceExists.set(true);
             return dtoParserExamSet.generateDTOFromObject(examSetOptional.get().getExamSetId());
         }
         ExamSet examSet = dtoParserExamSet.generateObjectFromDTO(examSetDTO);
@@ -76,11 +77,11 @@ public class ExamSetService {
     }
 
 
-    public boolean ressourceExists() {
+    public AtomicBoolean ressourceExists() {
         return ressourceExists;
     }
 
-    public void setRessourceExists(boolean ressourceExists) {
+    public void setRessourceExists(AtomicBoolean ressourceExists) {
         this.ressourceExists = ressourceExists;
     }
 }

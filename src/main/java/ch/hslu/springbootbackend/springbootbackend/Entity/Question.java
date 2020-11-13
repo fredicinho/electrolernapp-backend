@@ -22,7 +22,7 @@ public class Question{
     private Integer id;
 
     @Column(length=1000000)
-    private String questionphrase;
+    private String questionPhrase;
 
     @ManyToMany(mappedBy = "questionPossibleList")
     private List<Answer> possibleAnswers = new LinkedList<>();
@@ -59,8 +59,8 @@ public class Question{
     private List<ExamSet> examSets = new LinkedList<>();
 
 
-    public Question(String questionphrase, List<Answer> possibleAnswers, List<Answer> correctAnswers, QuestionType questionType, User user, List<CategorySet> categorySets, Media questionImage, Media answerImage, int pointsToAchieve) {
-        this.questionphrase = questionphrase;
+    public Question(String questionPhrase, List<Answer> possibleAnswers, List<Answer> correctAnswers, QuestionType questionType, User user, List<CategorySet> categorySets, Media questionImage, Media answerImage, int pointsToAchieve) {
+        this.questionPhrase = questionPhrase;
         this.possibleAnswers = possibleAnswers;
         this.correctAnswers = correctAnswers;
         this.questionType = questionType;
@@ -70,8 +70,8 @@ public class Question{
         this.categorySet = categorySets;
         this.pointsToAchieve = pointsToAchieve;
     }
-    public Question(String questionphrase, List<Answer> answers, List<Answer>  correctAnswers, QuestionType questionType, int pointsToAchieve) {
-        this.setQuestionphrase(questionphrase);
+    public Question(String questionPhrase, List<Answer> answers, List<Answer>  correctAnswers, QuestionType questionType, int pointsToAchieve) {
+        this.setQuestionPhrase(questionPhrase);
         this.setPossibleAnswers(answers);
         this.setCorrectAnswers(correctAnswers);
         this.setQuestionType(questionType);
@@ -141,12 +141,12 @@ public class Question{
         this.id = id;
     }
 
-    public String getQuestionphrase() {
-        return questionphrase;
+    public String getQuestionPhrase() {
+        return questionPhrase;
     }
 
-    public void setQuestionphrase(String questionphrase) {
-        this.questionphrase = questionphrase;
+    public void setQuestionPhrase(String questionphrase) {
+        this.questionPhrase = questionphrase;
     }
 
     public List<Answer> getPossibleAnswers() {
@@ -210,7 +210,7 @@ public class Question{
     public String toString() {
         return "Question{" +
                 "id=" + id +
-                ", questionphrase='" + questionphrase + '\'' +
+                ", questionphrase='" + questionPhrase + '\'' +
                 ", possibleAnswers=" + possibleAnswers +
                 ", correctAnswers=" + correctAnswers +
                 ", questionType=" + questionType +

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 public class QuestionService {
@@ -45,14 +46,14 @@ public class QuestionService {
 
 
 
-    private boolean ressourceExists = false;
+    private AtomicBoolean ressourceExists = new AtomicBoolean();
 
 
     public QuestionDTO createNewQuestion(QuestionDTO questionDTO){
 
-        List<Question> questions = questionRepository.findByQuestionphrase(questionDTO.getQuestionphrase());
+        List<Question> questions = questionRepository.findByQuestionPhrase(questionDTO.getQuestionPhrase());
         if (!questions.isEmpty()) {
-            ressourceExists = true;
+            ressourceExists.set(true);
             return dtoParserQuestion.generateDTOFromObject(questions.get(0).getId());
         }
         Question question = dtoParserQuestion.generateObjectFromDTO(questionDTO);
@@ -123,12 +124,12 @@ public class QuestionService {
         return list;
     }
 
-    public boolean ressourceExists() {
+    public AtomicBoolean ressourceExists() {
         return ressourceExists;
     }
 
 
-    public void setRessourceExists(boolean ressourceExists) {
+    public void setRessourceExists(AtomicBoolean ressourceExists) {
         this.ressourceExists = ressourceExists;
     }
 

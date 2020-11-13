@@ -1,5 +1,6 @@
 package ch.hslu.springbootbackend.springbootbackend.DTO;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.util.LinkedList;
@@ -8,6 +9,7 @@ import java.util.List;
 public class InstitutionDTO extends RepresentationModel<InstitutionDTO> {
     private int id;
     private String name;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<Integer> schoolClassIds = new LinkedList<>();
 
     public InstitutionDTO(String name){

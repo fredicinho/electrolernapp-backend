@@ -49,11 +49,12 @@ public class InstitutionController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<InstitutionDTO> getExamSetById(@PathVariable(value = "id") Integer institutionId) {
+    public ResponseEntity<InstitutionDTO> getInstitutionById(@PathVariable(value = "id") Integer institutionId) {
 
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(institutionService.getInstitutionById(institutionId));
     }
+
 }

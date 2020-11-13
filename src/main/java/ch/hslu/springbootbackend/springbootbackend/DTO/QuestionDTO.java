@@ -20,7 +20,7 @@ public class QuestionDTO extends RepresentationModel<QuestionDTO> {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Integer id;
 
-    private String questionphrase;
+    private String questionPhrase;
     private List<Answer> possibleAnswers = new LinkedList<>();
     private List<Answer> correctAnswers = new LinkedList<>();
 
@@ -44,15 +44,15 @@ public class QuestionDTO extends RepresentationModel<QuestionDTO> {
 
     public QuestionDTO(){}
 
-    public QuestionDTO(Integer id, String questionphrase, QuestionType questionType, int pointsToAchieve) {
+    public QuestionDTO(Integer id, String questionPhrase, QuestionType questionType, int pointsToAchieve) {
         this.id = id;
-        this.questionphrase = questionphrase;
+        this.questionPhrase = questionPhrase;
         this.questionType = questionType;
         this.pointsToAchieve = pointsToAchieve;
     }
 
-    public QuestionDTO(String questionphrase, QuestionType questionType, List<Answer> possibleAnswer, List<Answer> correctAnswer, List<Integer> statisticsIds, int questionImageId, int answerImageId, int pointsToAchieve) {
-        this.questionphrase = questionphrase;
+    public QuestionDTO(String questionPhrase, QuestionType questionType, List<Answer> possibleAnswer, List<Answer> correctAnswer, List<Integer> statisticsIds, int questionImageId, int answerImageId, int pointsToAchieve) {
+        this.questionPhrase = questionPhrase;
         this.questionType = questionType;
         this.possibleAnswers = possibleAnswer;
         this.correctAnswers = correctAnswer;
@@ -70,12 +70,12 @@ public class QuestionDTO extends RepresentationModel<QuestionDTO> {
         this.id = id;
     }
 
-    public String getQuestionphrase() {
-        return questionphrase;
+    public String getQuestionPhrase() {
+        return questionPhrase;
     }
 
-    public void setQuestionphrase(String questionphrase) {
-        this.questionphrase = questionphrase;
+    public void setQuestionPhrase(String questionPhrase) {
+        this.questionPhrase = questionPhrase;
     }
 
     public QuestionType getQuestionType() {
@@ -154,7 +154,7 @@ public class QuestionDTO extends RepresentationModel<QuestionDTO> {
     public String toString() {
         return "QuestionDTO{" +
                 "id=" + id +
-                ", questionphrase='" + questionphrase + '\'' +
+                ", questionphrase='" + questionPhrase + '\'' +
                 ", possibleAnswers=" + possibleAnswers +
                 ", correctAnswers=" + correctAnswers +
                 ", questionType=" + questionType;

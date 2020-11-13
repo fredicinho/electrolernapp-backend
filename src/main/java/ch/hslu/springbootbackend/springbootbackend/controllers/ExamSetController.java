@@ -31,8 +31,8 @@ public class ExamSetController {
     public ResponseEntity<ExamSetDTO> newSchoolClass(@RequestBody ExamSetDTO newExamSet) {
         ExamSetDTO examSetDTO = examSetService.createNewExamSet(newExamSet);
         if(examSetDTO != null) {
-            if(examSetService.ressourceExists()){
-                examSetService.setRessourceExists(false);
+            if(examSetService.ressourceExists().get()){
+                examSetService.ressourceExists().set(false);
                 return ResponseEntity
                         .status(HttpStatus.CONFLICT)
                         .contentType(MediaType.APPLICATION_JSON)
