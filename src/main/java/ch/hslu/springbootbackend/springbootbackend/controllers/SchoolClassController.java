@@ -26,8 +26,8 @@ public class SchoolClassController {
     @Autowired
     UserRepository userRepository;
 
-    @PostMapping("")
     //@PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping("/")
     public ResponseEntity<SchoolClassDTO> newSchoolClass(@RequestBody SchoolClassDTO newSchoolClass) {
             SchoolClassDTO schoolClassDTO = schoolClassService.createNewSchoolClass(newSchoolClass);
         if(schoolClassDTO != null) {

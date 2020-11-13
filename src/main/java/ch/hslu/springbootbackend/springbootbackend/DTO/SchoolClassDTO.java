@@ -42,6 +42,11 @@ public class SchoolClassDTO extends RepresentationModel<SchoolClassDTO> {
         this.description = description;
     }
 
+    public SchoolClassDTO(String name, String description, Integer institutionId) {
+        this.name = name;
+        this.description = description;
+        this.institutionId = institutionId;
+    }
 
     public String getName() {
         return name;
