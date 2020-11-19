@@ -12,6 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
+import java.util.List;
+
 // TODO: Kann nur eine Mapping-Methode nehmen und als parameter noch die entity übergeben...
 // TODO: Somit müsste nur eine Methode implementiert werden!!
 
@@ -34,6 +37,83 @@ public class CsvController {
         this.csvCategoryService = csvCategoryService;
         this.csvCategorySetService = csvCategorySetService;
         this.csvMediaService = csvMediaService;
+    }
+
+    @PostMapping("/all")
+    public ResponseEntity<List<MessageResponse>> uploadAllFiles(@RequestParam("categoryFile") MultipartFile categoryFile, @RequestParam("categorySetFile") MultipartFile categorySetFile, @RequestParam("mediaFile") MultipartFile mediaFile, @RequestParam("questionFile") MultipartFile questionFile ) {
+        List<MessageResponse> messageList = new ArrayList<>();
+        String categoryMessage = "";
+
+        if (csvCategoryService.hasCSVFormat(categoryFile)) {
+            try {
+                csvCategoryService.saveNewEntities(categoryFile);
+
+                categoryMessage = "Uploaded the file successfully: " + categoryFile.getOriginalFilename();
+                messageList.add(new MessageResponse(categoryMessage));
+            } catch (Exception e) {
+                categoryMessage = "Could not upload the file: " + categoryFile.getOriginalFilename() + "! " + e.getMessage();
+                LOG.error(categoryMessage);
+                e.printStackTrace();
+                messageList.add(new MessageResponse(categoryMessage));
+                return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(messageList);
+            }
+        }
+
+
+        String categorySetMessage = "";
+
+        if (csvCategorySetService.hasCSVFormat(categorySetFile)) {
+            try {
+                csvCategorySetService.saveNewEntities(categorySetFile);
+
+                categorySetMessage = "Uploaded the file successfully: " + categorySetFile.getOriginalFilename();
+                messageList.add(new MessageResponse(categorySetMessage));
+            } catch (Exception e) {
+                categorySetMessage = "Could not upload the file: " + categorySetFile.getOriginalFilename() + "! " + e.getMessage();
+                LOG.error(categorySetMessage);
+                e.printStackTrace();
+                messageList.add(new MessageResponse(categorySetMessage));
+                return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(messageList);
+            }
+        }
+
+
+        String mediaMessage = "";
+
+        if (csvMediaService.hasCSVFormat(mediaFile)) {
+            try {
+                csvMediaService.saveNewEntities(mediaFile);
+
+                mediaMessage = "Uploaded the file successfully: " + mediaFile.getOriginalFilename();
+                messageList.add(new MessageResponse(mediaMessage));
+            } catch (Exception e) {
+                mediaMessage = "Could not upload the file: " + mediaFile.getOriginalFilename() + "! " + e.getMessage();
+                LOG.error(mediaMessage);
+                e.printStackTrace();
+                messageList.add(new MessageResponse(mediaMessage));
+                return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(messageList);
+            }
+        }
+
+
+        String questionMessage = "";
+
+        if (csvQuestionService.hasCSVFormat(questionFile)) {
+            try {
+                csvQuestionService.saveNewEntities(questionFile);
+
+                questionMessage = "Uploaded the file successfully: " + questionFile.getOriginalFilename();
+                messageList.add(new MessageResponse(questionMessage));
+            } catch (Exception e) {
+                questionMessage = "Could not upload the file: " + questionFile.getOriginalFilename() + "! " + e.getMessage();
+                LOG.error(questionMessage);
+                e.printStackTrace();
+                messageList.add(new MessageResponse(questionMessage));
+                return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(messageList);
+            }
+        }
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(messageList);
     }
 
 
