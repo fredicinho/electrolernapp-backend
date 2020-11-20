@@ -6,10 +6,7 @@ import ch.hslu.springbootbackend.springbootbackend.Utils.QuestionType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
@@ -221,5 +218,21 @@ public class Question{
                 ", answerImage=" + answerImage +
                 ", categorySet=" + categorySet +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Question question = (Question) o;
+        return pointsToAchieve == question.pointsToAchieve &&
+                Objects.equals(questionPhrase, question.questionPhrase) &&
+                questionType == question.questionType &&
+                Objects.equals(createdByUser, question.createdByUser);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(questionPhrase, questionType, pointsToAchieve);
     }
 }

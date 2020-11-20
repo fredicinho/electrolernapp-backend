@@ -67,7 +67,7 @@ public class DTOParserExamSet implements DTOParserStrategy{
     public List<ExamSetDTO> generateDTOsFromObjects(List list) {
         List<ExamSetDTO> examSetDTOS = new ArrayList<>();
         for(Object examSetDTO:list){
-            ExamSetDTO examSet = (ExamSetDTO) examSetDTO;
+            ExamSet examSet = (ExamSet) examSetDTO;
             examSetDTOS.add(generateDTOFromObject(examSet.getExamSetId()));
         }
         return examSetDTOS;

@@ -1,11 +1,8 @@
 package ch.hslu.springbootbackend.springbootbackend.Strategy;
 
 import ch.hslu.springbootbackend.springbootbackend.DTO.ExamResultDTO;
-import ch.hslu.springbootbackend.springbootbackend.Entity.Answer;
-import ch.hslu.springbootbackend.springbootbackend.Entity.ExamResult;
-import ch.hslu.springbootbackend.springbootbackend.Entity.Question;
+import ch.hslu.springbootbackend.springbootbackend.Entity.*;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.ExamSet;
-import ch.hslu.springbootbackend.springbootbackend.Entity.User;
 import ch.hslu.springbootbackend.springbootbackend.Repository.*;
 import ch.hslu.springbootbackend.springbootbackend.controllers.AnswerController;
 import ch.hslu.springbootbackend.springbootbackend.controllers.ExamSetController;
@@ -73,8 +70,8 @@ public class DTOParserExamResult implements DTOParserStrategy {
     public List<ExamResultDTO> generateDTOsFromObjects(List list) {
         List<ExamResultDTO> examResultDTOs = new ArrayList<>();
         for(Object examResultDTO:list){
-            ExamResultDTO examResultDTO1 = (ExamResultDTO) examResultDTO;
-            examResultDTOs.add(generateDTOFromObject(examResultDTO1.getExamResultId()));
+            ExamResult examResult = (ExamResult) examResultDTO;
+            examResultDTOs.add(generateDTOFromObject(examResult.getId()));
         }
         return examResultDTOs;
     }

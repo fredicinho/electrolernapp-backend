@@ -52,7 +52,7 @@ public class QuestionService {
     public QuestionDTO createNewQuestion(QuestionDTO questionDTO){
 
         List<Question> questions = questionRepository.findByQuestionPhrase(questionDTO.getQuestionPhrase());
-        if (!questions.isEmpty()) {
+        if (questions.size() != 0) {
             ressourceExists.set(true);
             return dtoParserQuestion.generateDTOFromObject(questions.get(0).getId());
         }

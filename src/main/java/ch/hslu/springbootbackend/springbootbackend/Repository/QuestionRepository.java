@@ -1,7 +1,7 @@
 package ch.hslu.springbootbackend.springbootbackend.Repository;
 
-import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.CategorySet;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Question;
+import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.CategorySet;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.ExamSet;
 import ch.hslu.springbootbackend.springbootbackend.Entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,4 +15,5 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
     List<Question> findQuestionByCategorySet(CategorySet categorySet);
     List<Question> findQuestionByCreatedByUser(User user);
     List<Question> findQuestionByExamSets(ExamSet examSet);
+    //List<Question> findQuestionByPossibleAnswers(List<Answer> possibleAnswers);
 }

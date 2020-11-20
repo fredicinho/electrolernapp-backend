@@ -1,14 +1,14 @@
 package ch.hslu.springbootbackend.springbootbackend.controllers;
 
-import ch.hslu.springbootbackend.springbootbackend.DTO.ExamResultDTO;
 import ch.hslu.springbootbackend.springbootbackend.DTO.ExamSetDTO;
 import ch.hslu.springbootbackend.springbootbackend.Repository.ExamSetRepository;
-import ch.hslu.springbootbackend.springbootbackend.Service.EntityService.ExamResultService;
 import ch.hslu.springbootbackend.springbootbackend.Service.EntityService.ExamSetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,8 +23,9 @@ public class ExamSetController {
     ExamSetRepository examSetRepository;
     @Autowired
     ExamSetService examSetService;
-    @Autowired
-    ExamResultService examResultService;
+
+
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
     @PostMapping("")
     //@PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -50,22 +51,6 @@ public class ExamSetController {
         }
     }
 
-    @PostMapping("/check")
-    //@PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<ExamResultDTO> check(@RequestBody ExamResultDTO newExamResultDTO) {
-        ExamResultDTO examResultDTO = examResultService.saveNewExamResult(newExamResultDTO);
-        if(examResultDTO != null) {
-            return ResponseEntity
-                    .status(HttpStatus.CREATED)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(examResultDTO);
-        }
-        else{
-            return ResponseEntity.
-                    notFound()
-                    .build();
-        }
-    }
 
     @GetMapping("/")
     public List<ExamSetDTO> getAllExamSets() {

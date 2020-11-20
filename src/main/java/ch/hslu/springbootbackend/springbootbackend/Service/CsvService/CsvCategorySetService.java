@@ -53,16 +53,12 @@ public class CsvCategorySetService implements CsvService {
             Iterable<CSVRecord> csvRecords = csvParser.getRecords();
 
             for (CSVRecord csvRecord : csvRecords) {
-                if(csvRecord.get("categorieid").equals("NIL")){
-                    newCategorieSets.add(new CategorySet(Integer.parseInt(csvRecord.get("categorieSetId")), null, null, null));
-                }else {
                     int categoryId = Integer.parseInt(csvRecord.get("categorieid"));
                     Optional<Category> categoryOfCategorySet = categoryRepository.findById(categoryId);
                     if (!categoryOfCategorySet.isPresent()) {
-                        throw new IOException("The Category with the passed id = " + categoryId + " doesn't exists!");
+                        LOG.warn("No category with the Id "+categoryId + "categorySet created with category Null");
                     }
                     newCategorieSets.add(new CategorySet(Integer.parseInt(csvRecord.get("categorieSetId")), categoryOfCategorySet.get(), csvRecord.get("title"), csvRecord.get("categorieSetNumber")));
-                }
             }
             return newCategorieSets;
 

@@ -12,6 +12,7 @@ import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 public class QuestionDTO extends RepresentationModel<QuestionDTO> {
 
@@ -158,6 +159,22 @@ public class QuestionDTO extends RepresentationModel<QuestionDTO> {
                 ", possibleAnswers=" + possibleAnswers +
                 ", correctAnswers=" + correctAnswers +
                 ", questionType=" + questionType;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        QuestionDTO that = (QuestionDTO) o;
+        return pointsToAchieve == that.pointsToAchieve &&
+                Objects.equals(questionPhrase, that.questionPhrase) &&
+                questionType == that.questionType;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(questionPhrase, questionType, pointsToAchieve);
     }
 
     //private List<CategorySet> categorySet;

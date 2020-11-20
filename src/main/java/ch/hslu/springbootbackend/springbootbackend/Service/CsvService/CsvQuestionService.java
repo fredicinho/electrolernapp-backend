@@ -1,13 +1,11 @@
 package ch.hslu.springbootbackend.springbootbackend.Service.CsvService;
 
 import ch.hslu.springbootbackend.springbootbackend.Entity.Answer;
-import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.CategorySet;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Media;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Question;
-import ch.hslu.springbootbackend.springbootbackend.Repository.AnswerRepository;
-import ch.hslu.springbootbackend.springbootbackend.Repository.CategorySetRepository;
-import ch.hslu.springbootbackend.springbootbackend.Repository.MediaRepository;
-import ch.hslu.springbootbackend.springbootbackend.Repository.QuestionRepository;
+import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.CategorySet;
+import ch.hslu.springbootbackend.springbootbackend.Entity.User;
+import ch.hslu.springbootbackend.springbootbackend.Repository.*;
 import ch.hslu.springbootbackend.springbootbackend.Utils.QuestionType;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -23,25 +21,30 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 public class CsvQuestionService implements CsvService {
 
     private final Logger LOG = LoggerFactory.getLogger(CsvQuestionService.class);
-    static String[] HEADER_QUESTION = {"chapterId", "QuestionPhrase", "Answer1", "Answer2", "Answer3", "Answer4", "Answer5", "CorrectAnswerAsLetter", "textIfCorrect", "textIfIncorrect", "questionImageId", "solutionImageId"};
+    static String[] HEADER_QUESTION = {"categorySetId", "questionType", "questionPhrase", "Answer1", "Answer2", "Answer3", "Answer4", "Answer5", "CorrectAnswerAsLetter", "textIfCorrect", "textIfIncorrect", "questionImageId", "solutionImageId", "author", "pointsToAchieve"};
 
     private final QuestionRepository questionRepository;
     private final AnswerRepository answerRepository;
     private final CategorySetRepository categorySetRepository;
     private final MediaRepository mediaRepository;
+    private final UserRepository userRepository;
     private List<Answer> currentCreatedAnswers;
 
-    CsvQuestionService(QuestionRepository questionRepository, AnswerRepository answerRepository, CategorySetRepository categorySetRepository, MediaRepository mediaRepository) {
+    CsvQuestionService(QuestionRepository questionRepository, AnswerRepository answerRepository, CategorySetRepository categorySetRepository, MediaRepository mediaRepository, UserRepository userRepository) {
         this.questionRepository = questionRepository;
         this.answerRepository = answerRepository;
         this.categorySetRepository = categorySetRepository;
         this.mediaRepository = mediaRepository;
+        this.userRepository = userRepository;
     }
 
     public List<Question> saveNewEntities(MultipartFile file) {
@@ -66,11 +69,11 @@ public class CsvQuestionService implements CsvService {
             for (CSVRecord csvRecord : csvRecords) {
                 List<CategorySet> categorySet = new ArrayList<>();
                 try {
-                    CategorySet foundedCategorySet = this.getCategorySet(Integer.parseInt(csvRecord.get("chapterId")));
+                    CategorySet foundedCategorySet = this.getCategorySet(csvRecord.get("categorySetId"));
                     categorySet.add(foundedCategorySet);
 
                 } catch (NumberFormatException ex) {
-                    LOG.warn("Couldn't parse the founded Chapter ID :: " + csvRecord.get("chapterId") + " of the Data :: " + csvRecord.toString());
+                    LOG.warn("Couldn't parse the founded categorySetId :: " + csvRecord.get("categorySetId") + " of the Data :: " + csvRecord.toString());
                     continue;
                 }
 
@@ -91,10 +94,17 @@ public class CsvQuestionService implements CsvService {
                 }
 
                 List<Answer> correctAnswers = this.parseLettersToAnswers(csvRecord.get("CorrectAnswerAsLetter"), possibleAnswers);
-                QuestionType questionType = QuestionType.fromString("Multiple Choice");
+                QuestionType questionType = QuestionType.fromString(csvRecord.get("questionType"));
                 Media questionImage = null;
                 Media solutionImage = null;
-                int pointsToAchieve = 2;
+                User user;
+                int pointsToAchieve = Integer.parseInt(csvRecord.get("pointsToAchieve"));
+
+                if(!userRepository.existsByUsername(csvRecord.get("autor"))){
+                    user = new User(this.escapeAndEncodeString(csvRecord.get("autor")), null, null);
+                }else{
+                    user = userRepository.findByUsername(this.escapeAndEncodeString(csvRecord.get("autor"))).get();
+                }
                 if (this.checkIfMediaAvailableInCsv(csvRecord.get("questionImageId"))) {
                     questionImage = this.getMediaById(Integer.parseInt(csvRecord.get("questionImageId")));
                 }
@@ -107,7 +117,7 @@ public class CsvQuestionService implements CsvService {
                         possibleAnswers,
                         correctAnswers,
                         questionType,
-                        null,
+                        user,
                         categorySet,
                         questionImage,
                         solutionImage,
@@ -135,12 +145,13 @@ public class CsvQuestionService implements CsvService {
         return answerPhrase.equalsIgnoreCase("VOID") || answerPhrase.equalsIgnoreCase("");
     }
 
-    private CategorySet getCategorySet(final int categorySetId) {
-        Optional<CategorySet> categorySet = categorySetRepository.findById(categorySetId);
+    private CategorySet getCategorySet(final String categorySetNumber) {
+        Optional<CategorySet> categorySet = categorySetRepository.findByCategorySetNumber(categorySetNumber);
         if (categorySet.isPresent()) {
             return categorySet.get();
         } else {
-            throw new NoSuchElementException("The categorySet with the id :: " + categorySetId + " doesn't exists!");
+            LOG.warn("Category set with id " + categorySetNumber + "not found" );
+            return new CategorySet();
         }
 
     }
