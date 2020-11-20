@@ -19,7 +19,7 @@ public class InstitutionController {
     InstitutionService institutionService;
 
 
-    @PostMapping("")
+    @PostMapping("/")
     //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<InstitutionDTO> newSchoolClass(@RequestBody InstitutionDTO newInstitution) {
         InstitutionDTO institutionDTO = institutionService.createNewInstitution(newInstitution);
