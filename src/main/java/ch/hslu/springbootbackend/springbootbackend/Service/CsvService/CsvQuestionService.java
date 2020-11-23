@@ -100,7 +100,7 @@ public class CsvQuestionService implements CsvService {
                 User user;
                 int pointsToAchieve = Integer.parseInt(csvRecord.get("pointsToAchieve"));
 
-                if(!userRepository.existsByUsername(csvRecord.get("autor"))){
+                if(!userRepository.existsByUsername(escapeAndEncodeString(csvRecord.get("autor")))){
                     user = new User(this.escapeAndEncodeString(csvRecord.get("autor")), null, null);
                 }else{
                     user = userRepository.findByUsername(this.escapeAndEncodeString(csvRecord.get("autor"))).get();

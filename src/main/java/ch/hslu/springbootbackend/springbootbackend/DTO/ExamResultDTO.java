@@ -11,9 +11,8 @@ public class ExamResultDTO extends RepresentationModel<ExamResultDTO> {
     private Integer examResultId;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Double pointsAchieved;
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private long userId;
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+
     private int questionId;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private int examSetId;

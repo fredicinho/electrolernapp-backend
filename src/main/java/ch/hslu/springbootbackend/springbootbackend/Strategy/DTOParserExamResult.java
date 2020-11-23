@@ -1,13 +1,14 @@
 package ch.hslu.springbootbackend.springbootbackend.Strategy;
 
 import ch.hslu.springbootbackend.springbootbackend.DTO.ExamResultDTO;
-import ch.hslu.springbootbackend.springbootbackend.Entity.*;
+import ch.hslu.springbootbackend.springbootbackend.Entity.Answer;
+import ch.hslu.springbootbackend.springbootbackend.Entity.ExamResult;
+import ch.hslu.springbootbackend.springbootbackend.Entity.Question;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.ExamSet;
+import ch.hslu.springbootbackend.springbootbackend.Entity.User;
 import ch.hslu.springbootbackend.springbootbackend.Repository.*;
 import ch.hslu.springbootbackend.springbootbackend.controllers.AnswerController;
 import ch.hslu.springbootbackend.springbootbackend.controllers.ExamSetController;
-import ch.hslu.springbootbackend.springbootbackend.controllers.QuestionController;
-import ch.hslu.springbootbackend.springbootbackend.controllers.UserController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,8 +37,10 @@ public class DTOParserExamResult implements DTOParserStrategy {
         ExamResult examResult = examResultRepository.findById(id).orElseThrow();
         ExamResultDTO examResultDTO = new ExamResultDTO(id);
         examResultDTO.setPointsAchieved(examResult.getPointsAchieved());
-        examResultDTO.add(linkTo(methodOn(UserController.class).getUserById(examResult.getUser().getId())).withRel("user"));
-        examResultDTO.add(linkTo(methodOn(QuestionController.class).getQuestionById(examResult.getQuestion().getId())).withRel("question"));
+        //examResultDTO.add(linkTo(methodOn(UserController.class).getUserById(examResult.getUser().getId())).withRel("user"));
+        examResultDTO.setQuestionId(examResult.getQuestion().getId());
+        examResultDTO.setUserId(examResult.getUser().getId());
+        //examResultDTO.add(linkTo(methodOn(QuestionController.class).getQuestionById(examResult.getQuestion().getId())).withRel("question"));
         examResultDTO.add(linkTo(methodOn(ExamSetController.class).getExamSetById(examResult.getExamSet().getExamSetId())).withRel("examSet"));
         examResultDTO.add(linkTo(methodOn(AnswerController.class).getAnswersByExamAnswer(examResult.getId())).withRel("answersGiven"));
 

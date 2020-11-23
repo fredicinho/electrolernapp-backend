@@ -57,7 +57,7 @@ public class ExamSetController {
         return examSetService.getAllExamSets();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id }")
     public ResponseEntity<ExamSetDTO> getExamSetById(@PathVariable(value = "id") Integer examSetId) {
         return ResponseEntity
                 .ok()
