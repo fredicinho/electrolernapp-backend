@@ -37,18 +37,21 @@ public class ExamSet {
     private Date startDate;
     private Date endDate;
 
+    private String description;
+
     @OneToMany(targetEntity = ExamResult.class, cascade = CascadeType.ALL)
     private Set<ExamResult> examResults = new HashSet<>();
 
     public ExamSet(){}
 
-    public ExamSet(String title, List<Question> questionsInExamSet, List<SchoolClass> schoolClassesInExamSet, Date startDate, Date endDate, User user) {
+    public ExamSet(String title, List<Question> questionsInExamSet, List<SchoolClass> schoolClassesInExamSet, Date startDate, Date endDate, User user, String description) {
         this.title = title;
         this.questionsInExamSet = questionsInExamSet;
         this.schoolClassesInExamSet = schoolClassesInExamSet;
         this.startDate = startDate;
         this.endDate = endDate;
         this.createdByUser = user;
+        this.description = description;
     }
 
     @PostPersist
@@ -134,5 +137,13 @@ public class ExamSet {
         this.examResults = examResults;
     }
 
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
 }

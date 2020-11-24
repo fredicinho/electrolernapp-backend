@@ -39,7 +39,7 @@ public class DTOParserExamSet implements DTOParserStrategy{
     @Override
     public ExamSetDTO generateDTOFromObject(int id) {
         ExamSet examSet = examSetRepository.findById(id).orElseThrow();
-        ExamSetDTO examSetDTO = new ExamSetDTO(examSet.getExamSetId(), examSet.getTitle(), examSet.getStartDate(), examSet.getEndDate());
+        ExamSetDTO examSetDTO = new ExamSetDTO(examSet.getExamSetId(), examSet.getTitle(), examSet.getStartDate(), examSet.getEndDate(), examSet.getDescription());
         examSetDTO.add(linkTo(methodOn(QuestionController.class).getQuestionsByExamSet(examSet.getExamSetId())).withRel("questionsInExamSet"));
         examSetDTO.add(linkTo(methodOn(SchoolClassController.class).getSchoolClassesByExamSet(examSet.getExamSetId())).withRel("classesInExamSet"));
         examSetDTO.add(linkTo(methodOn(UserController.class).getUserById(examSet.getCreatedByUser().getId())).withRel("created by"));
@@ -57,7 +57,8 @@ public class DTOParserExamSet implements DTOParserStrategy{
                 this.getSchoolClassesFromDatabase(examSetDTO.getSchoolClassesInExamSet()),
                 examSetDTO.getStartDate(),
                 examSetDTO.getEndDate(),
-                this.getUserFromDatabase(examSetDTO.getUserId())
+                this.getUserFromDatabase(examSetDTO.getUserId()),
+                examSetDTO.getDescription()
             );
 
         return examSet;

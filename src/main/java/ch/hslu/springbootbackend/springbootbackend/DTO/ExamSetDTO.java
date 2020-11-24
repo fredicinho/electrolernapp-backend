@@ -24,12 +24,15 @@ public class ExamSetDTO extends RepresentationModel<ExamSetDTO> {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private int userId;
 
+    private String description;
+
     public ExamSetDTO(){}
-    public ExamSetDTO(Integer examSetId, String title, Date startDate, Date endDate) {
+    public ExamSetDTO(Integer examSetId, String title, Date startDate, Date endDate, String description) {
         this.examSetId = examSetId;
         this.title = title;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.description = description;
     }
 
 
@@ -89,5 +92,15 @@ public class ExamSetDTO extends RepresentationModel<ExamSetDTO> {
     public void setUserId(int userId) {
         this.userId = userId;
     }
+
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
 
 }
