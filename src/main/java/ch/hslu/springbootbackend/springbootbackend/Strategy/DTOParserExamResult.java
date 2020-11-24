@@ -40,10 +40,10 @@ public class DTOParserExamResult implements DTOParserStrategy {
         //examResultDTO.add(linkTo(methodOn(UserController.class).getUserById(examResult.getUser().getId())).withRel("user"));
         examResultDTO.setQuestionId(examResult.getQuestion().getId());
         examResultDTO.setUserId(examResult.getUser().getId());
+        examResultDTO.setChangedByTeacher(examResult.getChangedByTeacher());
         //examResultDTO.add(linkTo(methodOn(QuestionController.class).getQuestionById(examResult.getQuestion().getId())).withRel("question"));
         examResultDTO.add(linkTo(methodOn(ExamSetController.class).getExamSetById(examResult.getExamSet().getExamSetId())).withRel("examSet"));
         examResultDTO.add(linkTo(methodOn(AnswerController.class).getAnswersByExamAnswer(examResult.getId())).withRel("answersGiven"));
-
         return examResultDTO;
     }
 
@@ -66,6 +66,7 @@ public class DTOParserExamResult implements DTOParserStrategy {
         }
 
         examResult.setPointsAchieved(this.calculateScore(examResult.getQuestion().getCorrectAnswers(), examResult.getAnswersToCheck(), examResult.getQuestion().getPointsToAchieve()));
+        examResult.setChangedByTeacher(examResultDTO.getChangedByTeacher());
         return examResult;
     }
 

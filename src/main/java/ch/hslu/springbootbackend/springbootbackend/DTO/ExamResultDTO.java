@@ -3,6 +3,7 @@ package ch.hslu.springbootbackend.springbootbackend.DTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.hateoas.RepresentationModel;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,6 +19,8 @@ public class ExamResultDTO extends RepresentationModel<ExamResultDTO> {
     private int examSetId;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<String> sendedAnswers = new LinkedList<>();
+
+    private Date changedByTeacher = null;
 
     public ExamResultDTO(){}
     public ExamResultDTO(int id){
@@ -70,5 +73,15 @@ public class ExamResultDTO extends RepresentationModel<ExamResultDTO> {
     public void setSendedAnswers(List<String> sendedAnswers) {
         this.sendedAnswers = sendedAnswers;
     }
+
+    public Date getChangedByTeacher() {
+        return changedByTeacher;
+    }
+
+    public void setChangedByTeacher(Date changedByTeacher) {
+        this.changedByTeacher = changedByTeacher;
+    }
+
+
 
 }

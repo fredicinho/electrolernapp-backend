@@ -3,6 +3,7 @@ package ch.hslu.springbootbackend.springbootbackend.Entity;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.ExamSet;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -24,6 +25,8 @@ public class ExamResult{
     private ExamSet examSet;
     @ManyToMany(mappedBy = "examResults")
     private List<Answer> answersToCheck = new LinkedList<>();
+
+    private Date changedByTeacher = null;
 
     public ExamResult(){}
     public ExamResult(Integer id, User user, Question question, ExamSet examSet, List<Answer> answersToCheck) {
@@ -99,4 +102,14 @@ public class ExamResult{
     public void setExamSet(ExamSet examSet) {
         this.examSet = examSet;
     }
+
+
+    public Date getChangedByTeacher() {
+        return changedByTeacher;
+    }
+
+    public void setChangedByTeacher(Date changedByTeacher) {
+        this.changedByTeacher = changedByTeacher;
+    }
+
 }
