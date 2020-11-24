@@ -9,6 +9,7 @@ import ch.hslu.springbootbackend.springbootbackend.Strategy.DTOParserStatistic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -40,6 +41,13 @@ public class StatisticService {
 
     public StatisticDTO addNewStatistic(StatisticDTO statDTO){
         return dtoParserStatistic.generateDTOFromObject(statisticRepository.save(dtoParserStatistic.generateObjectFromDTO(statDTO)).getStatisticId());
+    }
+
+    public List<StatisticDTO> addNewStatistics(List<StatisticDTO> statisticDTOS){
+        List<StatisticDTO> statisticDTOS1 = new ArrayList<>();
+        for(StatisticDTO statisticDTO : statisticDTOS){
+            statisticDTOS1.add(this.addNewStatistic(statisticDTO));
+        }return statisticDTOS1;
     }
 
 }

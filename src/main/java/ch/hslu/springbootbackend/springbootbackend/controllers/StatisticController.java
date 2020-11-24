@@ -63,4 +63,23 @@ public class StatisticController {
 
 
     }
+
+    @PostMapping("/statistics")
+    //@PreAuthorize("")
+    public ResponseEntity<List<StatisticDTO>> addStatisticArray(@RequestBody List<StatisticDTO> newStatistics) {
+
+        List<StatisticDTO> statisticDTOs = statisticService.addNewStatistics(newStatistics);
+        if(statisticDTOs.size() != 0) {
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(statisticDTOs);
+        }else{
+            return ResponseEntity.
+                    notFound()
+                    .build();
+        }
+
+
+    }
 }
