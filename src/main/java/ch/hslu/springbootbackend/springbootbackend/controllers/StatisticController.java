@@ -19,6 +19,7 @@ import java.util.List;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/v1/statistics")
+@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TEACHER') or hasRole('ROLE_USER') ")
 public class StatisticController {
     private final Logger LOG = LoggerFactory.getLogger(StatisticController.class);
 
@@ -27,7 +28,6 @@ public class StatisticController {
     private StatisticService statisticService;
 
     @GetMapping("/User/{id}")
-    @PreAuthorize("hasAnyRole()")
     public List<StatisticDTO> getStatisticByUserId(@PathVariable(value = "id") long userId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_USER"))) {
@@ -38,7 +38,6 @@ public class StatisticController {
     }
 
     @GetMapping("/UserAndQuestion/")
-    @PreAuthorize("hasAnyRole()")
     public List<StatisticDTO> getStatisticByUserAndQuestion(@RequestParam Integer userId
                                                         , @RequestParam Integer questionId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -50,14 +49,12 @@ public class StatisticController {
     }
 
     @GetMapping("/Question/{id}")
-    @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
     public List<StatisticDTO> getStatisticByQuestionId(@PathVariable(value = "id") Integer questionId) throws ResourceNotFoundException {
             return statisticService.getByQuestionId(questionId);
 
     }
 
     @PostMapping("")
-    @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<StatisticDTO> addStatistic(@RequestBody StatisticDTO newStatistic) {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             newStatistic.setUsername(auth.getName());

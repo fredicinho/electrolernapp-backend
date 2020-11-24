@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -89,6 +90,7 @@ public class AuthController {
 												 userDetails.getEmail(), 
 												 roles));
 	}
+	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
 	@PostMapping("/startExam")
 	public ResponseEntity<?> authenticateUserForExam(@Valid @RequestBody LoginRequest loginRequest, @RequestParam int examSetId) {
 		Authentication authentication = authenticationManager.authenticate(
@@ -117,6 +119,7 @@ public class AuthController {
 				roles));
 	}
 
+	@PreAuthorize("hasRole('ROLE_EXAM')")
 	@PostMapping("/endExam")
 	public ResponseEntity<?> endExam(@RequestParam int examSetId) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();

@@ -25,7 +25,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/v1/users")
-@PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
+@PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
 public class UserController {
     private final Logger LOG = LoggerFactory.getLogger(StatisticController.class);
 
@@ -63,7 +63,7 @@ public class UserController {
                     .build();
             }
     }
-
+    @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
     @GetMapping("/schoolClasses")
     public List<User> getUsersBySchoolClasses(@RequestParam Integer schoolClassId) {
         //LOG.warn(foundedQuestion.toString());
