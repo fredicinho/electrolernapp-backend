@@ -21,14 +21,14 @@ public class ExamResultController {
 
     @PostMapping("/check")
     //@PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<ExamResultDTO> check(@RequestBody ExamResultDTO newExamResultDTO) {
+    public ResponseEntity check(@RequestBody ExamResultDTO newExamResultDTO) {
         //String username = auth.();
         ExamResultDTO examResultDTO = examResultService.saveNewExamResult(newExamResultDTO);
         if(examResultDTO != null) {
             return ResponseEntity
                     .status(HttpStatus.CREATED)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(examResultDTO);
+                    .body(null);
         }
         else{
             return ResponseEntity.
