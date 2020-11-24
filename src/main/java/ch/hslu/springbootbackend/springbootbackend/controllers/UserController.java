@@ -10,6 +10,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedList;
@@ -31,34 +34,39 @@ public class UserController {
     SchoolClassRepository schoolClassRepository;
 
     @GetMapping("")
-    //@PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
     public List<User> getAllUsers() throws ResourceNotFoundException {
         return userRepository.findAll();
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<User> getUserById(@PathVariable(value = "id") Long userId) {
-        //LOG.warn(foundedQuestion.toString());
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Optional<User> userOptional;
+        if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_USER"))) {
+            userOptional = userRepository.findByUsername(auth.getName());
+        }else {
+            userOptional = userRepository.findById(userId);
+        }
+        if(userOptional.isPresent()){
+            User user = userOptional.get();
+            user.add(linkTo(methodOn(SchoolClassController.class).getSchoolClassesByUser(userId)).withRel("schoolClasses"));
 
-
-            Optional<User> userOptional = userRepository.findById(userId);
-            if(userOptional.isPresent()){
-                User user = userOptional.get();
-                user.add(linkTo(methodOn(SchoolClassController.class).getSchoolClassesByUser(userId)).withRel("schoolClasses"));
-
-                return ResponseEntity
+            return ResponseEntity
                     .ok()
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(user);
-            }else{
-                LOG.warn("Resource was not found: ");
-                return ResponseEntity.
-                        notFound()
-                        .build();
+        }else{
+            LOG.warn("Resource was not found: ");
+            return ResponseEntity.
+                    notFound()
+                    .build();
             }
     }
 
     @GetMapping("/schoolClasses")
+    @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
     public List<User> getUsersBySchoolClasses(@RequestParam Integer schoolClassId) {
         //LOG.warn(foundedQuestion.toString());
         List<User> user = new LinkedList<>();

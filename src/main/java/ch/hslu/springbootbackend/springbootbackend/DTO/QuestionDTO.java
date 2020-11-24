@@ -28,8 +28,9 @@ public class QuestionDTO extends RepresentationModel<QuestionDTO> {
     private QuestionType questionType;
 
     private int pointsToAchieve;
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private Long userId;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String createdBy;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<Integer> statisticsIds = new ArrayList<>();
@@ -135,12 +136,12 @@ public class QuestionDTO extends RepresentationModel<QuestionDTO> {
         this.categorySetIds = categorySetIds;
     }
 
-    public Long getUserId() {
-        return userId;
+    public String getCreatedBy() {
+        return createdBy;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 
     public int getPointsToAchieve() {
@@ -176,6 +177,8 @@ public class QuestionDTO extends RepresentationModel<QuestionDTO> {
     public int hashCode() {
         return Objects.hash(questionPhrase, questionType, pointsToAchieve);
     }
+
+
 
     //private List<CategorySet> categorySet;
 }

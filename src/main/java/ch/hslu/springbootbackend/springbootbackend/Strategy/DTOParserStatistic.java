@@ -47,7 +47,7 @@ public class DTOParserStatistic implements DTOParserStrategy{
                 statisticDTO.getPointsAchieved(),
                 statisticDTO.isMarked());
         statistic.setQuestion(getQuestionFromDatabase(statisticDTO.getQuestionId()));
-        statistic.setUser(getUserFromDatabase(statisticDTO.getUserId()));
+        statistic.setUser(getUserFromDatabase(statisticDTO.getUsername()));
         return statistic;
     }
 
@@ -71,8 +71,8 @@ public class DTOParserStatistic implements DTOParserStrategy{
 
     }
 
-    private User getUserFromDatabase(long userId){
-        Optional<User> userOptional = userRepository.findById(userId);
+    private User getUserFromDatabase(String username){
+        Optional<User> userOptional = userRepository.findByUsername(username);
         User user = null;
         if(userOptional.isPresent()){
             user = userOptional.get();

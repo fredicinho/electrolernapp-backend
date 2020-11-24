@@ -46,10 +46,10 @@ public class ExamResultService {
 
     }
 
-    public List<ExamResultDTO> getExamResultsByExamSetAndUser(int examSetId, long userId){
+    public List<ExamResultDTO> getExamResultsByExamSetAndUser(int examSetId, String username){
         List<ExamResultDTO>  examResultDTO = new ArrayList<>();
         Optional<ExamSet> examSetOptional = examSetRepository.findById(examSetId);
-        Optional<User> userOptional = userRepository.findById(userId);
+        Optional<User> userOptional = userRepository.findByUsername(username);
         if(examSetOptional.isPresent() && userOptional.isPresent()){
             List<ExamResult> examResultOptional = examResultRepository.findAllByExamSetAndUser(examSetOptional.get(), userOptional.get());
             examResultDTO = dtoParserExamResult.generateDTOsFromObjects(examResultOptional);

@@ -12,7 +12,8 @@ public class ExamResultDTO extends RepresentationModel<ExamResultDTO> {
     private Integer examResultId;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Double pointsAchieved;
-    private long userId;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String username;
 
     private int questionId;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -40,14 +41,6 @@ public class ExamResultDTO extends RepresentationModel<ExamResultDTO> {
 
     public void setPointsAchieved(Double pointsAchieved) {
         this.pointsAchieved = pointsAchieved;
-    }
-
-    public long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(long userId) {
-        this.userId = userId;
     }
 
     public int getQuestionId() {
@@ -82,6 +75,13 @@ public class ExamResultDTO extends RepresentationModel<ExamResultDTO> {
         this.changedByTeacher = changedByTeacher;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
 
 }

@@ -70,7 +70,7 @@ public class DTOParserQuestion implements DTOParserStrategy{
                     questionDTO.getPossibleAnswers(),
                     questionDTO.getCorrectAnswers(),
                     questionDTO.getQuestionType(),
-                    this.getUser(questionDTO.getUserId()),
+                    this.getUser(questionDTO.getCreatedBy()),
                     this.getCategorySets(questionDTO.getCategorySetIds()),
                     this.getImage(questionDTO.getQuestionImageId()),
                     this.getImage(questionDTO.getAnswerImageId()),
@@ -95,9 +95,9 @@ public class DTOParserQuestion implements DTOParserStrategy{
 
 
 
-    private User getUser(long userId) throws ResourceNotFoundException {
-        return userRepository.findById(userId).orElseThrow(
-                () -> new ResourceNotFoundException("User not found for this id :: " + userId ));
+    private User getUser(String username) throws ResourceNotFoundException {
+        return userRepository.findByUsername(username).orElseThrow(
+                () -> new ResourceNotFoundException("User not found for this username :: " + username ));
     }
     private boolean checkIfAnswerImageExists(Question question){
         return question.getAnswerImage() != null;

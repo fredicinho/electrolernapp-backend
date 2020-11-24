@@ -6,6 +6,7 @@ import ch.hslu.springbootbackend.springbootbackend.Service.EntityService.Categor
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/v1/categorySets")
+@PreAuthorize("hasAnyRole()")
 public class CategorySetController {
 
 @Autowired
@@ -27,7 +29,6 @@ public class CategorySetController {
     public List<CategorySetDTO> getAllCategorySets() {
         return categorySetService.getAllCategorySets();
     }
-
 
 
     @GetMapping("/{id}")

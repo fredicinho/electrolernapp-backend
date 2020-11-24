@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedList;
@@ -20,6 +21,7 @@ import java.util.Optional;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
+@PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
 @RequestMapping("/api/v1/answers")
 public class AnswerController {
 
@@ -70,7 +72,6 @@ public class AnswerController {
     }
 
     public List<Answer> getCorrectAnswersByQuestion(@RequestParam int questionId){
-        LOG.warn("peterpan");
         Question question = dtoParserQuestion.generateObjectFromDTO(questionService.getById(questionId));
         return answerRepository.findAnswersByQuestionPossibleList(question);
     }

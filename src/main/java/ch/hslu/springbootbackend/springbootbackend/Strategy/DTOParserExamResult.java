@@ -39,7 +39,7 @@ public class DTOParserExamResult implements DTOParserStrategy {
         examResultDTO.setPointsAchieved(examResult.getPointsAchieved());
         //examResultDTO.add(linkTo(methodOn(UserController.class).getUserById(examResult.getUser().getId())).withRel("user"));
         examResultDTO.setQuestionId(examResult.getQuestion().getId());
-        examResultDTO.setUserId(examResult.getUser().getId());
+        examResultDTO.setUsername(examResult.getUser().getUsername());
         examResultDTO.setChangedByTeacher(examResult.getChangedByTeacher());
         //examResultDTO.add(linkTo(methodOn(QuestionController.class).getQuestionById(examResult.getQuestion().getId())).withRel("question"));
         examResultDTO.add(linkTo(methodOn(ExamSetController.class).getExamSetById(examResult.getExamSet().getExamSetId())).withRel("examSet"));
@@ -58,7 +58,7 @@ public class DTOParserExamResult implements DTOParserStrategy {
         }else{
             examResult = new ExamResult(
                 examResultDTO.getExamResultId(),
-                this.getUserFromDatabase(examResultDTO.getUserId()),
+                this.getUserFromDatabase(examResultDTO.getUsername()),
                 this.getQuestionFromDatabase(examResultDTO.getQuestionId()),
                 this.getExamSetFromDatabase(examResultDTO.getExamSetId()),
                 this.getAnswersFromDatabase(examResultDTO.getSendedAnswers())
@@ -80,8 +80,8 @@ public class DTOParserExamResult implements DTOParserStrategy {
         return examResultDTOs;
     }
 
-    private User getUserFromDatabase(long userId){
-        Optional<User> userOptional = userRepository.findById(userId);
+    private User getUserFromDatabase(String username){
+        Optional<User> userOptional = userRepository.findByUsername(username);
         if(userOptional.isPresent()){
             return userOptional.get();
         }else{
@@ -121,7 +121,7 @@ public class DTOParserExamResult implements DTOParserStrategy {
         return answers;
     }
     private Optional<ExamResult> getExistingExamResult(ExamResultDTO examResultDTO){
-        return examResultRepository.findAllByUserAndExamSetAndQuestion(this.getUserFromDatabase(examResultDTO.getUserId()), this.getExamSetFromDatabase(examResultDTO.getExamSetId()), this.getQuestionFromDatabase(examResultDTO.getQuestionId()));
+        return examResultRepository.findAllByUserAndExamSetAndQuestion(this.getUserFromDatabase(examResultDTO.getUsername()), this.getExamSetFromDatabase(examResultDTO.getExamSetId()), this.getQuestionFromDatabase(examResultDTO.getQuestionId()));
     }
 
     private double calculateScore(List<Answer> correctAnswer, List<Answer> answerToCheck, int maxPoints){

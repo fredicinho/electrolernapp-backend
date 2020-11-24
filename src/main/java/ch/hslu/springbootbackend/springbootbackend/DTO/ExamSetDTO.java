@@ -21,8 +21,9 @@ public class ExamSetDTO extends RepresentationModel<ExamSetDTO> {
     private List<Integer> questionsInExamSet = new LinkedList<>();
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<Integer> schoolClassesInExamSet = new LinkedList<>();
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private int userId;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String createdBy;
 
     private String description;
 
@@ -85,12 +86,12 @@ public class ExamSetDTO extends RepresentationModel<ExamSetDTO> {
         this.endDate = endDate;
     }
 
-    public int getUserId() {
-        return userId;
+    public String getCreatedBy() {
+        return createdBy;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setCreatedBy(String username) {
+        this.createdBy = username;
     }
 
 

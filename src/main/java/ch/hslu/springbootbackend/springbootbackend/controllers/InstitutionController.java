@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping("/api/v1/institutions")
+@PreAuthorize("hasAnyRole()")
 public class InstitutionController {
 
     @Autowired
@@ -20,7 +22,7 @@ public class InstitutionController {
 
 
     @PostMapping("/")
-    //@PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<InstitutionDTO> newSchoolClass(@RequestBody InstitutionDTO newInstitution) {
         InstitutionDTO institutionDTO = institutionService.createNewInstitution(newInstitution);
         if(institutionDTO != null) {
@@ -44,11 +46,13 @@ public class InstitutionController {
     }
 
     @GetMapping("/")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TEACHER')")
     public List<InstitutionDTO> getAllInstitutions() {
         return institutionService.getAllInstitutions();
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TEACHER')")
     public ResponseEntity<InstitutionDTO> getInstitutionById(@PathVariable(value = "id") Integer institutionId) {
 
         return ResponseEntity

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -28,8 +29,10 @@ public class ExamSetController {
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
     @PostMapping("")
-    //@PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_TEACHER')")
     public ResponseEntity<ExamSetDTO> newSchoolClass(@RequestBody ExamSetDTO newExamSet) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        newExamSet.setCreatedBy(auth.getName());
         ExamSetDTO examSetDTO = examSetService.createNewExamSet(newExamSet);
         if(examSetDTO != null) {
             if(examSetService.ressourceExists().get()){
@@ -53,18 +56,20 @@ public class ExamSetController {
 
 
     @GetMapping("/")
+    @PreAuthorize("hasRole('ROLE_TEACHER')")
     public List<ExamSetDTO> getAllExamSets() {
         return examSetService.getAllExamSets();
     }
 
     @GetMapping("/{id }")
+    @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_EXAM')")
     public ResponseEntity<ExamSetDTO> getExamSetById(@PathVariable(value = "id") Integer examSetId) {
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(examSetService.getExamSetById(examSetId));
     }
-
+    @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
     @PutMapping("/{id}/schoolClasses")
     public ResponseEntity<ExamSetDTO> updateExamSetSchoolClassesIn(@PathVariable(value = "id") Integer examSetId, @RequestParam Integer schoolClassId) {
         return ResponseEntity
@@ -73,6 +78,7 @@ public class ExamSetController {
                 .body(examSetService.updateExamSetSchoolClassesIn(examSetId, schoolClassId));
     }
 
+    @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
     @PutMapping("/{id}/questions")
     public ResponseEntity<ExamSetDTO> updateExamSetQuestionsIn(@PathVariable(value = "id") Integer examSetId, @RequestBody List<Integer> questionIds) {
         return ResponseEntity

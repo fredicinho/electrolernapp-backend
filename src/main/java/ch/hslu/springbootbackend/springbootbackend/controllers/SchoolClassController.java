@@ -9,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,10 +29,11 @@ public class SchoolClassController {
     @Autowired
     UserRepository userRepository;
 
-    //@PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TEACHER')")
     @PostMapping("/")
     public ResponseEntity<SchoolClassDTO> newSchoolClass(@RequestBody SchoolClassDTO newSchoolClass) {
-            SchoolClassDTO schoolClassDTO = schoolClassService.createNewSchoolClass(newSchoolClass);
+
+        SchoolClassDTO schoolClassDTO = schoolClassService.createNewSchoolClass(newSchoolClass);
         if(schoolClassDTO != null) {
             if(schoolClassService.ressourceExists()){
                 schoolClassService.setRessourceExists(false);
@@ -50,21 +54,30 @@ public class SchoolClassController {
         }
     }
 
+    @PreAuthorize("hasAnyRole()")
     @GetMapping("/user")
     public List<SchoolClassDTO> getSchoolClassesByUser(@RequestParam long userId) {
-        return schoolClassService.getAllSchoolClassesFromUser(userId);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_USER"))) {
+            return schoolClassService.getAllSchoolClassesFromUser(auth.getName());
+        }else{
+            return schoolClassService.getAllSchoolClassesFromUser(userId);
+        }
     }
 
     @GetMapping("/examSet")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TEACHER')")
     public List<SchoolClassDTO> getSchoolClassesByExamSet(@RequestParam int examSetId) {
         return schoolClassService.getAllSchoolClassesByExamSet(examSetId);
     }
     @GetMapping("/institution")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TEACHER')")
     public List<SchoolClassDTO> getSchoolClassesByInstitution(@RequestParam int institutionId) {
         return schoolClassService.getAllSchoolClassesByInstitution(institutionId);
     }
 
     @GetMapping("/")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TEACHER')")
     public List<SchoolClassDTO> getAllSchoolClasses() {
         return schoolClassService.getAllSchoolClasses();
     }

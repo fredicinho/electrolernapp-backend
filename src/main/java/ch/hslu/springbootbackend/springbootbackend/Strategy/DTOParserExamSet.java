@@ -9,6 +9,7 @@ import ch.hslu.springbootbackend.springbootbackend.Repository.ExamSetRepository;
 import ch.hslu.springbootbackend.springbootbackend.Repository.QuestionRepository;
 import ch.hslu.springbootbackend.springbootbackend.Repository.SchoolClassRepository;
 import ch.hslu.springbootbackend.springbootbackend.Repository.UserRepository;
+import ch.hslu.springbootbackend.springbootbackend.controllers.ExamResultController;
 import ch.hslu.springbootbackend.springbootbackend.controllers.QuestionController;
 import ch.hslu.springbootbackend.springbootbackend.controllers.SchoolClassController;
 import ch.hslu.springbootbackend.springbootbackend.controllers.UserController;
@@ -43,6 +44,7 @@ public class DTOParserExamSet implements DTOParserStrategy{
         examSetDTO.add(linkTo(methodOn(QuestionController.class).getQuestionsByExamSet(examSet.getExamSetId())).withRel("questionsInExamSet"));
         examSetDTO.add(linkTo(methodOn(SchoolClassController.class).getSchoolClassesByExamSet(examSet.getExamSetId())).withRel("classesInExamSet"));
         examSetDTO.add(linkTo(methodOn(UserController.class).getUserById(examSet.getCreatedByUser().getId())).withRel("created by"));
+        examSetDTO.add(linkTo(methodOn(ExamResultController.class).getAllExamResultsByExamSet(examSet.getExamSetId())).withRel("examResults"));
         return examSetDTO;
     }
 
@@ -57,7 +59,7 @@ public class DTOParserExamSet implements DTOParserStrategy{
                 this.getSchoolClassesFromDatabase(examSetDTO.getSchoolClassesInExamSet()),
                 examSetDTO.getStartDate(),
                 examSetDTO.getEndDate(),
-                this.getUserFromDatabase(examSetDTO.getUserId()),
+                this.getUserFromDatabase(examSetDTO.getCreatedBy()),
                 examSetDTO.getDescription()
             );
 
@@ -97,8 +99,8 @@ public class DTOParserExamSet implements DTOParserStrategy{
         return schoolClasses;
     }
 
-    private User getUserFromDatabase(long userId){
-        Optional<User> userOptional = userRepository.findById(userId);
+    private User getUserFromDatabase(String username){
+        Optional<User> userOptional = userRepository.findByUsername(username);
         if(userOptional.isPresent()){
             return userOptional.get();
         }else{

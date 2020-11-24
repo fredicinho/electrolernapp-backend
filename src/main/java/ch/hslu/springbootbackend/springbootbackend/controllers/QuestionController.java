@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -25,6 +27,7 @@ public class QuestionController {
     @Autowired
     private QuestionService questionService;
 
+    @PreAuthorize("hasAnyRole()")
     @GetMapping("")
     public List<QuestionDTO> getAllQuestions() {
         List<QuestionDTO> questions = new ArrayList<>();
@@ -32,33 +35,13 @@ public class QuestionController {
         return questions;
     }
 
-    @GetMapping("/mod")
-    @PreAuthorize("hasRole('ROLE_MODERATOR')")
-    public String modAccess() {
-        return "Mod Content.";
-    }
-
-    @GetMapping("/all")
-    public String allAccess() {
-        return "All Content.";
-    }
-
-    @GetMapping("/admin")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public String adminAccess() {
-        return "Admin Content.";
-    }
-
-    @GetMapping("/user")
-    @PreAuthorize("hasRole('ROLE_USER')")
-    public String userAccess() {
-        return "User Content.";
-    }
 
     @PostMapping("")
+    @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
     //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<QuestionDTO> newQuestion(@RequestBody QuestionDTO newQuestion) {
-
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        newQuestion.setCreatedBy(auth.getName());
             QuestionDTO questionDTO = questionService.createNewQuestion(newQuestion);
             if(questionDTO != null) {
                 if(questionService.ressourceExists().get()){
@@ -79,7 +62,7 @@ public class QuestionController {
                         .build();
             }
     }
-
+    @PreAuthorize("hasAnyRole()")
     @GetMapping("/{id}")
     public ResponseEntity<QuestionDTO> getQuestionById(@PathVariable(value = "id") Integer questionId) {
         //LOG.warn(foundedQuestion.toString());
@@ -96,6 +79,7 @@ public class QuestionController {
             }
     }
 
+    @PreAuthorize("hasAnyRole()")
     @GetMapping("/categorySet")
     public List<QuestionDTO> getQuestionsByCategorySet(@RequestParam int categorySetId) {
         List<QuestionDTO> questionDTOS = new ArrayList<>();
@@ -107,6 +91,7 @@ public class QuestionController {
         return questionDTOS;
     }
 
+    @PreAuthorize("hasRole('ROLE_EXAM') or hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
     @GetMapping("/examSet")
     public List<QuestionDTO> getQuestionsByExamSet(@RequestParam int examSetId) {
         return questionService.getByExamSet(examSetId);

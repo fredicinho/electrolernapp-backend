@@ -11,9 +11,10 @@ public class StatisticDTO extends RepresentationModel<StatisticDTO> {
     private Date date;
     private int pointsAchieved;
     private boolean isMarked;
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @NotNull
-    private long userId;
+    private String username;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @NotNull
     private int questionId;
@@ -57,13 +58,14 @@ public class StatisticDTO extends RepresentationModel<StatisticDTO> {
         isMarked = marked;
     }
 
-    public long getUserId() {
-        return userId;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUserId(long userId) {
-        this.userId = userId;
+    public void setUsername(String username) {
+        this.username = username;
     }
+
 
     public int getQuestionId() {
         return questionId;
@@ -81,7 +83,7 @@ public class StatisticDTO extends RepresentationModel<StatisticDTO> {
                 ", date=" + date +
                 ", pointsAchieved=" + pointsAchieved +
                 ", isMarked=" + isMarked +
-                ", userId=" + userId +
+                ", username=" + username +
                 ", questionId=" + questionId +
                 '}';
     }

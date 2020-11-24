@@ -9,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,31 +27,40 @@ public class StatisticController {
     private StatisticService statisticService;
 
     @GetMapping("/User/{id}")
-    //@PreAuthorize("hasRole('ROLE_USER')")
-    public List<StatisticDTO> getStatisticByUserid(@PathVariable(value = "id") long userId) throws ResourceNotFoundException {
+    @PreAuthorize("hasAnyRole()")
+    public List<StatisticDTO> getStatisticByUserId(@PathVariable(value = "id") long userId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_USER"))) {
+            return statisticService.getByUsername(auth.getName());
+        }else{
             return statisticService.getByUserId(userId);
+        }
     }
 
     @GetMapping("/UserAndQuestion/")
-    //@PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasAnyRole()")
     public List<StatisticDTO> getStatisticByUserAndQuestion(@RequestParam Integer userId
-                                                        , @RequestParam Integer questionId) throws ResourceNotFoundException {
-        return statisticService.getByUserAndQuestion(userId, questionId);
-
+                                                        , @RequestParam Integer questionId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_USER"))) {
+            return statisticService.getByUsernameAndQuestion(auth.getName(), questionId);
+        }else {
+            return statisticService.getByUserAndQuestion(userId, questionId);
+        }
     }
 
     @GetMapping("/Question/{id}")
-    //will be only available for teacher
-    //@PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
     public List<StatisticDTO> getStatisticByQuestionId(@PathVariable(value = "id") Integer questionId) throws ResourceNotFoundException {
             return statisticService.getByQuestionId(questionId);
 
     }
 
     @PostMapping("")
-    //@PreAuthorize("")
+    @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<StatisticDTO> addStatistic(@RequestBody StatisticDTO newStatistic) {
-
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            newStatistic.setUsername(auth.getName());
             StatisticDTO statisticDTO = statisticService.addNewStatistic(newStatistic);
             if(statisticDTO != null) {
                 return ResponseEntity
@@ -65,7 +77,7 @@ public class StatisticController {
     }
 
     @PostMapping("/statistics")
-    //@PreAuthorize("")
+    @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<StatisticDTO>> addStatisticArray(@RequestBody List<StatisticDTO> newStatistics) {
 
         List<StatisticDTO> statisticDTOs = statisticService.addNewStatistics(newStatistics);

@@ -23,6 +23,7 @@ import java.util.List;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/v1/csv")
+//@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class CsvController {
 
     private final Logger LOG = LoggerFactory.getLogger(CsvController.class);

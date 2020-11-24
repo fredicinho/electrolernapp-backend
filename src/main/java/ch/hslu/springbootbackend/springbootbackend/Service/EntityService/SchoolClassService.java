@@ -65,6 +65,14 @@ public class SchoolClassService {
         }
         return schoolClassDTOS;
     }
+    public List<SchoolClassDTO> getAllSchoolClassesFromUser(String username) {
+        List<SchoolClassDTO> schoolClassDTOS = new LinkedList<>();
+        Optional<User > userOptional = userRepository.findByUsername(username);
+        if(userOptional.isPresent()){
+            schoolClassDTOS = dtoParserSchoolClass.generateDTOsFromObjects(schoolClassRepository.findAllByUsersInClass(userOptional.get()));
+        }
+        return schoolClassDTOS;
+    }
 
     public List<SchoolClassDTO> getAllSchoolClassesByExamSet(int examSetId) {
         List<SchoolClassDTO> schoolClassDTOS = new LinkedList<>();

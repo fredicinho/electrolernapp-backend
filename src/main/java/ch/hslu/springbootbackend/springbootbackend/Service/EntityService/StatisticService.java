@@ -1,7 +1,7 @@
 package ch.hslu.springbootbackend.springbootbackend.Service.EntityService;
 
 import ch.hslu.springbootbackend.springbootbackend.DTO.StatisticDTO;
-import ch.hslu.springbootbackend.springbootbackend.Exception.ResourceNotFoundException;
+import ch.hslu.springbootbackend.springbootbackend.Entity.User;
 import ch.hslu.springbootbackend.springbootbackend.Repository.QuestionRepository;
 import ch.hslu.springbootbackend.springbootbackend.Repository.StatisticRepository;
 import ch.hslu.springbootbackend.springbootbackend.Repository.UserRepository;
@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class StatisticService {
@@ -31,13 +32,28 @@ public class StatisticService {
     public List<StatisticDTO> getByUserId(long userId){
         return dtoParserStatistic.generateDTOsFromObjects(statisticRepository.findByUserId(userId));
     }
+    public List<StatisticDTO> getByUsername(String username){
+        Optional<User> userOptional = userRepository.findByUsername(username);
+        if(userOptional.isPresent()) {
+            return dtoParserStatistic.generateDTOsFromObjects(statisticRepository.findByUserId(userOptional.get().getId()));
+        }else {
+            return null;
+        }
+    }
 
     public List<StatisticDTO> getByQuestionId(int questionId){
         return dtoParserStatistic.generateDTOsFromObjects(statisticRepository.findByQuestionId(questionId));
     }
-    public List<StatisticDTO> getByUserAndQuestion(int userId, int questionId) throws ResourceNotFoundException {
+    public List<StatisticDTO> getByUserAndQuestion(int userId, int questionId){
         return dtoParserStatistic.generateDTOsFromObjects(statisticRepository.findByUserAndQuestion(userId, questionId));
     }
+    public List<StatisticDTO> getByUsernameAndQuestion(String username, int questionId){
+        Optional<User> userOptional = userRepository.findByUsername(username);
+        if(userOptional.isPresent()) {
+            return dtoParserStatistic.generateDTOsFromObjects(statisticRepository.findByUserAndQuestion(userOptional.get().getId(), questionId));
+        }else {
+            return null;
+        }    }
 
     public StatisticDTO addNewStatistic(StatisticDTO statDTO){
         return dtoParserStatistic.generateDTOFromObject(statisticRepository.save(dtoParserStatistic.generateObjectFromDTO(statDTO)).getStatisticId());
