@@ -2,6 +2,7 @@ package ch.hslu.springbootbackend.springbootbackend.DTO;
 
 import ch.hslu.springbootbackend.springbootbackend.Entity.Answer;
 import ch.hslu.springbootbackend.springbootbackend.Utils.QuestionType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.hateoas.RepresentationModel;
 
@@ -29,7 +30,7 @@ public class QuestionDTO extends RepresentationModel<QuestionDTO> {
 
     private int pointsToAchieve;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @JsonIgnore
     private String createdBy;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

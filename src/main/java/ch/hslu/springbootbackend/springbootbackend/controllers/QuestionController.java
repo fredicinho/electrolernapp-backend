@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,8 +39,7 @@ public class QuestionController {
 
     @PostMapping("")
     @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
-    //@PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<QuestionDTO> newQuestion(@RequestBody QuestionDTO newQuestion) {
+    public ResponseEntity<QuestionDTO> newQuestion(@Valid @RequestBody QuestionDTO newQuestion) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         newQuestion.setCreatedBy(auth.getName());
             QuestionDTO questionDTO = questionService.createNewQuestion(newQuestion);

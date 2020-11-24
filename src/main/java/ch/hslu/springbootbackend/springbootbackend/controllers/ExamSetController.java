@@ -25,9 +25,6 @@ public class ExamSetController {
     @Autowired
     ExamSetService examSetService;
 
-
-    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
     @PostMapping("")
     @PreAuthorize("hasRole('ROLE_TEACHER')")
     public ResponseEntity<ExamSetDTO> newSchoolClass(@RequestBody ExamSetDTO newExamSet) {
