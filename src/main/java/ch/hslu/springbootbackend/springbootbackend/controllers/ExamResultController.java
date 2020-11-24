@@ -19,7 +19,7 @@ public class ExamResultController {
     ExamResultService examResultService;
 
 
-    @PostMapping("/check")
+    @PutMapping("/check")
     //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity check(@RequestBody ExamResultDTO newExamResultDTO) {
         //String username = auth.();
@@ -61,5 +61,6 @@ public class ExamResultController {
                     .build();
         }
     }
+
 
 }

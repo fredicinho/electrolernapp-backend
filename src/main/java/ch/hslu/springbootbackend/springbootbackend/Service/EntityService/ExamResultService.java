@@ -5,10 +5,7 @@ import ch.hslu.springbootbackend.springbootbackend.Entity.ExamResult;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Question;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.ExamSet;
 import ch.hslu.springbootbackend.springbootbackend.Entity.User;
-import ch.hslu.springbootbackend.springbootbackend.Repository.ExamResultRepository;
-import ch.hslu.springbootbackend.springbootbackend.Repository.ExamSetRepository;
-import ch.hslu.springbootbackend.springbootbackend.Repository.QuestionRepository;
-import ch.hslu.springbootbackend.springbootbackend.Repository.UserRepository;
+import ch.hslu.springbootbackend.springbootbackend.Repository.*;
 import ch.hslu.springbootbackend.springbootbackend.Strategy.DTOParserExamResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,6 +27,8 @@ public class ExamResultService {
     QuestionRepository questionRepository;
     @Autowired
     DTOParserExamResult dtoParserExamResult;
+    @Autowired
+    SchoolClassRepository schoolClassRepository;
 
     public ExamResultDTO saveNewExamResult(ExamResultDTO examResultDTO){
         ExamResult examResult = dtoParserExamResult.generateObjectFromDTO(examResultDTO);
@@ -73,6 +72,7 @@ public class ExamResultService {
         return examResultDTO;
 
     }
+
 
 
 }
