@@ -22,13 +22,13 @@ import java.util.List;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/v1/questions")
+@PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')" )
 public class QuestionController {
     private final Logger LOG = LoggerFactory.getLogger(QuestionController.class);
 
     @Autowired
     private QuestionService questionService;
 
-    @PreAuthorize("hasAnyRole()")
     @GetMapping("")
     public List<QuestionDTO> getAllQuestions() {
         List<QuestionDTO> questions = new ArrayList<>();
@@ -62,7 +62,6 @@ public class QuestionController {
                         .build();
             }
     }
-    @PreAuthorize("hasAnyRole()")
     @GetMapping("/{id}")
     public ResponseEntity<QuestionDTO> getQuestionById(@PathVariable(value = "id") Integer questionId) {
         //LOG.warn(foundedQuestion.toString());
@@ -79,7 +78,6 @@ public class QuestionController {
             }
     }
 
-    @PreAuthorize("hasAnyRole()")
     @GetMapping("/categorySet")
     public List<QuestionDTO> getQuestionsByCategorySet(@RequestParam int categorySetId) {
         List<QuestionDTO> questionDTOS = new ArrayList<>();
