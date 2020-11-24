@@ -30,7 +30,7 @@ public class DTOParserInstitution implements DTOParserStrategy {
     @Override
     public InstitutionDTO generateDTOFromObject(int id) {
         Institution institution = institutionRepository.findById(id).orElseThrow();
-        InstitutionDTO institutionDTO = new InstitutionDTO(id, institution.getName());
+        InstitutionDTO institutionDTO = new InstitutionDTO(id, institution.getName(), institution.getDescription(), institution.getPlace(), institution.getPostcode());
 
         institutionDTO.add(linkTo(methodOn(SchoolClassController.class).getSchoolClassesByInstitution(id)).withRel("schoolClassesInInstitution"));
 
@@ -41,7 +41,10 @@ public class DTOParserInstitution implements DTOParserStrategy {
     public Institution generateObjectFromDTO(Object objectDTO) {
         InstitutionDTO institutionDTO = (InstitutionDTO) objectDTO;
         Institution institution = new Institution(
-                institutionDTO.getName());
+                institutionDTO.getName(),
+                institutionDTO.getDescription(),
+                institutionDTO.getPlace(),
+                institutionDTO.getPostcode());
         institution.setSchoolClasses(getSchoolClassesFromDatabase(institutionDTO.getSchoolClassIds()));
         return institution;
     }
