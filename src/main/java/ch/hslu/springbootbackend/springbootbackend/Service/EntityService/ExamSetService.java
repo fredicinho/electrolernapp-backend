@@ -54,13 +54,18 @@ public class ExamSetService {
             Optional<SchoolClass> schoolClassOptional = schoolClassRepository.findById(schoolClassId);
             if(schoolClassOptional.isPresent()){
                 ExamSet examSet = examSetOptional.get();
-                if(!examSetRepository.findAllBySchoolClassesInExamSet(schoolClassOptional.get()).isPresent()) {
+                if(examSetRepository.findAllBySchoolClassesInExamSet(schoolClassOptional.get()).size() != 0) {
                     examSet.getSchoolClassesInExamSet().add(schoolClassOptional.get());
                     examSetRepository.save(examSet);
                 }
             }
         }
         return dtoParserExamSet.generateDTOFromObject(examSetId);
+    }
+
+    public long getTimeForExam(int examSetId){
+        ExamSet examSet = examSetRepository.findById(examSetId).orElseThrow(() -> new RuntimeException("Error: Exam is not found."));;
+        return examSet.getEndDate().getTime()-examSet.getStartDate().getTime();
     }
 
     public ExamSetDTO updateExamSetQuestionsIn(int examSetId, List<Integer> questionIds){

@@ -19,6 +19,7 @@ import java.util.List;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/v1/schoolClasses")
+@PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
 public class SchoolClassController {
 
     private final Logger LOG = LoggerFactory.getLogger(SchoolClassController.class);
@@ -54,7 +55,7 @@ public class SchoolClassController {
         }
     }
 
-    @PreAuthorize("hasAnyRole()")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_TEACHER')")
     @GetMapping("/user")
     public List<SchoolClassDTO> getSchoolClassesByUser(@RequestParam long userId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -66,18 +67,15 @@ public class SchoolClassController {
     }
 
     @GetMapping("/examSet")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TEACHER')")
     public List<SchoolClassDTO> getSchoolClassesByExamSet(@RequestParam int examSetId) {
         return schoolClassService.getAllSchoolClassesByExamSet(examSetId);
     }
     @GetMapping("/institution")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TEACHER')")
     public List<SchoolClassDTO> getSchoolClassesByInstitution(@RequestParam int institutionId) {
         return schoolClassService.getAllSchoolClassesByInstitution(institutionId);
     }
 
     @GetMapping("/")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TEACHER')")
     public List<SchoolClassDTO> getAllSchoolClasses() {
         return schoolClassService.getAllSchoolClasses();
     }

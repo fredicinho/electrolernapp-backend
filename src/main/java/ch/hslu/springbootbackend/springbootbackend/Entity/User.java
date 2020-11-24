@@ -36,6 +36,7 @@ public class User extends RepresentationModel<User> {
 	@Size(max = 120)
 	private String password;
 
+
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(	name = "user_roles",
 				joinColumns = @JoinColumn(name = "user_id"),
@@ -54,7 +55,7 @@ public class User extends RepresentationModel<User> {
 	@OneToMany(targetEntity = Statistic.class, cascade = CascadeType.ALL)
 	private Set<Statistic> statistics;
 
-
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@OneToMany(targetEntity = ExamResult.class, cascade = CascadeType.ALL)
 	private Set<ExamResult> examResults;
 

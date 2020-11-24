@@ -25,6 +25,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/v1/users")
+@PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
 public class UserController {
     private final Logger LOG = LoggerFactory.getLogger(StatisticController.class);
 
@@ -34,13 +35,11 @@ public class UserController {
     SchoolClassRepository schoolClassRepository;
 
     @GetMapping("")
-    @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
     public List<User> getAllUsers() throws ResourceNotFoundException {
         return userRepository.findAll();
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<User> getUserById(@PathVariable(value = "id") Long userId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Optional<User> userOptional;
@@ -66,7 +65,6 @@ public class UserController {
     }
 
     @GetMapping("/schoolClasses")
-    @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
     public List<User> getUsersBySchoolClasses(@RequestParam Integer schoolClassId) {
         //LOG.warn(foundedQuestion.toString());
         List<User> user = new LinkedList<>();
