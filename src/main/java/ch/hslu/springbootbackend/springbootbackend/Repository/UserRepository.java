@@ -19,5 +19,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 	List<User> findAllByInSchoolClasses(SchoolClass schoolClass);
 
-
 }

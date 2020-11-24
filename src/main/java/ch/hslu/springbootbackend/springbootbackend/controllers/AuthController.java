@@ -78,6 +78,10 @@ public class AuthController {
 		List<String> roles = userDetails.getAuthorities().stream()
 				.map(item -> item.getAuthority())
 				.collect(Collectors.toList());
+		if(roles.contains("ROLE_EXAM")){
+			User user = userRepository.findByUsername(loginRequest.getUsername()).orElseThrow(() -> new RuntimeException("Error: User is not found."));
+			userRepository.save(removeExamRole(user));
+		}
 
 		return ResponseEntity.ok(new JwtResponse(jwt,
 												 userDetails.getId(), 
@@ -87,14 +91,13 @@ public class AuthController {
 	}
 	@PostMapping("/startExam")
 	public ResponseEntity<?> authenticateUserForExam(@Valid @RequestBody LoginRequest loginRequest, @RequestParam int examSetId) {
-
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 		User user = userRepository.findByUsername(loginRequest.getUsername()).orElseThrow(() -> new RuntimeException("Error: User is not found."));;
 		String jwt;
 		long expirationTime;
 		if (checkIfUserHasPermissionToStartExam(user, examSetId)) {
-			user = updateExamRole(user);
+			user = addExamRole(user);
 			expirationTime = examSetService.getTimeForExam(examSetId);
 			jwt = jwtUtils.generateJwtToken(authentication, expirationTime);
 		}else{
@@ -107,7 +110,26 @@ public class AuthController {
 				.map(item -> item.getAuthority())
 				.collect(Collectors.toList());
 
+		return ResponseEntity.ok(new JwtResponse(jwt,
+				userDetails.getId(),
+				userDetails.getUsername(),
+				userDetails.getEmail(),
+				roles));
+	}
 
+	@PostMapping("/endExam")
+	public ResponseEntity<?> endExam(@RequestParam int examSetId) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		User user = userRepository.findByUsername(auth.getName()).orElseThrow(() -> new RuntimeException("Error: User is not found."));;
+		String jwt;
+		user = removeExamRole(user);
+		jwt = jwtUtils.generateJwtToken(auth);
+
+
+		UserDetailsImpl userDetails = (UserDetailsImpl) auth.getPrincipal();
+		List<String> roles = userDetails.getAuthorities().stream()
+				.map(item -> item.getAuthority())
+				.collect(Collectors.toList());
 
 		return ResponseEntity.ok(new JwtResponse(jwt,
 				userDetails.getId(),
@@ -179,10 +201,19 @@ public class AuthController {
 				.body(user);
 	}
 
-	private User updateExamRole(User user){
+	private User addExamRole(User user){
 		Role examRole = roleRepository.findByName(ERole.ROLE_EXAM)
 				.orElseThrow(() -> new RuntimeException("Error: Role is not found."));;
-		user.getRoles().add(examRole);
+
+				user.getRoles().add(examRole);
+		return userRepository.save(user);
+
+	}
+	private User removeExamRole(User user){
+		Role examRole = roleRepository.findByName(ERole.ROLE_EXAM)
+				.orElseThrow(() -> new RuntimeException("Error: Role is not found."));;
+
+		user.getRoles().remove(examRole);
 		return userRepository.save(user);
 
 	}
