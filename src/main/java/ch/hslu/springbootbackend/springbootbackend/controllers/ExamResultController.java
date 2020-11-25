@@ -50,7 +50,7 @@ public class ExamResultController {
     }
 
 
-    @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_USER')")
+    //@PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_USER')")
     @GetMapping("/examSets")
     public List<ExamResultDTO> getAllExamResultsByExamSet(@RequestParam Integer examSetId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -61,12 +61,12 @@ public class ExamResultController {
             return examResultService.getExamResultsByExamSet(examSetId);
         }
     }
-    @PreAuthorize("hasRole('ROLE_TEACHER')")
+    //@PreAuthorize("hasRole('ROLE_TEACHER')")
     @GetMapping("/examSetsAndUser")
     public List<ExamResultDTO> getAllExamSetResultsByUserAndExamSet(@RequestParam Integer examSetId, @RequestParam String username) {
         return examResultService.getExamResultsByExamSetAndUser(examSetId, username);
     }
-    @PreAuthorize("hasRole('ROLE_TEACHER')")
+    //@PreAuthorize("hasRole('ROLE_TEACHER')")
     @GetMapping("/examSetsAndUsersAndQuestion")
     public ResponseEntity<ExamResultDTO> getAllExamSetResultsByExamSetsAndUsersAndQuestion(@RequestParam Integer examSetId, @RequestParam Integer userId, @RequestParam Integer questionId) {
         ExamResultDTO examResultDTO = examResultService.getExamResultsByExamSetAndUserIdAndQuestionId(examSetId, userId, questionId);

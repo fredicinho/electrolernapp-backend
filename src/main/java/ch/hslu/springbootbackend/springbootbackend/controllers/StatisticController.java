@@ -74,7 +74,7 @@ public class StatisticController {
     }
 
     @PostMapping("/statistics")
-    @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
+    //@PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<StatisticDTO>> addStatisticArray(@RequestBody List<StatisticDTO> newStatistics) {
 
         List<StatisticDTO> statisticDTOs = statisticService.addNewStatistics(newStatistics);
