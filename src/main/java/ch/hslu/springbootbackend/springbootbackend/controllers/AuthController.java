@@ -104,6 +104,9 @@ public class AuthController {
 			jwt = jwtUtils.generateJwtToken(authentication, expirationTime);
 		}else{
 			jwt = jwtUtils.generateJwtToken(authentication);
+			return ResponseEntity.
+					badRequest()
+					.build();
 		}
 
 

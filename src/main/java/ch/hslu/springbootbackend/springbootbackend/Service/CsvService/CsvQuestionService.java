@@ -21,10 +21,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.concurrent.*;
+
 
 @Service
 public class CsvQuestionService implements CsvService {
@@ -37,7 +40,11 @@ public class CsvQuestionService implements CsvService {
     private final CategorySetRepository categorySetRepository;
     private final MediaRepository mediaRepository;
     private final UserRepository userRepository;
-    private List<Answer> currentCreatedAnswers;
+    private ConcurrentHashMap<String, Answer> currentCreatedAnswers;
+    private ConcurrentHashMap<String, User> currentCreatedUser;
+    private ConcurrentHashMap<Integer, Media> currentCreatedMedia;
+    private ConcurrentHashMap<String, CategorySet> currentCreatedCategorySets;
+    private ExecutorService executor = Executors.newFixedThreadPool(8);
 
     CsvQuestionService(QuestionRepository questionRepository, AnswerRepository answerRepository, CategorySetRepository categorySetRepository, MediaRepository mediaRepository, UserRepository userRepository) {
         this.questionRepository = questionRepository;
@@ -49,9 +56,13 @@ public class CsvQuestionService implements CsvService {
 
     public List<Question> saveNewEntities(MultipartFile file) {
         try {
+            Instant start = Instant.now();
             List<Question> questions = parseCsv(file.getInputStream());
-            //List<Question> persistedQuestions = questionRepository.saveAll(questions);
-            return questions;
+            Instant finish = Instant.now();
+            List<Question> persistedQuestions = questionRepository.saveAll(questions);
+            userRepository.saveAll(currentCreatedUser.values());
+            LOG.info("Imported " + persistedQuestions.size() + " in " + Duration.between(start, finish).toMillis());
+            return persistedQuestions;
         } catch (IOException e) {
             throw new RuntimeException("fail to store csv data: " + e.getMessage());
         }
@@ -64,70 +75,26 @@ public class CsvQuestionService implements CsvService {
 
             List<Question> newQuestions = new ArrayList<>();
 
-            Iterable<CSVRecord> csvRecords = csvParser.getRecords();
+            currentCreatedAnswers = this.mapFromList(answerRepository.findAll());
+            currentCreatedCategorySets = this.mapFromListCategorySet(categorySetRepository.findAll());
+            currentCreatedMedia = this.mapFromListMedia(mediaRepository.findAll());
+            currentCreatedUser = this.mapFromListUser(userRepository.findAll());
 
-            for (CSVRecord csvRecord : csvRecords) {
-                List<CategorySet> categorySet = new ArrayList<>();
-                try {
-                    CategorySet foundedCategorySet = this.getCategorySet(csvRecord.get("categorySetId"));
-                    categorySet.add(foundedCategorySet);
+            List <CSVRecord> csvRecords = csvParser.getRecords();
 
-                } catch (NumberFormatException ex) {
-                    LOG.warn("Couldn't parse the founded categorySetId :: " + csvRecord.get("categorySetId") + " of the Data :: " + csvRecord.toString());
-                    continue;
+
+
+            for(CSVRecord csvRecord : csvRecords) {
+                Future<Question> questionFuture = executor.submit(() -> createQuestionsFromCSV(csvRecord));
+                while (!questionFuture.isDone()) {
                 }
+                newQuestions.add(questionFuture.get());
+                LOG.warn("question finished" + newQuestions.size());
 
-                List<Answer> possibleAnswers = new ArrayList<>();
-                for (int i = 1; i <= 5; i++) {
-                    String answerPhrase = csvRecord.get("Answer" + i);
-                    if (this.checkIfAnswerIsEmpty(answerPhrase)) {
-                        continue;
-                    }
-                    String escapedAndEncodedString = this.escapeAndEncodeString(answerPhrase);
-                    Optional<Answer> foundedAnswer = answerRepository.findByAnswerPhrase(escapedAndEncodedString);
-                    if (foundedAnswer.isPresent()) {
-                        possibleAnswers.add(foundedAnswer.get());
-                    } else {
-                        Answer newAnswerOfQuestion = new Answer(escapedAndEncodedString);
-                        possibleAnswers.add(answerRepository.save(newAnswerOfQuestion));
-                    }
-                }
-
-                List<Answer> correctAnswers = this.parseLettersToAnswers(csvRecord.get("CorrectAnswerAsLetter"), possibleAnswers);
-                QuestionType questionType = QuestionType.fromString(csvRecord.get("questionType"));
-                Media questionImage = null;
-                Media solutionImage = null;
-                User user;
-                int pointsToAchieve = Integer.parseInt(csvRecord.get("pointsToAchieve"));
-
-                if(!userRepository.existsByUsername(escapeAndEncodeString(csvRecord.get("autor")))){
-                    user = new User(this.escapeAndEncodeString(csvRecord.get("autor")), null, null);
-                }else{
-                    user = userRepository.findByUsername(this.escapeAndEncodeString(csvRecord.get("autor"))).get();
-                }
-                if (this.checkIfMediaAvailableInCsv(csvRecord.get("questionImageId"))) {
-                    questionImage = this.getMediaById(Integer.parseInt(csvRecord.get("questionImageId")));
-                }
-                if (this.checkIfMediaAvailableInCsv(csvRecord.get("solutionImageId"))) {
-                    solutionImage = this.getMediaById(Integer.parseInt(csvRecord.get("solutionImageId")));
-                }
-
-                Question newQuestion = new Question(
-                        this.escapeAndEncodeString(csvRecord.get("QuestionPhrase")),
-                        possibleAnswers,
-                        correctAnswers,
-                        questionType,
-                        user,
-                        categorySet,
-                        questionImage,
-                        solutionImage,
-                        pointsToAchieve
-                );
-                Question newPersistedQuestion = questionRepository.save(newQuestion);
-                newQuestions.add(newPersistedQuestion);
             }
             return newQuestions;
-        } catch (IOException e) {
+
+        } catch (IOException | InterruptedException | ExecutionException e) {
             throw new RuntimeException("fail to parse CSV file: " + e.getMessage());
         }
     }
@@ -146,12 +113,12 @@ public class CsvQuestionService implements CsvService {
     }
 
     private CategorySet getCategorySet(final String categorySetNumber) {
-        Optional<CategorySet> categorySet = categorySetRepository.findByCategorySetNumber(categorySetNumber);
-        if (categorySet.isPresent()) {
-            return categorySet.get();
+        //Optional<CategorySet> categorySet = categorySetRepository.findByCategorySetNumber(categorySetNumber);
+        if (currentCreatedCategorySets.containsKey(categorySetNumber)) {
+            return currentCreatedCategorySets.get(categorySetNumber);
         } else {
             LOG.warn("Category set with id " + categorySetNumber + "not found" );
-            return new CategorySet();
+            return null;
         }
 
     }
@@ -184,9 +151,9 @@ public class CsvQuestionService implements CsvService {
     }
 
     private Media getMediaById(final int mediaId) {
-        Optional<Media> foundedMedia = mediaRepository.findById(mediaId);
-        if (foundedMedia.isPresent()) {
-            return foundedMedia.get();
+        //Optional<Media> foundedMedia = mediaRepository.findById(mediaId);
+        if (currentCreatedMedia.containsKey(mediaId)) {
+            return currentCreatedMedia.get(mediaId);
         } else {
             throw new NoSuchElementException("The Media with the id :: " + mediaId + " doesn't exists in the database!");
         }
@@ -199,6 +166,94 @@ public class CsvQuestionService implements CsvService {
         } catch (NumberFormatException ex) {
             return false;
         }
+    }
+
+    private ConcurrentHashMap<String, Answer> mapFromList(List<Answer> answerList){
+        ConcurrentHashMap<String,Answer> map = new ConcurrentHashMap<>();
+        for (Answer i : answerList) map.put(i.getAnswerPhrase(),i);
+        return map;
+    }
+
+    private ConcurrentHashMap<Integer, Media> mapFromListMedia(List<Media> answerList){
+        ConcurrentHashMap<Integer,Media> map = new ConcurrentHashMap<>();
+        for (Media i : answerList) map.put(i.getId(),i);
+        return map;
+    }
+
+    private ConcurrentHashMap<String, User> mapFromListUser(List<User> answerList){
+        ConcurrentHashMap<String,User> map = new ConcurrentHashMap<>();
+        for (User i : answerList) map.put(i.getUsername(),i);
+        return map;
+    }
+
+    private ConcurrentHashMap<String, CategorySet> mapFromListCategorySet(List<CategorySet> answerList){
+        ConcurrentHashMap<String,CategorySet> map = new ConcurrentHashMap<>();
+        for (CategorySet i : answerList) map.put(i.getCategorySetNumber(),i);
+        return map;
+    }
+
+    private Question createQuestionsFromCSV(CSVRecord csvRecord) {
+        List<Question> questionList = new ArrayList<>();
+            List<CategorySet> categorySet = new ArrayList<>();
+            try {
+                CategorySet foundedCategorySet = this.getCategorySet(csvRecord.get("categorySetId"));
+                categorySet.add(foundedCategorySet);
+
+            } catch (NumberFormatException ex) {
+                LOG.warn("Couldn't parse the founded categorySetId :: " + csvRecord.get("categorySetId") + " of the Data :: " + csvRecord.toString());
+            }
+
+            List<Answer> possibleAnswers = new ArrayList<>();
+            for (int i = 1; i <= 5; i++) {
+                String answerPhrase = csvRecord.get("Answer" + i);
+                if (this.checkIfAnswerIsEmpty(answerPhrase)) {
+                    continue;
+                }
+                String escapedAndEncodedString = this.escapeAndEncodeString(answerPhrase);
+                //Optional<Answer> foundedAnswer = answerRepository.findByAnswerPhrase(escapedAndEncodedString);
+                if (currentCreatedAnswers.containsKey(escapedAndEncodedString)) {
+                    possibleAnswers.add(currentCreatedAnswers.get(escapedAndEncodedString));
+                } else {
+                    Answer newAnswerOfQuestion = new Answer(escapedAndEncodedString);
+                    possibleAnswers.add(answerRepository.save(newAnswerOfQuestion));
+                    currentCreatedAnswers.put(newAnswerOfQuestion.getAnswerPhrase(), newAnswerOfQuestion);
+                }
+            }
+
+            List<Answer> correctAnswers = this.parseLettersToAnswers(csvRecord.get("CorrectAnswerAsLetter"), possibleAnswers);
+            QuestionType questionType = QuestionType.fromString(csvRecord.get("questionType"));
+            Media questionImage = null;
+            Media solutionImage = null;
+            User user = null;
+            int pointsToAchieve = Integer.parseInt(csvRecord.get("pointsToAchieve"));
+            String escapedAndEncodedString = this.escapeAndEncodeString(csvRecord.get("autor"));
+            if (currentCreatedUser.containsKey(escapedAndEncodedString)) {
+                user = currentCreatedUser.get(escapedAndEncodedString);
+            } else {
+                user = new User(this.escapeAndEncodeString(csvRecord.get("autor")), null, null);
+                //userRepository.save(user);
+                currentCreatedUser.put(escapedAndEncodedString, user);
+            }
+
+            if (this.checkIfMediaAvailableInCsv(csvRecord.get("questionImageId"))) {
+                questionImage = this.getMediaById(Integer.parseInt(csvRecord.get("questionImageId")));
+            }
+            if (this.checkIfMediaAvailableInCsv(csvRecord.get("solutionImageId"))) {
+                solutionImage = this.getMediaById(Integer.parseInt(csvRecord.get("solutionImageId")));
+            }
+
+            Question newQuestion = new Question(
+                    this.escapeAndEncodeString(csvRecord.get("QuestionPhrase")),
+                    possibleAnswers,
+                    correctAnswers,
+                    questionType,
+                    user,
+                    categorySet,
+                    questionImage,
+                    solutionImage,
+                    pointsToAchieve
+            );
+            return newQuestion;
     }
 
 }

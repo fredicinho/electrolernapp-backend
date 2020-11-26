@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +29,7 @@ public class CsvCategorySetService implements CsvService {
 
     private final CategorySetRepository categorySetRepository;
     private final CategoryRepository categoryRepository;
+    private HashMap<String, CategorySet> currentCreatedCategorySets;
 
     CsvCategorySetService(CategorySetRepository categorySetRepository, CategoryRepository categoryRepository) {
         this.categorySetRepository = categorySetRepository;
@@ -44,6 +46,7 @@ public class CsvCategorySetService implements CsvService {
     }
 
     public List<CategorySet> parseCsv(InputStream inputStream) {
+        currentCreatedCategorySets = this.mapFromList(categorySetRepository.findAll());
         try (BufferedReader fileReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
              CSVParser csvParser = new CSVParser(fileReader,
                      CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim())) {
@@ -58,13 +61,25 @@ public class CsvCategorySetService implements CsvService {
                     if (!categoryOfCategorySet.isPresent()) {
                         LOG.warn("No category with the Id "+categoryId + "categorySet created with category Null");
                     }
-                    newCategorieSets.add(new CategorySet(Integer.parseInt(csvRecord.get("categorieSetId")), categoryOfCategorySet.get(), csvRecord.get("title"), csvRecord.get("categorieSetNumber")));
+                    if(currentCreatedCategorySets.containsKey(csvRecord.get("categorieSetNumber"))){
+                        LOG.warn("categorySet with number " + csvRecord.get("categorieSetNumber") + "already exists");
+                    }else {
+                        CategorySet categorySet = new CategorySet(Integer.parseInt(csvRecord.get("categorieSetId")), categoryOfCategorySet.get(), csvRecord.get("title"), csvRecord.get("categorieSetNumber"));
+                        newCategorieSets.add(categorySet);
+                        currentCreatedCategorySets.put(categorySet.getCategorySetNumber(), categorySet);
+                    }
             }
             return newCategorieSets;
 
         } catch (IOException e) {
             throw new RuntimeException("Fail to parse CSV file: " + e.getMessage());
         }
+    }
+
+    private HashMap<String, CategorySet> mapFromList(List<CategorySet> categorySets){
+        HashMap<String,CategorySet> map = new HashMap<>();
+        for (CategorySet i: categorySets) map.put(i.getCategorySetNumber(),i);
+        return map;
     }
 
 }

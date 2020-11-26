@@ -44,11 +44,11 @@ public class User extends RepresentationModel<User> {
 	private Set<Role> roles = new HashSet<>();
 
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-	@OneToMany(targetEntity = Question.class, cascade = CascadeType.ALL)
+	@OneToMany(targetEntity = Question.class, cascade = CascadeType.DETACH)
 	private List<Question> createdQuestions = new ArrayList<>();
 
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-	@OneToMany(targetEntity = ExamSet.class, cascade = CascadeType.ALL)
+	@OneToMany(targetEntity = ExamSet.class, cascade = CascadeType.DETACH)
 	private List<ExamSet> createdExamSets = new ArrayList<>();
 
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

@@ -12,6 +12,7 @@ import java.util.*;
 @Entity
 public class Question{
 
+    //private final Logger LOG = LoggerFactory.getLogger(Question.class);
     public Question(){}
 
     @Id
@@ -88,9 +89,11 @@ public class Question{
         for(int i =0; i < examSets.size(); i++){
             examSets.get(i).insertQuestion(this);
         }
+
         if(this.createdByUser != null){
             this.createdByUser.getCreatedQuestions().add(this);
         }
+
     }
 
     public void insertIntoExamSet(ExamSet examSet){
