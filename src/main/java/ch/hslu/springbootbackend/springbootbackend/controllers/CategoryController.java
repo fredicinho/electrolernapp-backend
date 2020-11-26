@@ -15,7 +15,7 @@ import java.util.List;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/v1/categories")
-@PreAuthorize("hasAnyRole()")
+//@PreAuthorize("hasAnyRole()")
 public class CategoryController {
     private final Logger LOG = LoggerFactory.getLogger(CategoryController.class);
 
@@ -32,7 +32,7 @@ public class CategoryController {
                 .body(categoryDTO);
     }
 
-    @GetMapping("")
+    @GetMapping("/")
     public List<CategoryDTO> getAllCategories(){
         return categoryService.getAllCategories();
     }
