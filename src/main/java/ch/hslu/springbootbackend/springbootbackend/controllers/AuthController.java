@@ -3,6 +3,7 @@ package ch.hslu.springbootbackend.springbootbackend.controllers;
 import ch.hslu.springbootbackend.springbootbackend.Entity.ERole;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Role;
 import ch.hslu.springbootbackend.springbootbackend.Entity.SchoolClass;
+import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.ExamSet;
 import ch.hslu.springbootbackend.springbootbackend.Entity.User;
 import ch.hslu.springbootbackend.springbootbackend.Repository.ExamSetRepository;
 import ch.hslu.springbootbackend.springbootbackend.Repository.RoleRepository;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -226,10 +228,13 @@ public class AuthController {
 
 	private Boolean checkIfUserHasPermissionToStartExam(User user, int examSetId){
 		List<SchoolClass> schoolClasses = schoolClassRepository.findAllByUsersInClass(user);
+		ExamSet examSet = examSetRepository.findById(examSetId).orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+		if(examSet.getStartDate().getTime() > new Date().getTime()){
+			return false;
+		}
 		Boolean exists = false;
 		for(SchoolClass schoolClass : schoolClasses){
-			//LOG.warn(examSetRepository.findAllBySchoolClassesInExamSet(schoolClass).get().toString());
-			if(examSetRepository.findAllBySchoolClassesInExamSet(schoolClass).size() != 0){
+			if(examSetRepository.findAllBySchoolClassesInExamSet(schoolClass).size() != 0 ){
 				return true;
 			}
 		}
