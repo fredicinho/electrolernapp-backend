@@ -21,7 +21,7 @@ import java.util.Optional;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-//@PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
+@PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
 @RequestMapping("/api/v1/answers")
 public class AnswerController {
 

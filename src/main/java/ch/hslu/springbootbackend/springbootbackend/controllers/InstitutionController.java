@@ -14,7 +14,6 @@ import java.util.List;
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping("/api/v1/institutions")
-@PreAuthorize("hasAnyRole()")
 public class InstitutionController {
 
     @Autowired
@@ -22,7 +21,7 @@ public class InstitutionController {
 
 
     @PostMapping("/")
-    //@PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<InstitutionDTO> newSchoolClass(@RequestBody InstitutionDTO newInstitution) {
         InstitutionDTO institutionDTO = institutionService.createNewInstitution(newInstitution);
         if(institutionDTO != null) {
@@ -46,13 +45,13 @@ public class InstitutionController {
     }
 
     @GetMapping("/")
-    //@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TEACHER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TEACHER')")
     public List<InstitutionDTO> getAllInstitutions() {
         return institutionService.getAllInstitutions();
     }
 
     @GetMapping("/{id}")
-    //@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TEACHER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TEACHER')")
     public ResponseEntity<InstitutionDTO> getInstitutionById(@PathVariable(value = "id") Integer institutionId) {
 
         return ResponseEntity

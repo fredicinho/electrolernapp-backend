@@ -22,7 +22,7 @@ import java.util.Optional;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/v1/medias")
-@PreAuthorize("hasAnyRole()")
+@PreAuthorize("hasRole('ROLE_EXAM') or hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
 public class MediaController {
 
     @Autowired

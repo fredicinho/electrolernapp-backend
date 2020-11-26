@@ -27,7 +27,7 @@ public class ExamResultController {
     private final Logger LOG = LoggerFactory.getLogger(QuestionController.class);
 
     @PutMapping("/check")
-    @PreAuthorize("hasRole('ROLE_EXAM') or hasRole('ROLE_TEACHER')")
+    @PreAuthorize("hasRole('ROLE_EXAM') or hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity check(@RequestBody ExamResultDTO newExamResultDTO) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_TEACHER"))) {
@@ -50,7 +50,7 @@ public class ExamResultController {
     }
 
 
-    //@PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @GetMapping("/examSets")
     public List<ExamResultDTO> getAllExamResultsByExamSet(@RequestParam Integer examSetId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -61,12 +61,12 @@ public class ExamResultController {
             return examResultService.getExamResultsByExamSet(examSetId);
         }
     }
-    //@PreAuthorize("hasRole('ROLE_TEACHER')")
+    @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
     @GetMapping("/examSetsAndUser")
     public List<ExamResultDTO> getAllExamSetResultsByUserAndExamSet(@RequestParam Integer examSetId, @RequestParam String username) {
         return examResultService.getExamResultsByExamSetAndUser(examSetId, username);
     }
-    //@PreAuthorize("hasRole('ROLE_TEACHER')")
+    @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
     @GetMapping("/examSetsAndUsersAndQuestion")
     public ResponseEntity<ExamResultDTO> getAllExamSetResultsByExamSetsAndUsersAndQuestion(@RequestParam Integer examSetId, @RequestParam Integer userId, @RequestParam Integer questionId) {
         ExamResultDTO examResultDTO = examResultService.getExamResultsByExamSetAndUserIdAndQuestionId(examSetId, userId, questionId);

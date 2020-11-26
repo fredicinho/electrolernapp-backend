@@ -1,7 +1,6 @@
 package ch.hslu.springbootbackend.springbootbackend.controllers;
 
 import ch.hslu.springbootbackend.springbootbackend.DTO.StatisticDTO;
-import ch.hslu.springbootbackend.springbootbackend.Exception.ResourceNotFoundException;
 import ch.hslu.springbootbackend.springbootbackend.Service.EntityService.StatisticService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,8 +47,10 @@ public class StatisticController {
         }
     }
 
+
     @GetMapping("/Question/{id}")
-    public List<StatisticDTO> getStatisticByQuestionId(@PathVariable(value = "id") Integer questionId) throws ResourceNotFoundException {
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TEACHER')")
+    public List<StatisticDTO> getStatisticByQuestionId(@PathVariable(value = "id") Integer questionId){
             return statisticService.getByQuestionId(questionId);
 
     }
@@ -74,7 +75,7 @@ public class StatisticController {
     }
 
     @PostMapping("/statistics")
-    //@PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<StatisticDTO>> addStatisticArray(@RequestBody List<StatisticDTO> newStatistics) {
 
         List<StatisticDTO> statisticDTOs = statisticService.addNewStatistics(newStatistics);

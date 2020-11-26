@@ -15,7 +15,7 @@ import java.util.List;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/v1/categories")
-//@PreAuthorize("hasAnyRole()")
+@PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN') or hasRole('ROLE')")
 public class CategoryController {
     private final Logger LOG = LoggerFactory.getLogger(CategoryController.class);
 

@@ -38,7 +38,7 @@ public class QuestionController {
 
 
     @PostMapping("")
-    //@PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
     public ResponseEntity<QuestionDTO> newQuestion(@Valid @RequestBody QuestionDTO newQuestion) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         newQuestion.setCreatedBy(auth.getName());
@@ -79,6 +79,7 @@ public class QuestionController {
     }
 
     @GetMapping("/categorySet")
+
     public List<QuestionDTO> getQuestionsByCategorySet(@RequestParam int categorySetId) {
         List<QuestionDTO> questionDTOS = new ArrayList<>();
         try {
@@ -89,7 +90,7 @@ public class QuestionController {
         return questionDTOS;
     }
 
-    //@PreAuthorize("hasRole('ROLE_EXAM') or hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_EXAM') or hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
     @GetMapping("/examSet")
     public List<QuestionDTO> getQuestionsByExamSet(@RequestParam int examSetId) {
         return questionService.getByExamSet(examSetId);

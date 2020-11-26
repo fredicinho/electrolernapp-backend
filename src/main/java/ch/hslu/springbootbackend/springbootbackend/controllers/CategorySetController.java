@@ -14,7 +14,7 @@ import java.util.List;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/v1/categorySets")
-//@PreAuthorize("hasAnyRole()")
+@PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN') or hasRole('ROLE')")
 public class CategorySetController {
 
 @Autowired

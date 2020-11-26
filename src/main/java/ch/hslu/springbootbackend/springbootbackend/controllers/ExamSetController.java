@@ -26,7 +26,7 @@ public class ExamSetController {
     ExamSetService examSetService;
 
     @PostMapping("")
-    //@PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ExamSetDTO> newSchoolClass(@RequestBody ExamSetDTO newExamSet) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         newExamSet.setCreatedBy(auth.getName());
@@ -53,7 +53,7 @@ public class ExamSetController {
 
 
     @GetMapping("/")
-    @PreAuthorize("hasRole('ROLE_TEACHER')")
+    @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
     public List<ExamSetDTO> getAllExamSets() {
         return examSetService.getAllExamSets();
     }
