@@ -7,6 +7,8 @@ import ch.hslu.springbootbackend.springbootbackend.Repository.StatisticRepositor
 import ch.hslu.springbootbackend.springbootbackend.Repository.UserRepository;
 import ch.hslu.springbootbackend.springbootbackend.Strategy.DTOParserStatistic;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -61,7 +63,9 @@ public class StatisticService {
 
     public List<StatisticDTO> addNewStatistics(List<StatisticDTO> statisticDTOS){
         List<StatisticDTO> statisticDTOS1 = new ArrayList<>();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         for(StatisticDTO statisticDTO : statisticDTOS){
+            statisticDTO.setUsername(auth.getName());
             statisticDTOS1.add(this.addNewStatistic(statisticDTO));
         }return statisticDTOS1;
     }

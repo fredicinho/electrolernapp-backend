@@ -1,5 +1,6 @@
 package ch.hslu.springbootbackend.springbootbackend.DTO;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.hateoas.RepresentationModel;
 
@@ -12,7 +13,7 @@ public class StatisticDTO extends RepresentationModel<StatisticDTO> {
     private int pointsAchieved;
     private boolean isMarked;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @JsonIgnore
     @NotNull
     private String username;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
