@@ -4,13 +4,16 @@ import ch.hslu.springbootbackend.springbootbackend.DTO.ExamSetDTO;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Question;
 import ch.hslu.springbootbackend.springbootbackend.Entity.SchoolClass;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.ExamSet;
+import ch.hslu.springbootbackend.springbootbackend.Entity.User;
 import ch.hslu.springbootbackend.springbootbackend.Repository.ExamSetRepository;
 import ch.hslu.springbootbackend.springbootbackend.Repository.QuestionRepository;
 import ch.hslu.springbootbackend.springbootbackend.Repository.SchoolClassRepository;
+import ch.hslu.springbootbackend.springbootbackend.Repository.UserRepository;
 import ch.hslu.springbootbackend.springbootbackend.Strategy.DTOParserExamSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -26,6 +29,8 @@ public class ExamSetService {
     QuestionRepository questionRepository;
     @Autowired
     DTOParserExamSet dtoParserExamSet;
+    @Autowired
+    UserRepository userRepository;
 
 
     private AtomicBoolean ressourceExists = new AtomicBoolean();
@@ -81,6 +86,15 @@ public class ExamSetService {
         return dtoParserExamSet.generateDTOFromObject(examSetId);
     }
 
+    public List<ExamSetDTO> getExamSetsByUser(String username){
+        List<ExamSetDTO> examSetDTOS = new ArrayList<>();
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Error: User is not found."));
+        List<SchoolClass> schoolClasses = user.getInSchoolClasses();
+        for(SchoolClass schoolClass : schoolClasses){
+            examSetDTOS.addAll(dtoParserExamSet.generateDTOsFromObjects(examSetRepository.findAllBySchoolClassesInExamSet(schoolClass)));
+        }
+        return examSetDTOS;
+    }
 
     public AtomicBoolean ressourceExists() {
         return ressourceExists;

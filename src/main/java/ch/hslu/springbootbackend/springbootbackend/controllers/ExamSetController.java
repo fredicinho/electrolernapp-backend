@@ -53,9 +53,14 @@ public class ExamSetController {
 
 
     @GetMapping("/")
-    @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
     public List<ExamSetDTO> getAllExamSets() {
-        return examSetService.getAllExamSets();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_USER"))) {
+            return examSetService.getExamSetsByUser(auth.getName());
+        }else {
+            return examSetService.getAllExamSets();
+        }
     }
 
     @GetMapping("/{id }")
