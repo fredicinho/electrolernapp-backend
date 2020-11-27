@@ -51,7 +51,7 @@ public class UserController {
         if(userOptional.isPresent()){
             User user = userOptional.get();
             user.add(linkTo(methodOn(SchoolClassController.class).getSchoolClassesByUser(userId)).withRel("schoolClasses"));
-
+            user.add(linkTo(methodOn(ProfessionController.class).getProfessionById(user.getProfession().getId())).withRel("profession"));
             return ResponseEntity
                     .ok()
                     .contentType(MediaType.APPLICATION_JSON)
@@ -63,7 +63,7 @@ public class UserController {
                     .build();
             }
     }
-    //@PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
     @GetMapping("/schoolClasses")
     public List<User> getUsersBySchoolClasses(@RequestParam Integer schoolClassId) {
         //LOG.warn(foundedQuestion.toString());
