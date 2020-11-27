@@ -68,6 +68,7 @@ public class User extends RepresentationModel<User> {
 	private List<SchoolClass> inSchoolClasses = new LinkedList<>();
 
 
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@ManyToOne(targetEntity = Profession.class, cascade = CascadeType.ALL)
 	@JoinColumn(name = "fk_profession", nullable = true)
 	private Profession profession;

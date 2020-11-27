@@ -51,7 +51,9 @@ public class UserController {
         if(userOptional.isPresent()){
             User user = userOptional.get();
             user.add(linkTo(methodOn(SchoolClassController.class).getSchoolClassesByUser(userId)).withRel("schoolClasses"));
-            user.add(linkTo(methodOn(ProfessionController.class).getProfessionById(user.getProfession().getId())).withRel("profession"));
+            if(user.getProfession() != null) {
+                user.add(linkTo(methodOn(ProfessionController.class).getProfessionById(user.getProfession().getId())).withRel("profession"));
+            }
             return ResponseEntity
                     .ok()
                     .contentType(MediaType.APPLICATION_JSON)
