@@ -42,11 +42,9 @@ public class DTOParserQuestion implements DTOParserStrategy{
         questionDTO.setCorrectAnswers(answerRepository.findAnswersByQuestionCorrectList(question));
         //questionDTO.add(linkTo(methodOn(AnswerController.class).getPossibleAnswersByQuestion(questionId)).withRel("possibleAnswers"));
         //questionDTO.add(linkTo(methodOn(AnswerController.class).getCorrectAnswersByQuestion(questionId)).withRel("correctAnswers"));
-        try {
-            questionDTO.add(linkTo(methodOn(StatisticController.class).getStatisticByQuestionId(id)).withRel("statistics"));
-        } catch (ResourceNotFoundException e) {
-            e.printStackTrace();
-        }
+
+        questionDTO.add(linkTo(methodOn(StatisticController.class).getStatisticByQuestionId(id)).withRel("statistics"));
+
 
         if(checkIfQuestionImageExists(question)){
             questionDTO.add(linkTo(methodOn(MediaController.class).getMedia(question.getQuestionImage().getId())).withRel("questionImage"));
