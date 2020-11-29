@@ -63,8 +63,9 @@ public class ExamSetController {
         }
     }
 
-    @GetMapping("/{id }")
-    @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_EXAM')")
+    // TODO: Just Users who are in schoolclass of exam are allowed to get the specific exam!!!
+    // TODO: Else you have to give back an Unauthorized (401)
+    @GetMapping("/{id}")
     public ResponseEntity<ExamSetDTO> getExamSetById(@PathVariable(value = "id") Integer examSetId) {
         return ResponseEntity
                 .ok()

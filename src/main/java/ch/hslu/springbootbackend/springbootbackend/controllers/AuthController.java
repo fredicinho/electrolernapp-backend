@@ -92,7 +92,7 @@ public class AuthController {
 												 userDetails.getEmail(), 
 												 roles));
 	}
-	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
+
 	@PostMapping("/startExam")
 	public ResponseEntity<?> authenticateUserForExam(@Valid @RequestBody LoginRequest loginRequest, @RequestParam int examSetId) {
 		Authentication authentication = authenticationManager.authenticate(
