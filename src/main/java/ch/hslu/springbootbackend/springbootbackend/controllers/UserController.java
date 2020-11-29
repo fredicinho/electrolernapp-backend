@@ -75,7 +75,6 @@ public class UserController {
             user = userRepository.findAllByInSchoolClasses(schoolClass.get());
         }
         return user;
-
     }
 
 }

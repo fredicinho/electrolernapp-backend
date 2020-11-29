@@ -1,6 +1,8 @@
 package ch.hslu.springbootbackend.springbootbackend.controllers;
 
 import ch.hslu.springbootbackend.springbootbackend.DTO.ExamResultDTO;
+import ch.hslu.springbootbackend.springbootbackend.Entity.ExamResult;
+import ch.hslu.springbootbackend.springbootbackend.Exception.ResourceNotFoundException;
 import ch.hslu.springbootbackend.springbootbackend.Service.EntityService.ExamResultService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,6 +68,12 @@ public class ExamResultController {
     public List<ExamResultDTO> getAllExamSetResultsByUserAndExamSet(@RequestParam Integer examSetId, @RequestParam String username) {
         return examResultService.getExamResultsByExamSetAndUser(examSetId, username);
     }
+
+    @GetMapping("/examSetsAndSchoolClass")
+    public List<ExamResultDTO> getAllExamSetResultsByExamSetAndSchoolClass(@RequestParam Integer examSetId, @RequestParam Integer schoolClassId) throws ResourceNotFoundException {
+        return examResultService.getExamResultsByExamSetAndSchoolClass(examSetId, schoolClassId);
+    }
+
     @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
     @GetMapping("/examSetsAndUsersAndQuestion")
     public ResponseEntity<ExamResultDTO> getAllExamSetResultsByExamSetsAndUsersAndQuestion(@RequestParam Integer examSetId, @RequestParam Integer userId, @RequestParam Integer questionId) {
@@ -75,8 +83,7 @@ public class ExamResultController {
                     .status(HttpStatus.OK)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(examResultDTO);
-        }
-        else{
+        } else {
             return ResponseEntity.
                     notFound()
                     .build();

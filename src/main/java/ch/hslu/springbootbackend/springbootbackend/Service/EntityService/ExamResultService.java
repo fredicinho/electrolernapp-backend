@@ -3,10 +3,13 @@ package ch.hslu.springbootbackend.springbootbackend.Service.EntityService;
 import ch.hslu.springbootbackend.springbootbackend.DTO.ExamResultDTO;
 import ch.hslu.springbootbackend.springbootbackend.Entity.ExamResult;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Question;
+import ch.hslu.springbootbackend.springbootbackend.Entity.SchoolClass;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.ExamSet;
 import ch.hslu.springbootbackend.springbootbackend.Entity.User;
+import ch.hslu.springbootbackend.springbootbackend.Exception.ResourceNotFoundException;
 import ch.hslu.springbootbackend.springbootbackend.Repository.*;
 import ch.hslu.springbootbackend.springbootbackend.Strategy.DTOParserExamResult;
+import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -55,6 +58,26 @@ public class ExamResultService {
             examResultDTO = dtoParserExamResult.generateDTOsFromObjects(examResultOptional);
         }
         return examResultDTO;
+
+    }
+
+    public List<ExamResultDTO> getExamResultsByExamSetAndSchoolClass(int examSetId, int schoolClassId) throws ResourceNotFoundException {
+        List<ExamResult> examResults = new ArrayList<>();
+        Optional<SchoolClass> schoolClass = schoolClassRepository.findById(schoolClassId);
+        if (schoolClass.isPresent()) {
+            List<User> allUsers = userRepository.findAllByInSchoolClasses(schoolClass.get());
+            Optional<ExamSet> examSetOptional = examSetRepository.findById(examSetId);
+            if (examSetOptional.isPresent()) {
+                for (User user : allUsers) {
+                    examResults.addAll(examResultRepository.findAllByExamSetAndUser(examSetOptional.get(), user));
+                }
+                return dtoParserExamResult.generateDTOsFromObjects(examResults);
+            } else {
+                throw new ResourceNotFoundException("Examset with the id ::" + examSetId + " couldn't be founded.");
+            }
+        } else {
+            throw new ResourceNotFoundException("Schoolclass with the id :: " + schoolClassId + " couldn't be founded.");
+        }
 
     }
 
