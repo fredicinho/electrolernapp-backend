@@ -68,6 +68,12 @@ public class User extends RepresentationModel<User> {
 	private List<SchoolClass> inSchoolClasses = new LinkedList<>();
 
 
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+	@ManyToOne(targetEntity = Profession.class, cascade = CascadeType.ALL)
+	@JoinColumn(name = "fk_profession", nullable = true)
+	private Profession profession;
+
+
 	public User() {
 	}
 
@@ -81,6 +87,7 @@ public class User extends RepresentationModel<User> {
 		for(int i =0; i < getInSchoolClasses().size(); i++){
 			getInSchoolClasses().get(i).insertUser(this);
 		}
+		this.profession.getUsersInProfession().add(this);
 	}
 
 
@@ -169,4 +176,12 @@ public class User extends RepresentationModel<User> {
 		this.examResults = examResults;
 	}
 
+
+	public Profession getProfession() {
+		return profession;
+	}
+
+	public void setProfession(Profession profession) {
+		this.profession = profession;
+	}
 }

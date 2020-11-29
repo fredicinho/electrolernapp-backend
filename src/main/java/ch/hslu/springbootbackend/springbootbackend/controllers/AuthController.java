@@ -1,14 +1,8 @@
 package ch.hslu.springbootbackend.springbootbackend.controllers;
 
-import ch.hslu.springbootbackend.springbootbackend.Entity.ERole;
-import ch.hslu.springbootbackend.springbootbackend.Entity.Role;
-import ch.hslu.springbootbackend.springbootbackend.Entity.SchoolClass;
+import ch.hslu.springbootbackend.springbootbackend.Entity.*;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.ExamSet;
-import ch.hslu.springbootbackend.springbootbackend.Entity.User;
-import ch.hslu.springbootbackend.springbootbackend.Repository.ExamSetRepository;
-import ch.hslu.springbootbackend.springbootbackend.Repository.RoleRepository;
-import ch.hslu.springbootbackend.springbootbackend.Repository.SchoolClassRepository;
-import ch.hslu.springbootbackend.springbootbackend.Repository.UserRepository;
+import ch.hslu.springbootbackend.springbootbackend.Repository.*;
 import ch.hslu.springbootbackend.springbootbackend.Service.EntityService.ExamSetService;
 import ch.hslu.springbootbackend.springbootbackend.payload.request.LoginRequest;
 import ch.hslu.springbootbackend.springbootbackend.payload.request.SignupRequest;
@@ -61,6 +55,9 @@ public class AuthController {
 
 	@Autowired
 	ExamSetService examSetService;
+
+	@Autowired
+	ProfessionRepository professionRepository;
 
 	@Autowired
     PasswordEncoder encoder;
@@ -164,7 +161,11 @@ public class AuthController {
 		User user = new User(signUpRequest.getUsername(),
 							 signUpRequest.getEmail(),
 							 encoder.encode(signUpRequest.getPassword()));
-
+		LOG.warn(String.valueOf(signUpRequest.getProfessionId()));
+		Profession profession = professionRepository.findById(signUpRequest.getProfessionId()).orElse(null);
+		if(profession != null) {
+			user.setProfession(profession);
+		}
 		Set<String> strRoles = signUpRequest.getRole();
 		Set<Role> roles = new HashSet<>();
 
