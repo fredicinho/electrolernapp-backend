@@ -1,12 +1,10 @@
 package ch.hslu.springbootbackend.springbootbackend.controllers;
 
-import ch.hslu.springbootbackend.springbootbackend.Service.CsvService.CsvCategoryService;
-import ch.hslu.springbootbackend.springbootbackend.Service.CsvService.CsvCategorySetService;
-import ch.hslu.springbootbackend.springbootbackend.Service.CsvService.CsvMediaService;
-import ch.hslu.springbootbackend.springbootbackend.Service.CsvService.CsvQuestionService;
+import ch.hslu.springbootbackend.springbootbackend.Service.CsvService.*;
 import ch.hslu.springbootbackend.springbootbackend.payload.response.MessageResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +30,8 @@ public class CsvController {
     private final CsvCategoryService csvCategoryService;
     private final CsvCategorySetService csvCategorySetService;
     private final CsvMediaService csvMediaService;
+    @Autowired
+    CSVProfessionService csvProfessionService;
 
     public CsvController(CsvQuestionService csvQuestionService, CsvCategoryService csvCategoryService, CsvCategorySetService csvCategorySetService, CsvMediaService csvMediaService) {
         this.csvQuestionService = csvQuestionService;
@@ -147,6 +147,28 @@ public class CsvController {
         if (csvCategoryService.hasCSVFormat(file)) {
             try {
                 csvCategoryService.saveNewEntities(file);
+
+                message = "Uploaded the file successfully: " + file.getOriginalFilename();
+                return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse(message));
+            } catch (Exception e) {
+                message = "Could not upload the file: " + file.getOriginalFilename() + "! " + e.getMessage();
+                LOG.error(message);
+                e.printStackTrace();
+                return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new MessageResponse(message));
+            }
+        }
+
+        message = "Please upload a csv file!";
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse(message));
+    }
+
+    @PostMapping("/professions")
+    public ResponseEntity<MessageResponse> uploadProfessionFile(@RequestParam("file") MultipartFile file) {
+        String message = "";
+
+        if (csvProfessionService.hasCSVFormat(file)) {
+            try {
+                csvProfessionService.saveNewEntities(file);
 
                 message = "Uploaded the file successfully: " + file.getOriginalFilename();
                 return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse(message));

@@ -32,12 +32,14 @@ public class DTOParserQuestion implements DTOParserStrategy{
     CategorySetRepository categorySetRepository;
     @Autowired
     MediaRepository mediaRepository;
+    @Autowired
+    ProfessionRepository professionRepository;
 
 
     @Override
     public QuestionDTO generateDTOFromObject(int id) {
         Question question = questionRepository.findById(id).orElseThrow();
-        QuestionDTO questionDTO = new QuestionDTO(id, question.getQuestionPhrase(), question.getQuestionType(), question.getPointsToAchieve());
+        QuestionDTO questionDTO = new QuestionDTO(id, question.getQuestionPhrase(), question.getQuestionType(), question.getPointsToAchieve(), question.getQuestionLevel());
         questionDTO.setPossibleAnswers(answerRepository.findAnswersByQuestionPossibleList(question));
         questionDTO.setCorrectAnswers(answerRepository.findAnswersByQuestionCorrectList(question));
         //questionDTO.add(linkTo(methodOn(AnswerController.class).getPossibleAnswersByQuestion(questionId)).withRel("possibleAnswers"));
@@ -72,7 +74,10 @@ public class DTOParserQuestion implements DTOParserStrategy{
                     this.getCategorySets(questionDTO.getCategorySetIds()),
                     this.getImage(questionDTO.getQuestionImageId()),
                     this.getImage(questionDTO.getAnswerImageId()),
-                    questionDTO.getPointsToAchieve()
+                    questionDTO.getPointsToAchieve(),
+                    this.getProfessions(questionDTO.getProfessionsList()),
+                    questionDTO.getQuestionLevel()
+
             );
         } catch (ResourceNotFoundException e) {
             e.printStackTrace();
@@ -121,5 +126,12 @@ public class DTOParserQuestion implements DTOParserStrategy{
                 () -> new ResourceNotFoundException("Image not found for this id :: " + imageId ));
     }
 
+    private List<Profession> getProfessions(List<Integer> professionInts) throws ResourceNotFoundException {
+        List<Profession> professions = new ArrayList<>();
+        for(Integer professionIds : professionInts){
+            professions.add(professionRepository.findById(professionIds).orElseThrow(() -> new ResourceNotFoundException("Profession not found for this id :: " + professionIds )));
+        }
+        return professions;
+    }
 
 }

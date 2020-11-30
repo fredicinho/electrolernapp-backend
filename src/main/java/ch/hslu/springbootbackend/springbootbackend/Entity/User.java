@@ -87,7 +87,9 @@ public class User extends RepresentationModel<User> {
 		for(int i =0; i < getInSchoolClasses().size(); i++){
 			getInSchoolClasses().get(i).insertUser(this);
 		}
-		this.profession.getUsersInProfession().add(this);
+		if(this.profession != null){
+			this.profession.getUsersInProfession().add(this);
+		}
 	}
 
 

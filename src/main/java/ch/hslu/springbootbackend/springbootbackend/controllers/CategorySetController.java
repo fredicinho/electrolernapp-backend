@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/categorySets")
 @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_USER')")
-public class cateCategorySetController {
+public class CategorySetController {
 
 @Autowired
     CategorySetService categorySetService;

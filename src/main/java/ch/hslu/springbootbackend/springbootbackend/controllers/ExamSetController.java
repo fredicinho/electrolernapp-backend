@@ -26,7 +26,7 @@ public class ExamSetController {
     ExamSetService examSetService;
 
     @PostMapping("")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TEACHER')" )
     public ResponseEntity<ExamSetDTO> newSchoolClass(@RequestBody ExamSetDTO newExamSet) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         newExamSet.setCreatedBy(auth.getName());
@@ -63,8 +63,8 @@ public class ExamSetController {
         }
     }
 
-    // TODO: Just Users who are in schoolclass of exam are allowed to get the specific exam!!!
-    // TODO: Else you have to give back an Unauthorized (401)
+    // Just Users who are in schoolclass of exam are allowed to get the specific exam!!!
+    @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_EXAM')")
     @GetMapping("/{id}")
     public ResponseEntity<ExamSetDTO> getExamSetById(@PathVariable(value = "id") Integer examSetId) {
         return ResponseEntity

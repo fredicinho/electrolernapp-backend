@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 @Entity
@@ -18,8 +19,17 @@ public class Profession {
     @OneToMany(targetEntity = User.class, cascade = CascadeType.ALL)
     private List<User> usersInProfession = new ArrayList<>();
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "profession_question",
+            joinColumns = @JoinColumn(name = "professionId"),
+            inverseJoinColumns = @JoinColumn(name = "questionId"))
+    private List<Question> questionsInProfession = new LinkedList<>();
 
     public Profession(){}
+    public Profession(String name){
+        this.name = name;
+    }
 
     public int getId() {
         return id;
@@ -45,11 +55,17 @@ public class Profession {
         this.usersInProfession = usersInProfession;
     }
 
-    @PostPersist
-    private void assignFKs() {
-        for (int i = 0; i < usersInProfession.size(); i++) {
-            usersInProfession.get(i).setProfession(this);
-        }
+
+    public List<Question> getQuestionsInProfession() {
+        return questionsInProfession;
+    }
+
+    public void setQuestionsInProfession(List<Question> questionsInProfession) {
+        this.questionsInProfession = questionsInProfession;
+    }
+
+    public void insertQuestion(Question question){
+        this.questionsInProfession.add(question);
     }
 
 }

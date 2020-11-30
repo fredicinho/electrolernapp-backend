@@ -1,6 +1,7 @@
 package ch.hslu.springbootbackend.springbootbackend.DTO;
 
 import ch.hslu.springbootbackend.springbootbackend.Entity.Answer;
+import ch.hslu.springbootbackend.springbootbackend.Entity.QuestionLevel;
 import ch.hslu.springbootbackend.springbootbackend.Utils.QuestionType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -45,16 +46,22 @@ public class QuestionDTO extends RepresentationModel<QuestionDTO> {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private int answerImageId= 0;
 
+    private List<Integer> professionsList = new ArrayList<>();
+
+
+    private QuestionLevel questionLevel;
+
     public QuestionDTO(){}
 
-    public QuestionDTO(Integer id, String questionPhrase, QuestionType questionType, int pointsToAchieve) {
+    public QuestionDTO(Integer id, String questionPhrase, QuestionType questionType, int pointsToAchieve, QuestionLevel questionLevel) {
         this.id = id;
         this.questionPhrase = questionPhrase;
         this.questionType = questionType;
         this.pointsToAchieve = pointsToAchieve;
+        this.questionLevel = questionLevel;
     }
 
-    public QuestionDTO(String questionPhrase, QuestionType questionType, List<Answer> possibleAnswer, List<Answer> correctAnswer, List<Integer> statisticsIds, int questionImageId, int answerImageId, int pointsToAchieve) {
+    public QuestionDTO(String questionPhrase, QuestionType questionType, List<Answer> possibleAnswer, List<Answer> correctAnswer, List<Integer> statisticsIds, int questionImageId, int answerImageId, int pointsToAchieve, QuestionLevel questionLevel) {
         this.questionPhrase = questionPhrase;
         this.questionType = questionType;
         this.possibleAnswers = possibleAnswer;
@@ -63,6 +70,7 @@ public class QuestionDTO extends RepresentationModel<QuestionDTO> {
         this.questionImageId = questionImageId;
         this.answerImageId = answerImageId;
         this.pointsToAchieve = pointsToAchieve;
+        this.questionLevel = questionLevel;
     }
 
     public Integer getId() {
@@ -152,6 +160,23 @@ public class QuestionDTO extends RepresentationModel<QuestionDTO> {
     public void setPointsToAchieve(int pointsToAchieve) {
         this.pointsToAchieve = pointsToAchieve;
     }
+
+    public QuestionLevel getQuestionLevel() {
+        return questionLevel;
+    }
+
+    public void setQuestionLevel(QuestionLevel questionLevel) {
+        this.questionLevel = questionLevel;
+    }
+    public List<Integer> getProfessionsList() {
+        return professionsList;
+    }
+
+    public void setProfessionsList(List<Integer> professionsList) {
+        this.professionsList = professionsList;
+    }
+
+
 
     @Override
     public String toString() {

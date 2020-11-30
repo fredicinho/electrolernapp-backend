@@ -1,10 +1,7 @@
 package ch.hslu.springbootbackend.springbootbackend.Service.CsvService;
 
-import ch.hslu.springbootbackend.springbootbackend.Entity.Answer;
-import ch.hslu.springbootbackend.springbootbackend.Entity.Media;
-import ch.hslu.springbootbackend.springbootbackend.Entity.Question;
+import ch.hslu.springbootbackend.springbootbackend.Entity.*;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.CategorySet;
-import ch.hslu.springbootbackend.springbootbackend.Entity.User;
 import ch.hslu.springbootbackend.springbootbackend.Repository.*;
 import ch.hslu.springbootbackend.springbootbackend.Utils.QuestionType;
 import org.apache.commons.csv.CSVFormat;
@@ -13,13 +10,11 @@ import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
@@ -33,18 +28,24 @@ import java.util.concurrent.*;
 public class CsvQuestionService implements CsvService {
 
     private final Logger LOG = LoggerFactory.getLogger(CsvQuestionService.class);
-    static String[] HEADER_QUESTION = {"categorySetId", "questionType", "questionPhrase", "Answer1", "Answer2", "Answer3", "Answer4", "Answer5", "CorrectAnswerAsLetter", "textIfCorrect", "textIfIncorrect", "questionImageId", "solutionImageId", "author", "pointsToAchieve"};
+    static String[] HEADER_QUESTION = {"categorySetId", "questionType", "questionPhrase", "Answer1", "Answer2", "Answer3", "Answer4", "Answer5", "CorrectAnswerAsLetter", "textIfCorrect", "textIfIncorrect", "questionImageId", "solutionImageId", "author", "pointsToAchieve", "profession", "level"};
 
     private final QuestionRepository questionRepository;
     private final AnswerRepository answerRepository;
     private final CategorySetRepository categorySetRepository;
     private final MediaRepository mediaRepository;
     private final UserRepository userRepository;
+    @Autowired
+    ProfessionRepository professionRepository;
     private ConcurrentHashMap<String, Answer> currentCreatedAnswers;
     private ConcurrentHashMap<String, User> currentCreatedUser;
     private ConcurrentHashMap<Integer, Media> currentCreatedMedia;
     private ConcurrentHashMap<String, CategorySet> currentCreatedCategorySets;
+    private ConcurrentHashMap<String, Profession> currentCreatedProfessions;
+    private ConcurrentHashMap<String, Question> currentCreatedQuestions;
     private ExecutorService executor = Executors.newFixedThreadPool(8);
+    List<Question> newQuestions = new ArrayList<>();
+    List<Long> timePerQuestion = new ArrayList<>();
 
     CsvQuestionService(QuestionRepository questionRepository, AnswerRepository answerRepository, CategorySetRepository categorySetRepository, MediaRepository mediaRepository, UserRepository userRepository) {
         this.questionRepository = questionRepository;
@@ -62,37 +63,50 @@ public class CsvQuestionService implements CsvService {
             List<Question> persistedQuestions = questionRepository.saveAll(questions);
             userRepository.saveAll(currentCreatedUser.values());
             LOG.info("Imported " + persistedQuestions.size() + " in " + Duration.between(start, finish).toMillis());
+            this.writeToFile(timePerQuestion);
             return persistedQuestions;
         } catch (IOException e) {
             throw new RuntimeException("fail to store csv data: " + e.getMessage());
         }
     }
 
-    public List<Question> parseCsv(InputStream is) {
+    public List parseCsv(InputStream is) {
+
         try (BufferedReader fileReader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
              CSVParser csvParser = new CSVParser(fileReader,
                      CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim())) {
 
-            List<Question> newQuestions = new ArrayList<>();
+
 
             currentCreatedAnswers = this.mapFromList(answerRepository.findAll());
             currentCreatedCategorySets = this.mapFromListCategorySet(categorySetRepository.findAll());
             currentCreatedMedia = this.mapFromListMedia(mediaRepository.findAll());
             currentCreatedUser = this.mapFromListUser(userRepository.findAll());
+            currentCreatedProfessions = this.mapFromListProfession(professionRepository.findAll());
+            currentCreatedQuestions = this.mapFromListQuestion(questionRepository.findAll());
 
             List <CSVRecord> csvRecords = csvParser.getRecords();
 
 
 
             for(CSVRecord csvRecord : csvRecords) {
+                Instant start = Instant.now();
                 Future<Question> questionFuture = executor.submit(() -> createQuestionsFromCSV(csvRecord));
                 while (!questionFuture.isDone()) {
                 }
-                newQuestions.add(questionFuture.get());
-                LOG.warn("question finished" + newQuestions.size());
+                if(questionFuture.get() != null) {
+                    //newQuestions.add(questionFuture.get());
+                    Instant finish = Instant.now();
+                    currentCreatedQuestions.put(questionFuture.get().getQuestionPhrase(), questionFuture.get());
+                    this.timePerQuestion.add(Duration.between(start, finish).toMillis());
+                }
+
+                LOG.warn("question finished" + currentCreatedQuestions.size());
+
 
             }
-            return newQuestions;
+
+            return new ArrayList<>(currentCreatedQuestions.values());
 
         } catch (IOException | InterruptedException | ExecutionException e) {
             throw new RuntimeException("fail to parse CSV file: " + e.getMessage());
@@ -192,8 +206,46 @@ public class CsvQuestionService implements CsvService {
         return map;
     }
 
+    private ConcurrentHashMap<String, Profession> mapFromListProfession(List<Profession> answerList){
+        ConcurrentHashMap<String,Profession> map = new ConcurrentHashMap<>();
+        for (Profession i : answerList) map.put(i.getName(),i);
+        return map;
+    }
+    private ConcurrentHashMap<String, Question> mapFromListQuestion(List<Question> answerList){
+        ConcurrentHashMap<String,Question> map = new ConcurrentHashMap<>();
+        for (Question i : answerList) map.put(i.getQuestionPhrase(),i);
+        return map;
+    }
+    private Question insertNewProfession(Question question, String profession){
+        if(profession != "null"){
+            if(currentCreatedProfessions.containsKey(profession)) {
+                question.getProfessions().add(currentCreatedProfessions.get(profession));
+            }
+        }
+        return question;
+    }
+
+    private QuestionLevel getQuestionLevel(String level){
+
+        switch (level){
+            case "1":
+                return QuestionLevel.LEVEL_1;
+            case "2":
+                return QuestionLevel.LEVEL_2;
+            case "3":
+                return QuestionLevel.LEVEL_3;
+            default:
+                return QuestionLevel.NO_LEVEL;
+        }
+    }
+
     private Question createQuestionsFromCSV(CSVRecord csvRecord) {
-        List<Question> questionList = new ArrayList<>();
+        if (currentCreatedQuestions.containsKey(this.escapeAndEncodeString(csvRecord.get("QuestionPhrase")))) {
+            Question question = this.insertNewProfession(currentCreatedQuestions.get(this.escapeAndEncodeString(csvRecord.get("QuestionPhrase"))), csvRecord.get("profession"));
+            currentCreatedQuestions.replace(this.escapeAndEncodeString(csvRecord.get("QuestionPhrase")), question);
+            return null;
+        } else {
+            List<Question> questionList = new ArrayList<>();
             List<CategorySet> categorySet = new ArrayList<>();
             try {
                 CategorySet foundedCategorySet = this.getCategorySet(csvRecord.get("categorySetId"));
@@ -225,6 +277,8 @@ public class CsvQuestionService implements CsvService {
             Media questionImage = null;
             Media solutionImage = null;
             User user = null;
+            QuestionLevel questionLevel;
+            List<Profession> profession = new ArrayList<>();
             int pointsToAchieve = Integer.parseInt(csvRecord.get("pointsToAchieve"));
             String escapedAndEncodedString = this.escapeAndEncodeString(csvRecord.get("autor"));
             if (currentCreatedUser.containsKey(escapedAndEncodedString)) {
@@ -241,6 +295,12 @@ public class CsvQuestionService implements CsvService {
             if (this.checkIfMediaAvailableInCsv(csvRecord.get("solutionImageId"))) {
                 solutionImage = this.getMediaById(Integer.parseInt(csvRecord.get("solutionImageId")));
             }
+            if (currentCreatedProfessions.containsKey(csvRecord.get("profession"))) {
+                if (csvRecord.get("profession") != "null") {
+                    profession.add(currentCreatedProfessions.get(csvRecord.get("profession")));
+                }
+            }
+            questionLevel = this.getQuestionLevel(csvRecord.get("level"));
 
             Question newQuestion = new Question(
                     this.escapeAndEncodeString(csvRecord.get("QuestionPhrase")),
@@ -251,9 +311,21 @@ public class CsvQuestionService implements CsvService {
                     categorySet,
                     questionImage,
                     solutionImage,
-                    pointsToAchieve
+                    pointsToAchieve,
+                    profession,
+                    questionLevel
+
             );
             return newQuestion;
+        }
+    }
+
+    private void writeToFile(List<Long> list) throws IOException {
+        FileWriter writer = new FileWriter("output_2.txt");
+        for(Long str: list) {
+            writer.write(str + System.lineSeparator());
+        }
+        writer.close();
     }
 
 }

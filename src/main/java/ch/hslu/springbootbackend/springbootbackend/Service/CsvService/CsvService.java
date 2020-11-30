@@ -1,4 +1,5 @@
 package ch.hslu.springbootbackend.springbootbackend.Service.CsvService;
+
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
@@ -15,5 +16,6 @@ public interface CsvService {
     List saveNewEntities(MultipartFile file);
 
     List parseCsv(InputStream inputStream);
+
 
 }

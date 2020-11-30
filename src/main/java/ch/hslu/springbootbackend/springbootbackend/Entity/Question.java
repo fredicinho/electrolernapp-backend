@@ -56,8 +56,14 @@ public class Question{
     @ManyToMany(mappedBy = "questionsInExamSet")
     private List<ExamSet> examSets = new LinkedList<>();
 
+    @ManyToMany(mappedBy = "questionsInProfession")
+    private List<Profession> professions = new LinkedList<>();
 
-    public Question(String questionPhrase, List<Answer> possibleAnswers, List<Answer> correctAnswers, QuestionType questionType, User user, List<CategorySet> categorySets, Media questionImage, Media answerImage, int pointsToAchieve) {
+
+    private QuestionLevel questionLevel;
+
+
+    public Question(String questionPhrase, List<Answer> possibleAnswers, List<Answer> correctAnswers, QuestionType questionType, User user, List<CategorySet> categorySets, Media questionImage, Media answerImage, int pointsToAchieve, List<Profession> professions, QuestionLevel questionLevel) {
         this.questionPhrase = questionPhrase;
         this.possibleAnswers = possibleAnswers;
         this.correctAnswers = correctAnswers;
@@ -67,13 +73,16 @@ public class Question{
         this.answerImage = answerImage;
         this.categorySet = categorySets;
         this.pointsToAchieve = pointsToAchieve;
+        this.professions = professions;
+        this.questionLevel = questionLevel;
     }
-    public Question(String questionPhrase, List<Answer> answers, List<Answer>  correctAnswers, QuestionType questionType, int pointsToAchieve) {
+    public Question(String questionPhrase, List<Answer> answers, List<Answer>  correctAnswers, QuestionType questionType, int pointsToAchieve, QuestionLevel questionLevel) {
         this.setQuestionPhrase(questionPhrase);
         this.setPossibleAnswers(answers);
         this.setCorrectAnswers(correctAnswers);
         this.setQuestionType(questionType);
         this.setPointsToAchieve(pointsToAchieve);
+        this.questionLevel = questionLevel;
     }
     @PostPersist
     private void assignFKs(){
@@ -89,7 +98,9 @@ public class Question{
         for(int i =0; i < examSets.size(); i++){
             examSets.get(i).insertQuestion(this);
         }
-
+        for(int i = 0; i < professions.size(); i++){
+            professions.get(i).insertQuestion(this);
+        }
         if(this.createdByUser != null){
             this.createdByUser.getCreatedQuestions().add(this);
         }
@@ -205,6 +216,23 @@ public class Question{
     public void setExamResults(Set<ExamResult> examResults) {
         this.examResults = examResults;
     }
+
+    public List<Profession> getProfessions() {
+        return professions;
+    }
+
+    public void setProfessions(List<Profession> professions) {
+        this.professions = professions;
+    }
+
+    public QuestionLevel getQuestionLevel() {
+        return questionLevel;
+    }
+
+    public void setQuestionLevel(QuestionLevel questionLevel) {
+        this.questionLevel = questionLevel;
+    }
+
 
     @Override
     public String toString() {
