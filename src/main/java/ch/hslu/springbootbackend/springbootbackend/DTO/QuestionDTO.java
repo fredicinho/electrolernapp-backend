@@ -2,7 +2,7 @@ package ch.hslu.springbootbackend.springbootbackend.DTO;
 
 import ch.hslu.springbootbackend.springbootbackend.Entity.Answer;
 import ch.hslu.springbootbackend.springbootbackend.Entity.QuestionLevel;
-import ch.hslu.springbootbackend.springbootbackend.Utils.QuestionType;
+import ch.hslu.springbootbackend.springbootbackend.Entity.QuestionType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.hateoas.RepresentationModel;

@@ -6,6 +6,7 @@ import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.CategorySet;
 import ch.hslu.springbootbackend.springbootbackend.Exception.ResourceNotFoundException;
 import ch.hslu.springbootbackend.springbootbackend.Repository.*;
 import ch.hslu.springbootbackend.springbootbackend.controllers.MediaController;
+import ch.hslu.springbootbackend.springbootbackend.controllers.ProfessionController;
 import ch.hslu.springbootbackend.springbootbackend.controllers.StatisticController;
 import ch.hslu.springbootbackend.springbootbackend.controllers.UserController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,7 @@ public class DTOParserQuestion implements DTOParserStrategy{
         //questionDTO.add(linkTo(methodOn(AnswerController.class).getCorrectAnswersByQuestion(questionId)).withRel("correctAnswers"));
 
         questionDTO.add(linkTo(methodOn(StatisticController.class).getStatisticByQuestionId(id)).withRel("statistics"));
+        questionDTO.add(linkTo(methodOn(ProfessionController.class).getProfessionByQuestion(id)).withRel("professions"));
 
 
         if(checkIfQuestionImageExists(question)){

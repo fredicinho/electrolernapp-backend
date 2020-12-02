@@ -3,7 +3,6 @@ package ch.hslu.springbootbackend.springbootbackend.Service.CsvService;
 import ch.hslu.springbootbackend.springbootbackend.Entity.*;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.CategorySet;
 import ch.hslu.springbootbackend.springbootbackend.Repository.*;
-import ch.hslu.springbootbackend.springbootbackend.Utils.QuestionType;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -14,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -43,6 +43,7 @@ public class CsvQuestionService implements CsvService {
     private ConcurrentHashMap<String, CategorySet> currentCreatedCategorySets;
     private ConcurrentHashMap<String, Profession> currentCreatedProfessions;
     private ConcurrentHashMap<String, Question> currentCreatedQuestions;
+    private ConcurrentHashMap<String, Question> questionsToCreate = new ConcurrentHashMap<>();
     private ExecutorService executor = Executors.newFixedThreadPool(8);
     List<Question> newQuestions = new ArrayList<>();
     List<Long> timePerQuestion = new ArrayList<>();
@@ -54,16 +55,16 @@ public class CsvQuestionService implements CsvService {
         this.mediaRepository = mediaRepository;
         this.userRepository = userRepository;
     }
-
+    @Transactional
     public List<Question> saveNewEntities(MultipartFile file) {
         try {
             Instant start = Instant.now();
             List<Question> questions = parseCsv(file.getInputStream());
             Instant finish = Instant.now();
+            //answerRepository.saveAll(currentCreatedAnswers.values());
             List<Question> persistedQuestions = questionRepository.saveAll(questions);
             userRepository.saveAll(currentCreatedUser.values());
             LOG.info("Imported " + persistedQuestions.size() + " in " + Duration.between(start, finish).toMillis());
-            this.writeToFile(timePerQuestion);
             return persistedQuestions;
         } catch (IOException e) {
             throw new RuntimeException("fail to store csv data: " + e.getMessage());
@@ -98,6 +99,7 @@ public class CsvQuestionService implements CsvService {
                     //newQuestions.add(questionFuture.get());
                     Instant finish = Instant.now();
                     currentCreatedQuestions.put(questionFuture.get().getQuestionPhrase(), questionFuture.get());
+                    questionsToCreate.put(questionFuture.get().getQuestionPhrase(), questionFuture.get());
                     this.timePerQuestion.add(Duration.between(start, finish).toMillis());
                 }
 
@@ -106,7 +108,7 @@ public class CsvQuestionService implements CsvService {
 
             }
 
-            return new ArrayList<>(currentCreatedQuestions.values());
+            return new ArrayList<>(questionsToCreate.values());
 
         } catch (IOException | InterruptedException | ExecutionException e) {
             throw new RuntimeException("fail to parse CSV file: " + e.getMessage());
@@ -157,6 +159,7 @@ public class CsvQuestionService implements CsvService {
         }
         return correctAnswers;
     }
+
 
     private String escapeAndEncodeString(final String string) {
         String escapedSpanTagInString = string.replaceAll("<(/|S|B)[^>]*>", "");
@@ -217,9 +220,10 @@ public class CsvQuestionService implements CsvService {
         return map;
     }
     private Question insertNewProfession(Question question, String profession){
-        if(profession != "null"){
+        if(profession != "null" || profession != null){
             if(currentCreatedProfessions.containsKey(profession)) {
-                question.getProfessions().add(currentCreatedProfessions.get(profession));
+                if(!question.getProfessions().contains(currentCreatedProfessions.get(profession)))
+                    question.getProfessions().add(currentCreatedProfessions.get(profession));
             }
         }
         return question;
@@ -239,6 +243,20 @@ public class CsvQuestionService implements CsvService {
         }
     }
 
+    private QuestionType getQuestionType(String type){
+
+        switch (type){
+            case "MC":
+            return QuestionType.MultipleChoice;
+            case "FS":
+                return QuestionType.Fragestellung;
+            case "ZO":
+                return QuestionType.Zuordnung;
+            default:
+                return QuestionType.Theorie;
+        }
+    }
+
     private Question createQuestionsFromCSV(CSVRecord csvRecord) {
         if (currentCreatedQuestions.containsKey(this.escapeAndEncodeString(csvRecord.get("QuestionPhrase")))) {
             Question question = this.insertNewProfession(currentCreatedQuestions.get(this.escapeAndEncodeString(csvRecord.get("QuestionPhrase"))), csvRecord.get("profession"));
@@ -247,6 +265,8 @@ public class CsvQuestionService implements CsvService {
         } else {
             List<Question> questionList = new ArrayList<>();
             List<CategorySet> categorySet = new ArrayList<>();
+            List<Answer> possibleAnswers = new ArrayList<>();
+            List<Answer> correctAnswers = new ArrayList<>();
             try {
                 CategorySet foundedCategorySet = this.getCategorySet(csvRecord.get("categorySetId"));
                 categorySet.add(foundedCategorySet);
@@ -254,26 +274,23 @@ public class CsvQuestionService implements CsvService {
             } catch (NumberFormatException ex) {
                 LOG.warn("Couldn't parse the founded categorySetId :: " + csvRecord.get("categorySetId") + " of the Data :: " + csvRecord.toString());
             }
+            QuestionType questionType = this.getQuestionType(csvRecord.get("questionType"));
+            if(questionType == QuestionType.Fragestellung){
+                correctAnswers = getAnswers(csvRecord);
+            }else if(questionType == QuestionType.Theorie){
 
-            List<Answer> possibleAnswers = new ArrayList<>();
-            for (int i = 1; i <= 5; i++) {
-                String answerPhrase = csvRecord.get("Answer" + i);
-                if (this.checkIfAnswerIsEmpty(answerPhrase)) {
-                    continue;
-                }
-                String escapedAndEncodedString = this.escapeAndEncodeString(answerPhrase);
-                //Optional<Answer> foundedAnswer = answerRepository.findByAnswerPhrase(escapedAndEncodedString);
-                if (currentCreatedAnswers.containsKey(escapedAndEncodedString)) {
-                    possibleAnswers.add(currentCreatedAnswers.get(escapedAndEncodedString));
-                } else {
-                    Answer newAnswerOfQuestion = new Answer(escapedAndEncodedString);
-                    possibleAnswers.add(answerRepository.save(newAnswerOfQuestion));
-                    currentCreatedAnswers.put(newAnswerOfQuestion.getAnswerPhrase(), newAnswerOfQuestion);
-                }
+            }else if(questionType == QuestionType.Zuordnung){
+                possibleAnswers = getAnswersZuordnung(csvRecord);
+                correctAnswers = setCorrectAnswersForZuordnung(csvRecord, possibleAnswers);
+            }
+            else{
+                possibleAnswers = getAnswers(csvRecord);
+                correctAnswers = this.parseLettersToAnswers(csvRecord.get("CorrectAnswerAsLetter"), possibleAnswers);
             }
 
-            List<Answer> correctAnswers = this.parseLettersToAnswers(csvRecord.get("CorrectAnswerAsLetter"), possibleAnswers);
-            QuestionType questionType = QuestionType.fromString(csvRecord.get("questionType"));
+
+
+
             Media questionImage = null;
             Media solutionImage = null;
             User user = null;
@@ -326,6 +343,100 @@ public class CsvQuestionService implements CsvService {
             writer.write(str + System.lineSeparator());
         }
         writer.close();
+    }
+
+    private List<Answer> getAnswers(CSVRecord csvRecord){
+        List<Answer> possibleAnswers = new ArrayList<>();
+        for (int i = 1; i <= 5; i++) {
+            String answerPhrase = csvRecord.get("Answer" + i);
+            if (this.checkIfAnswerIsEmpty(answerPhrase)) {
+                continue;
+            }
+            String escapedAndEncodedString = this.escapeAndEncodeString(answerPhrase);
+            //Optional<Answer> foundedAnswer = answerRepository.findByAnswerPhrase(escapedAndEncodedString);
+            if (currentCreatedAnswers.containsKey(escapedAndEncodedString)) {
+                possibleAnswers.add(currentCreatedAnswers.get(escapedAndEncodedString));
+            } else {
+                Answer newAnswerOfQuestion = new Answer(escapedAndEncodedString);
+                possibleAnswers.add(answerRepository.save(newAnswerOfQuestion));
+                currentCreatedAnswers.put(newAnswerOfQuestion.getAnswerPhrase(), newAnswerOfQuestion);
+            }
+        }
+        return possibleAnswers;
+    }
+    private List<Answer> getAnswersZuordnung(CSVRecord csvRecord){
+        List<Answer> possibleAnswers = new ArrayList<>();
+        for (int i = 1; i <= 3; i++) {
+            String answerPhrase = csvRecord.get("Answer" + i);
+            if (this.checkIfAnswerIsEmpty(answerPhrase)) {
+                continue;
+            }
+            String escapedAndEncodedString = this.escapeAndEncodeString(answerPhrase);
+            //Optional<Answer> foundedAnswer = answerRepository.findByAnswerPhrase(escapedAndEncodedString);
+            if (currentCreatedAnswers.containsKey(escapedAndEncodedString)) {
+                possibleAnswers.add(currentCreatedAnswers.get(escapedAndEncodedString));
+            } else {
+                Answer newAnswerOfQuestion = new Answer(escapedAndEncodedString);
+                possibleAnswers.add(answerRepository.save(newAnswerOfQuestion));
+                currentCreatedAnswers.put(newAnswerOfQuestion.getAnswerPhrase(), newAnswerOfQuestion);
+            }
+        }
+        for (int i = 1; i <= 5; i++) {
+            String answerPhrase = csvRecord.get("ZO" + i);
+            if (this.checkIfAnswerIsEmpty(answerPhrase)) {
+                continue;
+            }
+            String escapedAndEncodedString = this.escapeAndEncodeString(answerPhrase);
+            //Optional<Answer> foundedAnswer = answerRepository.findByAnswerPhrase(escapedAndEncodedString);
+
+            escapedAndEncodedString = "MatchTo" + escapedAndEncodedString;
+        if (currentCreatedAnswers.containsKey(escapedAndEncodedString)) {
+                possibleAnswers.add(currentCreatedAnswers.get(escapedAndEncodedString));
+            } else {
+                Answer newAnswerOfQuestion = new Answer(escapedAndEncodedString);
+                possibleAnswers.add(answerRepository.save(newAnswerOfQuestion));
+                currentCreatedAnswers.put(newAnswerOfQuestion.getAnswerPhrase(), newAnswerOfQuestion);
+            }
+        }
+        return possibleAnswers;
+    }
+
+    List<Answer> setCorrectAnswersForZuordnung(CSVRecord csvRecord, List<Answer> possibleAnswers){
+        List<Answer> ownAnswers = new ArrayList<>();
+        List<Answer> correctAnswers = new ArrayList<>();
+        for (int i = 1; i <= 3; i++) {
+            String answerAsLetter = csvRecord.get("solution" + i);
+            String question = escapeAndEncodeString(csvRecord.get("Answer"+i));
+            List<Answer> answersWithMatchTo = new ArrayList<>();
+            for(Answer answer : possibleAnswers){
+                if(answer.getAnswerPhrase().contains("MatchTo")){
+                    answersWithMatchTo.add(answer);
+                }
+            }
+            List<Answer> answerPhrase = this.parseLettersToAnswers(answerAsLetter, answersWithMatchTo);
+            String answersCascased = question;
+            if (this.checkIfAnswerIsEmpty(answerAsLetter)) {
+                continue;
+            }else {
+                for (Answer answer : answerPhrase) {
+                    answersCascased += escapeAndEncodeString(answer.getAnswerPhrase());
+                }
+            }
+
+
+                //Optional<Answer> foundedAnswer = answerRepository.findByAnswerPhrase(escapedAndEncodedString);
+
+            if (currentCreatedAnswers.containsKey(answersCascased)) {
+                correctAnswers.add(currentCreatedAnswers.get(answersCascased));
+            } else {
+                Answer newAnswerOfQuestion = new Answer(answersCascased);
+                currentCreatedAnswers.put(newAnswerOfQuestion.getAnswerPhrase(), newAnswerOfQuestion);
+                correctAnswers.add(answerRepository.save(newAnswerOfQuestion));
+            }
+
+
+        }
+        return correctAnswers;
     }
 
 }

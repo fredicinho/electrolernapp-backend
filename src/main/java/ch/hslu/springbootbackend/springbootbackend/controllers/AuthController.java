@@ -40,25 +40,18 @@ public class AuthController {
 
 	@Autowired
     AuthenticationManager authenticationManager;
-
 	@Autowired
 	UserRepository userRepository;
-
 	@Autowired
 	RoleRepository roleRepository;
-
 	@Autowired
 	ExamSetRepository examSetRepository;
-
 	@Autowired
 	SchoolClassRepository schoolClassRepository;
-
 	@Autowired
 	ExamSetService examSetService;
-
 	@Autowired
 	ProfessionRepository professionRepository;
-
 	@Autowired
     PasswordEncoder encoder;
 
@@ -241,6 +234,7 @@ public class AuthController {
 		}
 		return exists;
 	}
+
 
 
 

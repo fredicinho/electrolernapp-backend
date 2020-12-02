@@ -1,6 +1,7 @@
 package ch.hslu.springbootbackend.springbootbackend.Entity;
 
 import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.ExamSet;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.hateoas.RepresentationModel;
@@ -72,6 +73,9 @@ public class User extends RepresentationModel<User> {
 	@ManyToOne(targetEntity = Profession.class, cascade = CascadeType.ALL)
 	@JoinColumn(name = "fk_profession", nullable = true)
 	private Profession profession;
+
+	@JsonIgnore
+	private String resetPasswordToken;
 
 
 	public User() {
@@ -186,4 +190,14 @@ public class User extends RepresentationModel<User> {
 	public void setProfession(Profession profession) {
 		this.profession = profession;
 	}
+
+
+	public String getResetPasswordToken() {
+		return resetPasswordToken;
+	}
+
+	public void setResetPasswordToken(String resetPasswordToken) {
+		this.resetPasswordToken = resetPasswordToken;
+	}
+
 }

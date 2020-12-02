@@ -2,7 +2,6 @@ package ch.hslu.springbootbackend.springbootbackend.Entity;
 
 import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.CategorySet;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.ExamSet;
-import ch.hslu.springbootbackend.springbootbackend.Utils.QuestionType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
@@ -22,10 +21,10 @@ public class Question{
     @Column(length=1000000)
     private String questionPhrase;
 
-    @ManyToMany(mappedBy = "questionPossibleList")
+    @ManyToMany(mappedBy = "questionPossibleList", cascade = CascadeType.PERSIST)
     private List<Answer> possibleAnswers = new LinkedList<>();
 
-    @ManyToMany(mappedBy = "questionCorrectList")
+    @ManyToMany(mappedBy = "questionCorrectList", cascade = CascadeType.PERSIST)
     private List<Answer> correctAnswers = new LinkedList<>();
 
     private QuestionType questionType;

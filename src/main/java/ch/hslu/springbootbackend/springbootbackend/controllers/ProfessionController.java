@@ -1,8 +1,10 @@
 package ch.hslu.springbootbackend.springbootbackend.controllers;
 
 import ch.hslu.springbootbackend.springbootbackend.Entity.Profession;
+import ch.hslu.springbootbackend.springbootbackend.Entity.Question;
 import ch.hslu.springbootbackend.springbootbackend.Entity.User;
 import ch.hslu.springbootbackend.springbootbackend.Repository.ProfessionRepository;
+import ch.hslu.springbootbackend.springbootbackend.Repository.QuestionRepository;
 import ch.hslu.springbootbackend.springbootbackend.Repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -26,6 +29,8 @@ public class ProfessionController {
     ProfessionRepository professionRepository;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    QuestionRepository questionRepository;
 
     @GetMapping("/{id}")
     public ResponseEntity<Profession> getProfessionById(@PathVariable(value = "id") Integer professionId) {
@@ -40,6 +45,14 @@ public class ProfessionController {
                     notFound()
                     .build();
         }
+    }
+    @GetMapping("/questions")
+    public List<Profession> getProfessionByQuestion(@RequestParam(value = "id") Integer questionId) {
+        Question question = questionRepository.findById(questionId).orElseThrow();
+        List<Profession> professionList= professionRepository.getAllByQuestionsInProfession(question);
+
+        return professionList;
+
     }
 
     @PostMapping("")

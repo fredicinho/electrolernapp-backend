@@ -19,7 +19,8 @@ public class Profession {
     @OneToMany(targetEntity = User.class, cascade = CascadeType.ALL)
     private List<User> usersInProfession = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(
             name = "profession_question",
             joinColumns = @JoinColumn(name = "professionId"),
