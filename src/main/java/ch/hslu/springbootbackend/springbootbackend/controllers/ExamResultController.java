@@ -1,6 +1,7 @@
 package ch.hslu.springbootbackend.springbootbackend.controllers;
 
 import ch.hslu.springbootbackend.springbootbackend.DTO.ExamResultDTO;
+import ch.hslu.springbootbackend.springbootbackend.DTO.ExamResultUpdateDTO;
 import ch.hslu.springbootbackend.springbootbackend.Exception.ResourceNotFoundException;
 import ch.hslu.springbootbackend.springbootbackend.Service.EntityService.ExamResultService;
 import org.slf4j.Logger;
@@ -52,8 +53,8 @@ public class ExamResultController {
 
     @PutMapping("/")
     @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity updatePointsAchieved(@RequestBody Long userId, Double pointsAchieved, Integer examSetId, Integer questionId) {
-        ExamResultDTO examResultDTO = examResultService.updateExamResultPointsAchieved(examSetId, userId, questionId, pointsAchieved);
+    public ResponseEntity updatePointsAchieved(@RequestBody ExamResultUpdateDTO examResultUpdateDTO) {
+        ExamResultDTO examResultDTO = examResultService.updateExamResultPointsAchieved(examResultUpdateDTO.getExamSetId(), examResultUpdateDTO.getUserId(), examResultUpdateDTO.getQuestionId(), examResultUpdateDTO.getPointsAchieved());
         if(examResultDTO != null) {
             return ResponseEntity
                     .ok()
