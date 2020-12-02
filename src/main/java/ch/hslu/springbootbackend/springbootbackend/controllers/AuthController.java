@@ -83,6 +83,24 @@ public class AuthController {
 												 roles));
 	}
 
+	@GetMapping("/isTeacherOrAdmin")
+	public ResponseEntity<String> checkAuthorization() {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		SecurityContextHolder.getContext().setAuthentication(auth);
+		String jwt = jwtUtils.generateJwtToken(auth);
+
+		UserDetailsImpl userDetails = (UserDetailsImpl) auth.getPrincipal();
+		List<String> roles = userDetails.getAuthorities().stream()
+				.map(item -> item.getAuthority())
+				.collect(Collectors.toList());
+		if(roles.contains("ROLE_ADMIN") || roles.contains("ROLE_TEACHER")){
+			return ResponseEntity.ok("Ok");
+		} else {
+			return ResponseEntity.badRequest().body("Not Ok");
+		}
+	}
+
+
 	@PostMapping("/startExam")
 	public ResponseEntity<?> authenticateUserForExam(@Valid @RequestBody LoginRequest loginRequest, @RequestParam int examSetId) {
 		Authentication authentication = authenticationManager.authenticate(
