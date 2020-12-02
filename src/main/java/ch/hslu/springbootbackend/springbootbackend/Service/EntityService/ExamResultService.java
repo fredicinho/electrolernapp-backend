@@ -9,11 +9,11 @@ import ch.hslu.springbootbackend.springbootbackend.Entity.User;
 import ch.hslu.springbootbackend.springbootbackend.Exception.ResourceNotFoundException;
 import ch.hslu.springbootbackend.springbootbackend.Repository.*;
 import ch.hslu.springbootbackend.springbootbackend.Strategy.DTOParserExamResult;
-import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -93,6 +93,13 @@ public class ExamResultService {
             }
         }
         return examResultDTO;
+
+    }
+    public ExamResultDTO updateExamResultPointsAchieved(int examSetId, long userId, int questionId, double pointsAchieved){
+        ExamResult examResult = dtoParserExamResult.generateObjectFromDTO(this.getExamResultsByExamSetAndUserIdAndQuestionId(examSetId, userId, questionId));
+        examResult.setPointsAchieved(pointsAchieved);
+        examResult.setChangedByTeacher(new Date());
+        return dtoParserExamResult.generateDTOFromObject(examResultRepository.save(examResult).getId());
 
     }
 

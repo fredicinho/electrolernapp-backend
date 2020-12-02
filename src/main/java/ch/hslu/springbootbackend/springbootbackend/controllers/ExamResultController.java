@@ -50,6 +50,23 @@ public class ExamResultController {
         }
     }
 
+    @PutMapping("/")
+    @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
+    public ResponseEntity updatePointsAchieved(@RequestBody Long userId, Double pointsAchieved, Integer examSetId, Integer questionId) {
+        ExamResultDTO examResultDTO = examResultService.updateExamResultPointsAchieved(examSetId, userId, questionId, pointsAchieved);
+        if(examResultDTO != null) {
+            return ResponseEntity
+                    .ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(examResultDTO);
+        }
+        else{
+            return ResponseEntity.
+                    notFound()
+                    .build();
+        }
+    }
+
 
     @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @GetMapping("/examSets")
