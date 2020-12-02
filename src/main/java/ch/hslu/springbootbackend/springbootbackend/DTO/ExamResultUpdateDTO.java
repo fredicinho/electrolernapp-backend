@@ -50,4 +50,13 @@ public class ExamResultUpdateDTO {
     }
 
 
+    @Override
+    public String toString() {
+        return "ExamResultUpdateDTO{" +
+                "userId=" + userId +
+                ", pointsAchieved=" + pointsAchieved +
+                ", examSetId=" + examSetId +
+                ", questionId=" + questionId +
+                '}';
+    }
 }

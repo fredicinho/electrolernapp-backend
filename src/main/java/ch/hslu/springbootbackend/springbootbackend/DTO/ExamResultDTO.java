@@ -84,4 +84,16 @@ public class ExamResultDTO extends RepresentationModel<ExamResultDTO> {
     }
 
 
+    @Override
+    public String toString() {
+        return "ExamResultDTO{" +
+                "examResultId=" + examResultId +
+                ", pointsAchieved=" + pointsAchieved +
+                ", username='" + username + '\'' +
+                ", questionId=" + questionId +
+                ", examSetId=" + examSetId +
+                ", sendedAnswers=" + sendedAnswers +
+                ", changedByTeacher=" + changedByTeacher +
+                '}';
+    }
 }

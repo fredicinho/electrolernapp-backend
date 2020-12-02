@@ -53,7 +53,7 @@ public class ExamResultController {
 
     @PutMapping("/")
     @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity updatePointsAchieved(@RequestBody ExamResultUpdateDTO examResultUpdateDTO) {
+    public ResponseEntity updatePointsAchieved(@RequestBody ExamResultUpdateDTO examResultUpdateDTO) throws ResourceNotFoundException {
         ExamResultDTO examResultDTO = examResultService.updateExamResultPointsAchieved(examResultUpdateDTO.getExamSetId(), examResultUpdateDTO.getUserId(), examResultUpdateDTO.getQuestionId(), examResultUpdateDTO.getPointsAchieved());
         if(examResultDTO != null) {
             return ResponseEntity
@@ -94,7 +94,7 @@ public class ExamResultController {
 
     @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
     @GetMapping("/examSetsAndUsersAndQuestion")
-    public ResponseEntity<ExamResultDTO> getAllExamSetResultsByExamSetsAndUsersAndQuestion(@RequestParam Integer examSetId, @RequestParam Integer userId, @RequestParam Integer questionId) {
+    public ResponseEntity<ExamResultDTO> getAllExamSetResultsByExamSetsAndUsersAndQuestion(@RequestParam Integer examSetId, @RequestParam Integer userId, @RequestParam Integer questionId) throws ResourceNotFoundException {
         ExamResultDTO examResultDTO = examResultService.getExamResultsByExamSetAndUserIdAndQuestionId(examSetId, userId, questionId);
         if(examResultDTO != null) {
             return ResponseEntity

@@ -64,7 +64,7 @@ public class ExamSetController {
     }
 
     // Just Users who are in schoolclass of exam are allowed to get the specific exam!!!
-    @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_EXAM')")
+    // @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_EXAM')")
     @GetMapping("/{id}")
     public ResponseEntity<ExamSetDTO> getExamSetById(@PathVariable(value = "id") Integer examSetId) {
         return ResponseEntity
@@ -72,6 +72,7 @@ public class ExamSetController {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(examSetService.getExamSetById(examSetId));
     }
+
     @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
     @PutMapping("/{id}/schoolClasses")
     public ResponseEntity<ExamSetDTO> updateExamSetSchoolClassesIn(@PathVariable(value = "id") Integer examSetId, @RequestParam Integer schoolClassId) {
