@@ -99,12 +99,11 @@ public class ExamResultService {
         if(examResultOptional.isPresent()) {
             return dtoParserExamResult.generateDTOFromObject(examResultOptional.get().getId());
         } else {
-            System.out.println("ExamResult doesnt exists");
             ExamResultDTO examResultDto = new ExamResultDTO();
             examResultDto.setExamSetId(examSetId);
             examResultDto.setQuestionId(questionId);
             examResultDto.setUsername(userOptional.get().getUsername());
-            return examResultDTO;
+            return examResultDto;
         }
 
     }
@@ -115,7 +114,6 @@ public class ExamResultService {
         examResult.setChangedByTeacher(new Date());
         examResult.setUser(this.userRepository.getOne(userId));
         examResult.setExamSet(this.examSetRepository.getOne(examSetId));
-        System.out.println(examResult.toString());
         return dtoParserExamResult.generateDTOFromObject(examResultRepository.save(examResult).getId());
 
     }
