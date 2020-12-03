@@ -36,7 +36,9 @@ public class CategorySetService {
 
     public List<CategorySetDTO> getCategorySetByCategoryId (Integer categoryId){
         List<CategorySet> categorySets = categorySetRepository.findByCategoryId(categoryId);
-        return generateCategorySetDTOFromCatagorySet(categorySets);
+        List<CategorySet> filteredCategorySets = this.filterEmptyCategorySets(categorySets);
+        System.out.println("Filtered CategorySets");
+        return generateCategorySetDTOFromCatagorySet(filteredCategorySets);
     }
 
     private List<CategorySetDTO> generateCategorySetDTOFromCatagorySet(List<CategorySet> list){
@@ -52,7 +54,19 @@ public class CategorySetService {
 
     public List<CategorySetDTO> getAllCategorySets() {
         List<CategorySet> allCategorySets = categorySetRepository.findAll();
-        return this.generateCategorySetDTOFromCatagorySet(allCategorySets);
+        List<CategorySet> filteredCategorySets = this.filterEmptyCategorySets(allCategorySets);
+        return this.generateCategorySetDTOFromCatagorySet(filteredCategorySets);
+    }
+
+    private List<CategorySet> filterEmptyCategorySets(List<CategorySet> categorySets) {
+        List<CategorySet> filteredCategorySet = new ArrayList<>();
+        for (CategorySet categorySet : categorySets
+             ) {
+            if (!categorySet.getQuestionsInSet().isEmpty()) {
+                filteredCategorySet.add(categorySet);
+            }
+        }
+        return filteredCategorySet;
     }
 
 }
