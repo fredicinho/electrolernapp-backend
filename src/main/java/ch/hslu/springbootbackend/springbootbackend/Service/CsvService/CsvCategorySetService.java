@@ -9,6 +9,7 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,14 +28,13 @@ public class CsvCategorySetService implements CsvService {
     private final Logger LOG = LoggerFactory.getLogger(CsvQuestionService.class);
     static String[] HEADER_CATEGORYSET = {"id", "categorieid", "title", "categorieSetNumber"};
 
-    private final CategorySetRepository categorySetRepository;
-    private final CategoryRepository categoryRepository;
+    @Autowired
+    private CategorySetRepository categorySetRepository;
+    @Autowired
+    private CategoryRepository categoryRepository;
+
     private HashMap<String, CategorySet> currentCreatedCategorySets;
 
-    CsvCategorySetService(CategorySetRepository categorySetRepository, CategoryRepository categoryRepository) {
-        this.categorySetRepository = categorySetRepository;
-        this.categoryRepository = categoryRepository;
-    }
 
     public List<CategorySet> saveNewEntities(MultipartFile file) {
         try {

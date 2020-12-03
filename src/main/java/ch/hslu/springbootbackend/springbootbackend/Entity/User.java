@@ -86,6 +86,19 @@ public class User extends RepresentationModel<User> {
 		this.email = email;
 		this.password = password;
 	}
+
+	public User(String username, String email, String password, Profession profession) {
+
+	}
+
+	public User(String username, String email, String password, Profession profession, Set<Role> role) {
+		this.username = username;
+		this.email = email;
+		this.password = password;
+		this.profession = profession;
+		this.roles = role;
+	}
+
 	@PostPersist
 	private void assignFKs(){
 		for(int i =0; i < getInSchoolClasses().size(); i++){

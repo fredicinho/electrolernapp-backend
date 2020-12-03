@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.concurrent.*;
 
 @Service
-public class CSVProfessionService implements CsvService{
+public class CsvProfessionService implements CsvService{
 
     static String[] HEADER_QUESTION = {"pr_id", "label"};
 

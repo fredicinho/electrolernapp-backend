@@ -5,6 +5,7 @@ import ch.hslu.springbootbackend.springbootbackend.Repository.CategoryRepository
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,11 +21,9 @@ import java.util.List;
 public class CsvCategoryService implements CsvService {
     static String[] HEADER_CATEGORY = {"id", "NAME"};
 
-    private final CategoryRepository categoryRepository;
+    @Autowired
+    private CategoryRepository categoryRepository;
 
-    CsvCategoryService(CategoryRepository categoryRepository) {
-        this.categoryRepository = categoryRepository;
-    }
 
     public List<Category> saveNewEntities(MultipartFile file) {
         try {

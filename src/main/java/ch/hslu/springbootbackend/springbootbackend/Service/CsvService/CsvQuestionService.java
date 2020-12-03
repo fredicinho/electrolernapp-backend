@@ -30,11 +30,15 @@ public class CsvQuestionService implements CsvService {
     private final Logger LOG = LoggerFactory.getLogger(CsvQuestionService.class);
     static String[] HEADER_QUESTION = {"categorySetId", "questionType", "questionPhrase", "Answer1", "Answer2", "Answer3", "Answer4", "Answer5", "CorrectAnswerAsLetter", "textIfCorrect", "textIfIncorrect", "questionImageId", "solutionImageId", "author", "pointsToAchieve", "profession", "level"};
 
-    private final QuestionRepository questionRepository;
-    private final AnswerRepository answerRepository;
-    private final CategorySetRepository categorySetRepository;
-    private final MediaRepository mediaRepository;
-    private final UserRepository userRepository;
+    @Autowired
+    private QuestionRepository questionRepository;
+    @Autowired
+    private AnswerRepository answerRepository;
+    @Autowired
+    private CategorySetRepository categorySetRepository;
+    private MediaRepository mediaRepository;
+    @Autowired
+    private UserRepository userRepository;
     @Autowired
     ProfessionRepository professionRepository;
     private ConcurrentHashMap<String, Answer> currentCreatedAnswers;
@@ -48,13 +52,6 @@ public class CsvQuestionService implements CsvService {
     List<Question> newQuestions = new ArrayList<>();
     List<Long> timePerQuestion = new ArrayList<>();
 
-    CsvQuestionService(QuestionRepository questionRepository, AnswerRepository answerRepository, CategorySetRepository categorySetRepository, MediaRepository mediaRepository, UserRepository userRepository) {
-        this.questionRepository = questionRepository;
-        this.answerRepository = answerRepository;
-        this.categorySetRepository = categorySetRepository;
-        this.mediaRepository = mediaRepository;
-        this.userRepository = userRepository;
-    }
     @Transactional
     public List<Question> saveNewEntities(MultipartFile file) {
         try {

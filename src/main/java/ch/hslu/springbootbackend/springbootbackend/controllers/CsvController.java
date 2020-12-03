@@ -25,20 +25,19 @@ import java.util.List;
 public class CsvController {
 
     private final Logger LOG = LoggerFactory.getLogger(CsvController.class);
-
-    private final CsvQuestionService csvQuestionService;
-    private final CsvCategoryService csvCategoryService;
-    private final CsvCategorySetService csvCategorySetService;
-    private final CsvMediaService csvMediaService;
     @Autowired
-    CSVProfessionService csvProfessionService;
+    private CsvQuestionService csvQuestionService;
+    @Autowired
+    private CsvCategoryService csvCategoryService;
+    @Autowired
+    private CsvCategorySetService csvCategorySetService;
+    @Autowired
+    private CsvMediaService csvMediaService;
+    @Autowired
+    CsvProfessionService csvProfessionService;
+    @Autowired
+    CsvUserService csvUserService;
 
-    public CsvController(CsvQuestionService csvQuestionService, CsvCategoryService csvCategoryService, CsvCategorySetService csvCategorySetService, CsvMediaService csvMediaService) {
-        this.csvQuestionService = csvQuestionService;
-        this.csvCategoryService = csvCategoryService;
-        this.csvCategorySetService = csvCategorySetService;
-        this.csvMediaService = csvMediaService;
-    }
 
     @PostMapping("/all")
     public ResponseEntity<List<MessageResponse>> uploadAllFiles(@RequestParam("categoryFile") MultipartFile categoryFile, @RequestParam("categorySetFile") MultipartFile categorySetFile, @RequestParam("mediaFile") MultipartFile mediaFile, @RequestParam("questionFile") MultipartFile questionFile ) {
@@ -213,6 +212,28 @@ public class CsvController {
         if (csvMediaService.hasCSVFormat(file)) {
             try {
                 csvMediaService.saveNewEntities(file);
+
+                message = "Uploaded the file successfully: " + file.getOriginalFilename();
+                return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse(message));
+            } catch (Exception e) {
+                message = "Could not upload the file: " + file.getOriginalFilename() + "! " + e.getMessage();
+                LOG.error(message);
+                e.printStackTrace();
+                return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new MessageResponse(message));
+            }
+        }
+
+        message = "Please upload a csv file!";
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse(message));
+    }
+
+    @PostMapping("/users")
+    public ResponseEntity<MessageResponse> uploadUserFile(@RequestParam("file") MultipartFile file) {
+        String message = "";
+
+        if (csvUserService.hasCSVFormat(file)) {
+            try {
+                csvUserService.saveNewEntities(file);
 
                 message = "Uploaded the file successfully: " + file.getOriginalFilename();
                 return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse(message));
