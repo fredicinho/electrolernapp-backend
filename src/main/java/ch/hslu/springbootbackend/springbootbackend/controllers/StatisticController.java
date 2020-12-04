@@ -12,7 +12,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -20,8 +19,8 @@ import java.util.List;
 @RequestMapping("/api/v1/statistics")
 @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TEACHER') or hasRole('ROLE_USER') ")
 public class StatisticController {
-    private final Logger LOG = LoggerFactory.getLogger(StatisticController.class);
 
+    private final Logger LOG = LoggerFactory.getLogger(StatisticController.class);
 
     @Autowired
     private StatisticService statisticService;
