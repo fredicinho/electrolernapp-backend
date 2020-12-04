@@ -81,7 +81,7 @@ public class UserController {
         return user;
     }
 
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_TEACHER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TEACHER')")
     @PutMapping("/writeIn")
     public ResponseEntity<?> addUserToSchoolClass(HttpServletRequest request) {
         String writeInCode = request.getParameter("writeInCode");

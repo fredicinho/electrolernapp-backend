@@ -1,5 +1,6 @@
 package ch.hslu.springbootbackend.springbootbackend.controllers;
 
+import ch.hslu.springbootbackend.springbootbackend.DTO.UserDTO;
 import ch.hslu.springbootbackend.springbootbackend.Service.CsvService.*;
 import ch.hslu.springbootbackend.springbootbackend.payload.response.MessageResponse;
 import org.slf4j.Logger;
@@ -9,8 +10,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.supercsv.io.CsvBeanWriter;
+import org.supercsv.io.ICsvBeanWriter;
+import org.supercsv.prefs.CsvPreference;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 // TODO: Kann nur eine Mapping-Methode nehmen und als parameter noch die entity übergeben...
@@ -40,7 +49,7 @@ public class CsvController {
 
 
     @PostMapping("/all")
-    public ResponseEntity<List<MessageResponse>> uploadAllFiles(@RequestParam("categoryFile") MultipartFile categoryFile, @RequestParam("categorySetFile") MultipartFile categorySetFile, @RequestParam("mediaFile") MultipartFile mediaFile, @RequestParam("questionFile") MultipartFile questionFile ) {
+    public ResponseEntity<List<MessageResponse>> uploadAllFiles(@RequestParam("categoryFile") MultipartFile categoryFile, @RequestParam("categorySetFile") MultipartFile categorySetFile, @RequestParam("mediaFile") MultipartFile mediaFile, @RequestParam("questionFile") MultipartFile questionFile) {
         List<MessageResponse> messageList = new ArrayList<>();
         String categoryMessage = "";
 
@@ -248,5 +257,35 @@ public class CsvController {
         message = "Please upload a csv file!";
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse(message));
     }
+
+    @GetMapping("/users/export")
+    public void exportToCSV(HttpServletResponse response) throws IOException {
+        response.setContentType("text/csv");
+        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+        String currentDateTime = dateFormatter.format(new Date());
+
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=users_" + currentDateTime + ".csv";
+        response.setHeader(headerKey, headerValue);
+
+
+        List<UserDTO> listUserDTO = csvUserService.getAllAsDTO();
+
+        ICsvBeanWriter csvWriter = new CsvBeanWriter(response.getWriter(), CsvPreference.STANDARD_PREFERENCE);
+
+
+        String[] csvHeader = {"id", "username", "email", "profession", "roles", "schoolClassesIn"};
+        String[] nameMapping = {"id", "username", "email", "profession", "roles", "schoolClassesIn"};;
+
+
+        //csvWriter.write(csvHeader);
+        for(UserDTO user : listUserDTO){
+            csvWriter.write(user, nameMapping);
+        }
+
+        csvWriter.close();
+    }
+
+
 
 }

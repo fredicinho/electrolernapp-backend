@@ -7,6 +7,7 @@ import javax.persistence.*;
 import java.util.LinkedList;
 import java.util.List;
 
+
 @Entity
 public class SchoolClass {
 
@@ -24,7 +25,7 @@ public class SchoolClass {
     @ManyToMany(mappedBy = "schoolClassesInExamSet")
     private List<ExamSet> examSetsForSchoolClass = new LinkedList<>();
 
-    @ManyToMany(mappedBy = "inSchoolClasses", cascade = CascadeType.PERSIST)
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "inSchoolClasses", cascade = CascadeType.PERSIST)
     private List<User> usersInClass = new LinkedList<>();
 
     @ManyToOne

@@ -3,6 +3,7 @@ package ch.hslu.springbootbackend.springbootbackend.Entity;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.ExamSet;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.*;
@@ -10,7 +11,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.*;
-
+@Lazy
 @Entity
 @Table(	name = "users",
 		uniqueConstraints = { 
@@ -59,7 +60,7 @@ public class User extends RepresentationModel<User> {
 	private Set<ExamResult> examResults;
 
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(
 			name = "schoolClass_user",
 			joinColumns = @JoinColumn(name = "userId"),
@@ -89,12 +90,13 @@ public class User extends RepresentationModel<User> {
 
 	}
 
-	public User(String username, String email, String password, Profession profession, Set<Role> role) {
+	public User(String username, String email, String password, Profession profession, Set<Role> role, List<SchoolClass> schoolClasses) {
 		this.username = username;
 		this.email = email;
 		this.password = password;
 		this.profession = profession;
 		this.roles = role;
+		this.inSchoolClasses = schoolClasses;
 	}
 
 	@PostPersist

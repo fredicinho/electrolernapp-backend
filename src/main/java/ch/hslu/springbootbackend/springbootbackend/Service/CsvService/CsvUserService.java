@@ -1,11 +1,10 @@
 package ch.hslu.springbootbackend.springbootbackend.Service.CsvService;
 
-import ch.hslu.springbootbackend.springbootbackend.Entity.ERole;
-import ch.hslu.springbootbackend.springbootbackend.Entity.Profession;
-import ch.hslu.springbootbackend.springbootbackend.Entity.Role;
-import ch.hslu.springbootbackend.springbootbackend.Entity.User;
+import ch.hslu.springbootbackend.springbootbackend.DTO.UserDTO;
+import ch.hslu.springbootbackend.springbootbackend.Entity.*;
 import ch.hslu.springbootbackend.springbootbackend.Repository.ProfessionRepository;
 import ch.hslu.springbootbackend.springbootbackend.Repository.RoleRepository;
+import ch.hslu.springbootbackend.springbootbackend.Repository.SchoolClassRepository;
 import ch.hslu.springbootbackend.springbootbackend.Repository.UserRepository;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -23,10 +22,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.*;
 
 @Service
@@ -38,6 +34,8 @@ public class CsvUserService implements CsvService{
     RoleRepository roleRepository;
     @Autowired
     ProfessionRepository professionRepository;
+    @Autowired
+    SchoolClassRepository schoolClassRepository;
 
     private final Logger LOG = LoggerFactory.getLogger(CsvUserService.class);
     private ConcurrentHashMap<String, User> currentCreatedUser;
@@ -104,15 +102,17 @@ public class CsvUserService implements CsvService{
         String profession = csvRecord.get("profession");
         String role = csvRecord.get("role");
         Set<Role> roleSet = new HashSet<>();
+        List<SchoolClass> schoolClasses = this.getSchoolClasses(Integer.valueOf(csvRecord.get("schoolClassId")));
         if(currentCreatedUser.containsKey(username)){
             return null;
         }
         roleSet.add(this.getRole(role));
 
+
         if(username.equals("null")){
             return null;
         }else {
-            return new User(username, email, password, currentCreatedProfessions.get(profession), roleSet);
+            return new User(username, email, password, currentCreatedProfessions.get(profession), roleSet, schoolClasses);
         }
     }
     private ConcurrentHashMap<String, User> mapFromListUser(List<User> answerList){
@@ -134,14 +134,58 @@ public class CsvUserService implements CsvService{
 
     private Role getRole(String role){
         switch (role) {
-            case "admin":
+            case "ROLE_ADMIN":
                 return currentCreatedRoles.get(ERole.ROLE_ADMIN.toString());
-            case "exam":
+            case "ROLE_EXAM":
                 return currentCreatedRoles.get(ERole.ROLE_EXAM.toString());
-            case "teacher":
+            case "ROLE_TEACHER":
                 return currentCreatedRoles.get(ERole.ROLE_TEACHER.toString());
             default:
                 return currentCreatedRoles.get(ERole.ROLE_USER.toString());
         }
     }
+
+    public List<UserDTO> getAllAsDTO(){
+        List<User> listUser = userRepository.findAll();
+        List<UserDTO> userDTOList = new ArrayList<>();
+        for(User user : listUser){
+            UserDTO userDTO = new UserDTO(user.getId(), user.getUsername(), user.getEmail(), this.getRoles(user.getRoles()), this.getExamSets(user.getInSchoolClasses()));
+            if(user.getProfession() != null){
+                userDTO.setProfession(user.getProfession().getName());
+                userDTOList.add(userDTO);
+            }else{
+                userDTO.setProfession(null);
+                userDTOList.add(userDTO);
+            }
+
+        }
+        return userDTOList;
+    }
+    public List<User> getAll(){
+        return userRepository.findAll();
+    }
+
+    public List<String> getRoles(Set<Role> roles) {
+        List<String> stringList = new ArrayList<>();
+        for(Role role : roles){
+            stringList.add(role.getName().toString());
+        }return stringList;
+
+    }
+    public List<Integer> getExamSets(List<SchoolClass> schoolClasses) {
+        List<Integer> stringList = new ArrayList<>();
+        for(SchoolClass schoolClass : schoolClasses){
+            stringList.add(schoolClass.getId());
+        }return stringList;
+    }
+
+    private List<SchoolClass> getSchoolClasses(int id){
+        List<SchoolClass> schoolClasses = new ArrayList<>();
+        Optional<SchoolClass> schoolClassOptional = schoolClassRepository.findById(id);
+        if(schoolClassOptional.isPresent()){
+            schoolClasses.add(schoolClassOptional.get());
+        }
+        return schoolClasses;
+    }
+
 }
