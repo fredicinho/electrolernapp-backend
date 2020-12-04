@@ -1,6 +1,7 @@
 package ch.hslu.springbootbackend.springbootbackend.Entity;
 
 import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.ExamSet;
+import net.bytebuddy.utility.RandomString;
 
 import javax.persistence.*;
 import java.util.LinkedList;
@@ -17,12 +18,13 @@ public class SchoolClass {
 
     private String description;
 
-    private final int writeInCode = this.hashCode();
+
+    private final String writeInCode = RandomString.make(10);
 
     @ManyToMany(mappedBy = "schoolClassesInExamSet")
     private List<ExamSet> examSetsForSchoolClass = new LinkedList<>();
 
-    @ManyToMany(mappedBy = "inSchoolClasses")
+    @ManyToMany(mappedBy = "inSchoolClasses", cascade = CascadeType.PERSIST)
     private List<User> usersInClass = new LinkedList<>();
 
     @ManyToOne
@@ -94,7 +96,7 @@ public class SchoolClass {
         this.usersInClass = usersInClass;
     }
 
-    public int getWriteInCode() {
+    public String getWriteInCode() {
         return writeInCode;
     }
 

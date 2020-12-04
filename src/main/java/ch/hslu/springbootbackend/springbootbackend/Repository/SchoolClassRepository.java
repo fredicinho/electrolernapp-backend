@@ -13,6 +13,7 @@ import java.util.Optional;
 @Repository
 public interface SchoolClassRepository extends JpaRepository<SchoolClass, Integer> {
     Optional<SchoolClass> findByName(String name);
+    Optional<SchoolClass> findByWriteInCode(String writeInCode);
     List<SchoolClass> findAllByUsersInClass(User user);
     List<SchoolClass> findAllByExamSetsForSchoolClass(ExamSet examSet);
     List<SchoolClass> findAllByInstitution(Institution institution);

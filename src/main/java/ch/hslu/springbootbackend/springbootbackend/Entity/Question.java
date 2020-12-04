@@ -2,12 +2,10 @@ package ch.hslu.springbootbackend.springbootbackend.Entity;
 
 import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.CategorySet;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.ExamSet;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import java.util.*;
 
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
 public class Question{
 

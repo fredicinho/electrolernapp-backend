@@ -5,6 +5,7 @@ import ch.hslu.springbootbackend.springbootbackend.Entity.User;
 import ch.hslu.springbootbackend.springbootbackend.Exception.ResourceNotFoundException;
 import ch.hslu.springbootbackend.springbootbackend.Repository.SchoolClassRepository;
 import ch.hslu.springbootbackend.springbootbackend.Repository.UserRepository;
+import ch.hslu.springbootbackend.springbootbackend.Service.EntityService.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +33,8 @@ public class UserController {
 
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    UserService userService;
     @Autowired
     SchoolClassRepository schoolClassRepository;
 
@@ -75,6 +79,25 @@ public class UserController {
             user = userRepository.findAllByInSchoolClasses(schoolClass.get());
         }
         return user;
+    }
+
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_TEACHER')")
+    @PutMapping("/writeIn")
+    public ResponseEntity<?> addUserToSchoolClass(HttpServletRequest request) {
+        String writeInCode = request.getParameter("writeInCode");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null) {
+            userService.addUserToSchoolClass(writeInCode, auth.getName());
+            return ResponseEntity
+                    .ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("user added to school class");
+        }else{
+            return ResponseEntity
+                    .badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("user could not be added to school class");
+        }
     }
 
 }

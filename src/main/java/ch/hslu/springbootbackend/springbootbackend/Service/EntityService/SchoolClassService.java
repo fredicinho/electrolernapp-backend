@@ -46,12 +46,31 @@ public class SchoolClassService {
 
         Optional<SchoolClass> schoolClassOptional = schoolClassRepository.findByName(schoolClassDTO.getName());
         if (schoolClassOptional.isPresent()) {
-            this.ressourceExists = true;
-            return dtoParserSchoolClass.generateDTOFromObject(schoolClassOptional.get().getId());
+            SchoolClass schoolClass = dtoParserSchoolClass.generateObjectFromDTO(schoolClassDTO);
+            return dtoParserSchoolClass.generateDTOFromObject(schoolClassRepository.save(schoolClass).getId());
+        }else {
+            return null;
         }
-        SchoolClass schoolClass = this.dtoParserSchoolClass.generateObjectFromDTO(schoolClassDTO);
-        return dtoParserSchoolClass.generateDTOFromObject(schoolClassRepository.save(schoolClass).getId());
     }
+
+    public SchoolClassDTO updateSchoolClass(SchoolClassDTO schoolClassDTO){
+
+        Optional<SchoolClass> schoolClassOptional = schoolClassRepository.findById(schoolClassDTO.getId());
+        if (schoolClassOptional.isPresent()) {
+            SchoolClass schoolClass = schoolClassOptional.get();
+            SchoolClass schoolClassNew = this.dtoParserSchoolClass.generateObjectFromDTO(schoolClassDTO);
+            schoolClass.setInstitution(schoolClassNew.getInstitution());
+            schoolClass.setDescription(schoolClassNew.getDescription());
+            schoolClass.setUsersInClass(schoolClassNew.getUsersInClass());
+            schoolClass.setName(schoolClassNew.getName());
+            schoolClass.setExamSetsForSchoolClass(schoolClassNew.getExamSetsForSchoolClass());
+            return dtoParserSchoolClass.generateDTOFromObject(schoolClassRepository.save(schoolClass).getId());
+        }else{
+            return null;
+        }
+
+    }
+
 
     public List<SchoolClassDTO> getAllSchoolClasses(){
         return dtoParserSchoolClass.generateDTOsFromObjects(schoolClassRepository.findAll());
@@ -91,6 +110,7 @@ public class SchoolClassService {
         }
         return schoolClassDTOS;
     }
+
 
     public boolean ressourceExists() {
         return ressourceExists;

@@ -30,10 +30,9 @@ public class SchoolClassController {
     @Autowired
     UserRepository userRepository;
 
-    //@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TEACHER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TEACHER')")
     @PostMapping("/")
     public ResponseEntity<SchoolClassDTO> newSchoolClass(@RequestBody SchoolClassDTO newSchoolClass) {
-
         SchoolClassDTO schoolClassDTO = schoolClassService.createNewSchoolClass(newSchoolClass);
         if(schoolClassDTO != null) {
             if(schoolClassService.ressourceExists()){
@@ -45,6 +44,23 @@ public class SchoolClassController {
             }else
                 return ResponseEntity
                         .status(HttpStatus.CREATED)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(schoolClassDTO);
+        }
+        else{
+            return ResponseEntity.
+                    notFound()
+                    .build();
+        }
+    }
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TEACHER')")
+    @PutMapping("/")
+    public ResponseEntity<SchoolClassDTO> updateSchoolClass(@RequestBody SchoolClassDTO newSchoolClassDTO) {
+        SchoolClassDTO schoolClassDTO = schoolClassService.updateSchoolClass(newSchoolClassDTO);
+        if(schoolClassDTO != null) {
+                schoolClassService.setRessourceExists(false);
+                return ResponseEntity
+                        .status(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(schoolClassDTO);
         }

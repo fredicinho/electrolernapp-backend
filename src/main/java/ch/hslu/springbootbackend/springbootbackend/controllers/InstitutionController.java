@@ -60,4 +60,10 @@ public class InstitutionController {
                 .body(institutionService.getInstitutionById(institutionId));
     }
 
+    @PutMapping("/")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TEACHER')")
+    public List<InstitutionDTO> updateInstitution() {
+        return institutionService.getAllInstitutions();
+    }
+
 }

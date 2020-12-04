@@ -69,7 +69,7 @@ public class ExamSetService {
     }
 
     public long getTimeForExam(int examSetId){
-        ExamSet examSet = examSetRepository.findById(examSetId).orElseThrow(() -> new RuntimeException("Error: Exam is not found."));;
+        ExamSet examSet = examSetRepository.findById(examSetId).orElseThrow(() -> new RuntimeException("Error: Exam is not found."));
         return examSet.getEndDate().getTime()-examSet.getStartDate().getTime();
     }
 

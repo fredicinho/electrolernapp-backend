@@ -27,20 +27,20 @@ import java.util.concurrent.*;
 @Service
 public class CsvQuestionService implements CsvService {
 
-    private final Logger LOG = LoggerFactory.getLogger(CsvQuestionService.class);
     static String[] HEADER_QUESTION = {"categorySetId", "questionType", "questionPhrase", "Answer1", "Answer2", "Answer3", "Answer4", "Answer5", "CorrectAnswerAsLetter", "textIfCorrect", "textIfIncorrect", "questionImageId", "solutionImageId", "author", "pointsToAchieve", "profession", "level"};
-
+    private final Logger LOG = LoggerFactory.getLogger(CsvQuestionService.class);
+    @Autowired
+    ProfessionRepository professionRepository;
     @Autowired
     private QuestionRepository questionRepository;
     @Autowired
     private AnswerRepository answerRepository;
     @Autowired
     private CategorySetRepository categorySetRepository;
+    @Autowired
     private MediaRepository mediaRepository;
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    ProfessionRepository professionRepository;
     private ConcurrentHashMap<String, Answer> currentCreatedAnswers;
     private ConcurrentHashMap<String, User> currentCreatedUser;
     private ConcurrentHashMap<Integer, Media> currentCreatedMedia;
@@ -48,9 +48,9 @@ public class CsvQuestionService implements CsvService {
     private ConcurrentHashMap<String, Profession> currentCreatedProfessions;
     private ConcurrentHashMap<String, Question> currentCreatedQuestions;
     private ConcurrentHashMap<String, Question> questionsToCreate = new ConcurrentHashMap<>();
-    private ExecutorService executor = Executors.newFixedThreadPool(8);
-    List<Question> newQuestions = new ArrayList<>();
+    private ConcurrentHashMap<String, User> userToCreate = new ConcurrentHashMap<>();
     List<Long> timePerQuestion = new ArrayList<>();
+    private ExecutorService executor = Executors.newFixedThreadPool(8);
 
     @Transactional
     public List<Question> saveNewEntities(MultipartFile file) {
@@ -60,7 +60,7 @@ public class CsvQuestionService implements CsvService {
             Instant finish = Instant.now();
             //answerRepository.saveAll(currentCreatedAnswers.values());
             List<Question> persistedQuestions = questionRepository.saveAll(questions);
-            userRepository.saveAll(currentCreatedUser.values());
+            userRepository.saveAll(userToCreate.values());
             LOG.info("Imported " + persistedQuestions.size() + " in " + Duration.between(start, finish).toMillis());
             return persistedQuestions;
         } catch (IOException e) {
@@ -75,7 +75,6 @@ public class CsvQuestionService implements CsvService {
                      CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim())) {
 
 
-
             currentCreatedAnswers = this.mapFromList(answerRepository.findAll());
             currentCreatedCategorySets = this.mapFromListCategorySet(categorySetRepository.findAll());
             currentCreatedMedia = this.mapFromListMedia(mediaRepository.findAll());
@@ -83,16 +82,15 @@ public class CsvQuestionService implements CsvService {
             currentCreatedProfessions = this.mapFromListProfession(professionRepository.findAll());
             currentCreatedQuestions = this.mapFromListQuestion(questionRepository.findAll());
 
-            List <CSVRecord> csvRecords = csvParser.getRecords();
+            List<CSVRecord> csvRecords = csvParser.getRecords();
 
 
-
-            for(CSVRecord csvRecord : csvRecords) {
+            for (CSVRecord csvRecord : csvRecords) {
                 Instant start = Instant.now();
                 Future<Question> questionFuture = executor.submit(() -> createQuestionsFromCSV(csvRecord));
                 while (!questionFuture.isDone()) {
                 }
-                if(questionFuture.get() != null) {
+                if (questionFuture.get() != null) {
                     //newQuestions.add(questionFuture.get());
                     Instant finish = Instant.now();
                     currentCreatedQuestions.put(questionFuture.get().getQuestionPhrase(), questionFuture.get());
@@ -130,7 +128,7 @@ public class CsvQuestionService implements CsvService {
         if (currentCreatedCategorySets.containsKey(categorySetNumber)) {
             return currentCreatedCategorySets.get(categorySetNumber);
         } else {
-            LOG.warn("Category set with id " + categorySetNumber + "not found" );
+            LOG.warn("Category set with id " + categorySetNumber + "not found");
             return null;
         }
 
@@ -182,53 +180,55 @@ public class CsvQuestionService implements CsvService {
         }
     }
 
-    private ConcurrentHashMap<String, Answer> mapFromList(List<Answer> answerList){
-        ConcurrentHashMap<String,Answer> map = new ConcurrentHashMap<>();
-        for (Answer i : answerList) map.put(i.getAnswerPhrase(),i);
+    private ConcurrentHashMap<String, Answer> mapFromList(List<Answer> answerList) {
+        ConcurrentHashMap<String, Answer> map = new ConcurrentHashMap<>();
+        for (Answer i : answerList) map.put(i.getAnswerPhrase(), i);
         return map;
     }
 
-    private ConcurrentHashMap<Integer, Media> mapFromListMedia(List<Media> answerList){
-        ConcurrentHashMap<Integer,Media> map = new ConcurrentHashMap<>();
-        for (Media i : answerList) map.put(i.getId(),i);
+    private ConcurrentHashMap<Integer, Media> mapFromListMedia(List<Media> answerList) {
+        ConcurrentHashMap<Integer, Media> map = new ConcurrentHashMap<>();
+        for (Media i : answerList) map.put(i.getId(), i);
         return map;
     }
 
-    private ConcurrentHashMap<String, User> mapFromListUser(List<User> answerList){
-        ConcurrentHashMap<String,User> map = new ConcurrentHashMap<>();
-        for (User i : answerList) map.put(i.getUsername(),i);
+    private ConcurrentHashMap<String, User> mapFromListUser(List<User> answerList) {
+        ConcurrentHashMap<String, User> map = new ConcurrentHashMap<>();
+        for (User i : answerList) map.put(i.getUsername(), i);
         return map;
     }
 
-    private ConcurrentHashMap<String, CategorySet> mapFromListCategorySet(List<CategorySet> answerList){
-        ConcurrentHashMap<String,CategorySet> map = new ConcurrentHashMap<>();
-        for (CategorySet i : answerList) map.put(i.getCategorySetNumber(),i);
+    private ConcurrentHashMap<String, CategorySet> mapFromListCategorySet(List<CategorySet> answerList) {
+        ConcurrentHashMap<String, CategorySet> map = new ConcurrentHashMap<>();
+        for (CategorySet i : answerList) map.put(i.getCategorySetNumber(), i);
         return map;
     }
 
-    private ConcurrentHashMap<String, Profession> mapFromListProfession(List<Profession> answerList){
-        ConcurrentHashMap<String,Profession> map = new ConcurrentHashMap<>();
-        for (Profession i : answerList) map.put(i.getName(),i);
+    private ConcurrentHashMap<String, Profession> mapFromListProfession(List<Profession> answerList) {
+        ConcurrentHashMap<String, Profession> map = new ConcurrentHashMap<>();
+        for (Profession i : answerList) map.put(i.getName(), i);
         return map;
     }
-    private ConcurrentHashMap<String, Question> mapFromListQuestion(List<Question> answerList){
-        ConcurrentHashMap<String,Question> map = new ConcurrentHashMap<>();
-        for (Question i : answerList) map.put(i.getQuestionPhrase(),i);
+
+    private ConcurrentHashMap<String, Question> mapFromListQuestion(List<Question> answerList) {
+        ConcurrentHashMap<String, Question> map = new ConcurrentHashMap<>();
+        for (Question i : answerList) map.put(i.getQuestionPhrase(), i);
         return map;
     }
-    private Question insertNewProfession(Question question, String profession){
-        if(profession != "null" || profession != null){
-            if(currentCreatedProfessions.containsKey(profession)) {
-                if(!question.getProfessions().contains(currentCreatedProfessions.get(profession)))
+
+    private Question insertNewProfession(Question question, String profession) {
+        if (profession != "null" || profession != null) {
+            if (currentCreatedProfessions.containsKey(profession)) {
+                if (!question.getProfessions().contains(currentCreatedProfessions.get(profession)))
                     question.getProfessions().add(currentCreatedProfessions.get(profession));
             }
         }
         return question;
     }
 
-    private QuestionLevel getQuestionLevel(String level){
+    private QuestionLevel getQuestionLevel(String level) {
 
-        switch (level){
+        switch (level) {
             case "1":
                 return QuestionLevel.LEVEL_1;
             case "2":
@@ -240,11 +240,11 @@ public class CsvQuestionService implements CsvService {
         }
     }
 
-    private QuestionType getQuestionType(String type){
+    private QuestionType getQuestionType(String type) {
 
-        switch (type){
+        switch (type) {
             case "MC":
-            return QuestionType.MultipleChoice;
+                return QuestionType.MultipleChoice;
             case "FS":
                 return QuestionType.Fragestellung;
             case "ZO":
@@ -272,20 +272,17 @@ public class CsvQuestionService implements CsvService {
                 LOG.warn("Couldn't parse the founded categorySetId :: " + csvRecord.get("categorySetId") + " of the Data :: " + csvRecord.toString());
             }
             QuestionType questionType = this.getQuestionType(csvRecord.get("questionType"));
-            if(questionType == QuestionType.Fragestellung){
+            if (questionType == QuestionType.Fragestellung) {
                 correctAnswers = getAnswers(csvRecord);
-            }else if(questionType == QuestionType.Theorie){
+            } else if (questionType == QuestionType.Theorie) {
 
-            }else if(questionType == QuestionType.Zuordnung){
+            } else if (questionType == QuestionType.Zuordnung) {
                 possibleAnswers = getAnswersZuordnung(csvRecord);
                 correctAnswers = setCorrectAnswersForZuordnung(csvRecord, possibleAnswers);
-            }
-            else{
+            } else {
                 possibleAnswers = getAnswers(csvRecord);
                 correctAnswers = this.parseLettersToAnswers(csvRecord.get("CorrectAnswerAsLetter"), possibleAnswers);
             }
-
-
 
 
             Media questionImage = null;
@@ -301,6 +298,7 @@ public class CsvQuestionService implements CsvService {
                 user = new User(this.escapeAndEncodeString(csvRecord.get("autor")), null, null);
                 //userRepository.save(user);
                 currentCreatedUser.put(escapedAndEncodedString, user);
+                userToCreate.put(escapedAndEncodedString, user);
             }
 
             if (this.checkIfMediaAvailableInCsv(csvRecord.get("questionImageId"))) {
@@ -336,13 +334,13 @@ public class CsvQuestionService implements CsvService {
 
     private void writeToFile(List<Long> list) throws IOException {
         FileWriter writer = new FileWriter("output_2.txt");
-        for(Long str: list) {
+        for (Long str : list) {
             writer.write(str + System.lineSeparator());
         }
         writer.close();
     }
 
-    private List<Answer> getAnswers(CSVRecord csvRecord){
+    private List<Answer> getAnswers(CSVRecord csvRecord) {
         List<Answer> possibleAnswers = new ArrayList<>();
         for (int i = 1; i <= 5; i++) {
             String answerPhrase = csvRecord.get("Answer" + i);
@@ -361,7 +359,8 @@ public class CsvQuestionService implements CsvService {
         }
         return possibleAnswers;
     }
-    private List<Answer> getAnswersZuordnung(CSVRecord csvRecord){
+
+    private List<Answer> getAnswersZuordnung(CSVRecord csvRecord) {
         List<Answer> possibleAnswers = new ArrayList<>();
         for (int i = 1; i <= 3; i++) {
             String answerPhrase = csvRecord.get("Answer" + i);
@@ -387,7 +386,7 @@ public class CsvQuestionService implements CsvService {
             //Optional<Answer> foundedAnswer = answerRepository.findByAnswerPhrase(escapedAndEncodedString);
 
             escapedAndEncodedString = "MatchTo" + escapedAndEncodedString;
-        if (currentCreatedAnswers.containsKey(escapedAndEncodedString)) {
+            if (currentCreatedAnswers.containsKey(escapedAndEncodedString)) {
                 possibleAnswers.add(currentCreatedAnswers.get(escapedAndEncodedString));
             } else {
                 Answer newAnswerOfQuestion = new Answer(escapedAndEncodedString);
@@ -398,15 +397,15 @@ public class CsvQuestionService implements CsvService {
         return possibleAnswers;
     }
 
-    List<Answer> setCorrectAnswersForZuordnung(CSVRecord csvRecord, List<Answer> possibleAnswers){
+    List<Answer> setCorrectAnswersForZuordnung(CSVRecord csvRecord, List<Answer> possibleAnswers) {
         List<Answer> ownAnswers = new ArrayList<>();
         List<Answer> correctAnswers = new ArrayList<>();
         for (int i = 1; i <= 3; i++) {
             String answerAsLetter = csvRecord.get("solution" + i);
-            String question = escapeAndEncodeString(csvRecord.get("Answer"+i));
+            String question = escapeAndEncodeString(csvRecord.get("Answer" + i));
             List<Answer> answersWithMatchTo = new ArrayList<>();
-            for(Answer answer : possibleAnswers){
-                if(answer.getAnswerPhrase().contains("MatchTo")){
+            for (Answer answer : possibleAnswers) {
+                if (answer.getAnswerPhrase().contains("MatchTo")) {
                     answersWithMatchTo.add(answer);
                 }
             }
@@ -414,14 +413,14 @@ public class CsvQuestionService implements CsvService {
             String answersCascased = question;
             if (this.checkIfAnswerIsEmpty(answerAsLetter)) {
                 continue;
-            }else {
+            } else {
                 for (Answer answer : answerPhrase) {
                     answersCascased += escapeAndEncodeString(answer.getAnswerPhrase());
                 }
             }
 
 
-                //Optional<Answer> foundedAnswer = answerRepository.findByAnswerPhrase(escapedAndEncodedString);
+            //Optional<Answer> foundedAnswer = answerRepository.findByAnswerPhrase(escapedAndEncodedString);
 
             if (currentCreatedAnswers.containsKey(answersCascased)) {
                 correctAnswers.add(currentCreatedAnswers.get(answersCascased));
