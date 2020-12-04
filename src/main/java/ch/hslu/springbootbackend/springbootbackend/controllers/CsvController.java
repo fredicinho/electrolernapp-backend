@@ -1,7 +1,13 @@
 package ch.hslu.springbootbackend.springbootbackend.controllers;
 
+import ch.hslu.springbootbackend.springbootbackend.DTO.ExamResultDTO;
+import ch.hslu.springbootbackend.springbootbackend.DTO.ExamSetDTO;
+import ch.hslu.springbootbackend.springbootbackend.DTO.QuestionDTO;
 import ch.hslu.springbootbackend.springbootbackend.DTO.UserDTO;
 import ch.hslu.springbootbackend.springbootbackend.Service.CsvService.*;
+import ch.hslu.springbootbackend.springbootbackend.Service.EntityService.ExamResultService;
+import ch.hslu.springbootbackend.springbootbackend.Service.EntityService.ExamSetService;
+import ch.hslu.springbootbackend.springbootbackend.Service.EntityService.QuestionService;
 import ch.hslu.springbootbackend.springbootbackend.payload.response.MessageResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +41,10 @@ public class CsvController {
 
     private final Logger LOG = LoggerFactory.getLogger(CsvController.class);
     @Autowired
+    CsvProfessionService csvProfessionService;
+    @Autowired
+    CsvUserService csvUserService;
+    @Autowired
     private CsvQuestionService csvQuestionService;
     @Autowired
     private CsvCategoryService csvCategoryService;
@@ -43,10 +53,11 @@ public class CsvController {
     @Autowired
     private CsvMediaService csvMediaService;
     @Autowired
-    CsvProfessionService csvProfessionService;
+    QuestionService questionService;
     @Autowired
-    CsvUserService csvUserService;
-
+    ExamSetService examSetService;
+    @Autowired
+    ExamResultService examResultService;
 
     @PostMapping("/all")
     public ResponseEntity<List<MessageResponse>> uploadAllFiles(@RequestParam("categoryFile") MultipartFile categoryFile, @RequestParam("categorySetFile") MultipartFile categorySetFile, @RequestParam("mediaFile") MultipartFile mediaFile, @RequestParam("questionFile") MultipartFile questionFile) {
@@ -259,7 +270,7 @@ public class CsvController {
     }
 
     @GetMapping("/users/export")
-    public void exportToCSV(HttpServletResponse response) throws IOException {
+    public void exportUsersToCSV(HttpServletResponse response) throws IOException {
         response.setContentType("text/csv");
         DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
         String currentDateTime = dateFormatter.format(new Date());
@@ -273,19 +284,93 @@ public class CsvController {
 
         ICsvBeanWriter csvWriter = new CsvBeanWriter(response.getWriter(), CsvPreference.STANDARD_PREFERENCE);
 
-
         String[] csvHeader = {"id", "username", "email", "profession", "roles", "schoolClassesIn"};
-        String[] nameMapping = {"id", "username", "email", "profession", "roles", "schoolClassesIn"};;
-
+        String[] nameMapping = {"id", "username", "email", "profession", "roles", "schoolClassesIn"};
 
         //csvWriter.write(csvHeader);
-        for(UserDTO user : listUserDTO){
+        for (UserDTO user : listUserDTO) {
             csvWriter.write(user, nameMapping);
         }
 
         csvWriter.close();
     }
 
+    @GetMapping("/questions/export")
+    public void exportQuestionsToCSV(HttpServletResponse response) throws IOException {
+        response.setContentType("text/csv");
+        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+        String currentDateTime = dateFormatter.format(new Date());
+
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=questions_" + currentDateTime + ".csv";
+        response.setHeader(headerKey, headerValue);
+
+
+        List<QuestionDTO> listQuestionDto = questionService.getAllQuestions();
+
+        ICsvBeanWriter csvWriter = new CsvBeanWriter(response.getWriter(), CsvPreference.STANDARD_PREFERENCE);
+
+        //String[] csvHeader = {"id", "username", "email", "profession", "roles", "schoolClassesIn"};
+        String[] nameMapping = {"id", "questionPhrase", "possibleAnswers", "correctAnswers", "questionType", "pointsToAchieve", "categorySetIds", "questionImageId", "answerImageId", "questionLevel", "professionsList" };
+
+        //csvWriter.write(csvHeader);
+        for (QuestionDTO question : listQuestionDto) {
+            csvWriter.write(question, nameMapping);
+        }
+
+        csvWriter.close();
+    }
+
+    @GetMapping("/examSets/export")
+    public void exportExamSetsToCSV(HttpServletResponse response) throws IOException {
+        response.setContentType("text/csv");
+        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+        String currentDateTime = dateFormatter.format(new Date());
+
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=questions_" + currentDateTime + ".csv";
+        response.setHeader(headerKey, headerValue);
+
+
+        List<ExamSetDTO> examSetDTOS = examSetService.getAllExamSets();
+
+        ICsvBeanWriter csvWriter = new CsvBeanWriter(response.getWriter(), CsvPreference.STANDARD_PREFERENCE);
+
+        //String[] csvHeader = {"id", "username", "email", "profession", "roles", "schoolClassesIn"};
+        String[] nameMapping = {"examSetId", "title", "startDate", "endDate", "questionsInExamSet", "schoolClassesInExamSet", "createdBy", "description" };
+
+        //csvWriter.write(csvHeader);
+        for (ExamSetDTO examSetDTO : examSetDTOS) {
+            csvWriter.write(examSetDTO, nameMapping);
+        }
+
+        csvWriter.close();
+    }
+    @GetMapping("/examResults/export")
+    public void exportExamResultsToCSV(HttpServletResponse response) throws IOException {
+        response.setContentType("text/csv");
+        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+        String currentDateTime = dateFormatter.format(new Date());
+
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=questions_" + currentDateTime + ".csv";
+        response.setHeader(headerKey, headerValue);
+
+
+        List<ExamResultDTO> examResultDTOS = examResultService.getAll();
+
+        ICsvBeanWriter csvWriter = new CsvBeanWriter(response.getWriter(), CsvPreference.STANDARD_PREFERENCE);
+
+        //String[] csvHeader = {"id", "username", "email", "profession", "roles", "schoolClassesIn"};
+        String[] nameMapping = {"examResultId", "pointsAchieved", "username", "questionId", "examSetId", "sendedAnswers", "changedByTeacher"};
+
+        //csvWriter.write(csvHeader);
+        for (ExamResultDTO examResultDTO : examResultDTOS) {
+            csvWriter.write(examResultDTO, nameMapping);
+        }
+
+        csvWriter.close();
+    }
 
 
 }
