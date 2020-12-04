@@ -112,4 +112,16 @@ public class ExamResult{
         this.changedByTeacher = changedByTeacher;
     }
 
+    @Override
+    public String toString() {
+        return "ExamResult{" +
+                "id=" + id +
+                ", pointsAchieved=" + pointsAchieved +
+                ", user=" + user +
+                ", question=" + question +
+                ", examSet=" + examSet +
+                ", answersToCheck=" + answersToCheck +
+                ", changedByTeacher=" + changedByTeacher +
+                '}';
+    }
 }

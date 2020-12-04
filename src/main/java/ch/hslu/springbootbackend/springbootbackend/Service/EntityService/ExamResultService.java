@@ -80,24 +80,39 @@ public class ExamResultService {
 
     }
 
-    public ExamResultDTO getExamResultsByExamSetAndUserIdAndQuestionId(int examSetId, long userId, int questionId){
+    public ExamResultDTO getExamResultsByExamSetAndUserIdAndQuestionId(int examSetId, long userId, int questionId) throws ResourceNotFoundException {
         ExamResultDTO  examResultDTO = null;
         Optional<ExamSet> examSetOptional = examSetRepository.findById(examSetId);
-        Optional<User> userOptional = userRepository.findById(userId);
-        Optional<Question> questionOptional = questionRepository.findById(questionId);
-        if(examSetOptional.isPresent() && userOptional.isPresent() && questionOptional.isPresent()){
-            Optional<ExamResult> examResultOptional =examResultRepository.findAllByUserAndExamSetAndQuestion(userOptional.get(), examSetOptional.get(), questionOptional.get());
-            if(examResultOptional.isPresent()) {
-                examResultDTO = dtoParserExamResult.generateDTOFromObject(examResultOptional.get().getId());
-            }
+        if (!examSetOptional.isPresent()) {
+            throw new ResourceNotFoundException("The Exam with the examSetId :: " + examSetId + " doesn't exists!");
         }
-        return examResultDTO;
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (!userOptional.isPresent()) {
+            throw new ResourceNotFoundException("The User with the userId :: " + userId + " doesn't exists!");
+        }
+        Optional<Question> questionOptional = questionRepository.findById(questionId);
+        if (!questionOptional.isPresent()) {
+            throw new ResourceNotFoundException("The Question with the questionId :: " + questionId + " doesn't exists!");
+        }
+        Optional<ExamResult> examResultOptional = examResultRepository.findAllByUserAndExamSetAndQuestion(userOptional.get(), examSetOptional.get(), questionOptional.get());
+        if(examResultOptional.isPresent()) {
+            return dtoParserExamResult.generateDTOFromObject(examResultOptional.get().getId());
+        } else {
+            ExamResultDTO examResultDto = new ExamResultDTO();
+            examResultDto.setExamSetId(examSetId);
+            examResultDto.setQuestionId(questionId);
+            examResultDto.setUsername(userOptional.get().getUsername());
+            return examResultDto;
+        }
 
     }
-    public ExamResultDTO updateExamResultPointsAchieved(int examSetId, long userId, int questionId, double pointsAchieved){
-        ExamResult examResult = dtoParserExamResult.generateObjectFromDTO(this.getExamResultsByExamSetAndUserIdAndQuestionId(examSetId, userId, questionId));
+    public ExamResultDTO updateExamResultPointsAchieved(int examSetId, long userId, int questionId, double pointsAchieved) throws ResourceNotFoundException {
+        ExamResultDTO examResultDTO = this.getExamResultsByExamSetAndUserIdAndQuestionId(examSetId, userId, questionId);
+        ExamResult examResult = dtoParserExamResult.generateObjectFromDTO(examResultDTO);
         examResult.setPointsAchieved(pointsAchieved);
         examResult.setChangedByTeacher(new Date());
+        examResult.setUser(this.userRepository.getOne(userId));
+        examResult.setExamSet(this.examSetRepository.getOne(examSetId));
         return dtoParserExamResult.generateDTOFromObject(examResultRepository.save(examResult).getId());
 
     }

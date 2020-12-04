@@ -32,7 +32,7 @@ public class ForgotPasswordController {
         String email = request.getParameter("email");
         String token = RandomString.make(30);
         userService.updateResetPasswordToken(token, email);
-        String resetPasswordLink = Utility.getSiteURL(request) + "/reset_password?token=" + token;
+        String resetPasswordLink = "http://wiproh20-owerlen.enterpriselab.ch" + "/createpassword/" + token;
         sendEmail(email, resetPasswordLink);
 
         return ResponseEntity

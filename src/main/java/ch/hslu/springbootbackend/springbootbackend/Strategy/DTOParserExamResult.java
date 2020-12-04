@@ -52,10 +52,10 @@ public class DTOParserExamResult implements DTOParserStrategy {
         ExamResult examResult = null;
         ExamResultDTO examResultDTO = (ExamResultDTO) objectDTO;
         Optional<ExamResult> examResultOptional = getExistingExamResult(examResultDTO);
-        if(examResultOptional.isPresent()){
+        if (examResultOptional.isPresent()){
             examResult = examResultOptional.get();
             examResult.setAnswersToCheck(getAnswersFromDatabase(examResultDTO.getSendedAnswers()));
-        }else{
+        } else {
             examResult = new ExamResult(
                 examResultDTO.getExamResultId(),
                 this.getUserFromDatabase(examResultDTO.getUsername()),
@@ -64,7 +64,6 @@ public class DTOParserExamResult implements DTOParserStrategy {
                 this.getAnswersFromDatabase(examResultDTO.getSendedAnswers())
             );
         }
-
         examResult.setPointsAchieved(this.calculateScore(examResult.getQuestion().getCorrectAnswers(), examResult.getAnswersToCheck(), examResult.getQuestion().getPointsToAchieve()));
         examResult.setChangedByTeacher(examResultDTO.getChangedByTeacher());
         return examResult;
