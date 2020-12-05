@@ -32,15 +32,15 @@ public class SchoolClassController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TEACHER')")
     @PostMapping("/")
-    public ResponseEntity<SchoolClassDTO> newSchoolClass(@RequestBody SchoolClassDTO newSchoolClass) {
+    public ResponseEntity<?> newSchoolClass(@RequestBody SchoolClassDTO newSchoolClass) {
         SchoolClassDTO schoolClassDTO = schoolClassService.createNewSchoolClass(newSchoolClass);
         if(schoolClassDTO != null) {
-            if(schoolClassService.ressourceExists()){
-                schoolClassService.setRessourceExists(false);
+            if(schoolClassService.getRessourceExists().get()){
+                schoolClassService.getRessourceExists().set(false);
                 return ResponseEntity
                         .status(HttpStatus.CONFLICT)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body(schoolClassDTO);
+                        .body("schoolClass already exists, use put to update");
             }else
                 return ResponseEntity
                         .status(HttpStatus.CREATED)
@@ -58,7 +58,6 @@ public class SchoolClassController {
     public ResponseEntity<SchoolClassDTO> updateSchoolClass(@RequestBody SchoolClassDTO newSchoolClassDTO) {
         SchoolClassDTO schoolClassDTO = schoolClassService.updateSchoolClass(newSchoolClassDTO);
         if(schoolClassDTO != null) {
-                schoolClassService.setRessourceExists(false);
                 return ResponseEntity
                         .status(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)

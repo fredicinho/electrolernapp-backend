@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 public class SchoolClassService {
@@ -39,17 +40,18 @@ public class SchoolClassService {
     private final Logger LOG = LoggerFactory.getLogger(SchoolClassService.class);
 
 
-    private boolean ressourceExists = false;
+
+    private AtomicBoolean ressourceExists = new AtomicBoolean(false);
 
 
     public SchoolClassDTO createNewSchoolClass(SchoolClassDTO schoolClassDTO){
-
         Optional<SchoolClass> schoolClassOptional = schoolClassRepository.findByName(schoolClassDTO.getName());
-        if (schoolClassOptional.isPresent()) {
+        if (!schoolClassOptional.isPresent()) {
             SchoolClass schoolClass = dtoParserSchoolClass.generateObjectFromDTO(schoolClassDTO);
             return dtoParserSchoolClass.generateDTOFromObject(schoolClassRepository.save(schoolClass).getId());
         }else {
-            return null;
+            this.setRessourceExists(new AtomicBoolean(true));
+            return dtoParserSchoolClass.generateDTOFromObject(schoolClassOptional.get().getId());
         }
     }
 
@@ -112,10 +114,11 @@ public class SchoolClassService {
     }
 
 
-    public boolean ressourceExists() {
+    public AtomicBoolean getRessourceExists() {
         return ressourceExists;
     }
-    public void setRessourceExists(boolean ressourceExists) {
+
+    public void setRessourceExists(AtomicBoolean ressourceExists) {
         this.ressourceExists = ressourceExists;
     }
 

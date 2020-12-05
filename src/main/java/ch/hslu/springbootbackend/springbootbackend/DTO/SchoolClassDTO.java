@@ -20,7 +20,7 @@ public class SchoolClassDTO extends RepresentationModel<SchoolClassDTO> {
     private String name;
 
     private String description;
-
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private final int writeInCode = this.hashCode();
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -42,10 +42,12 @@ public class SchoolClassDTO extends RepresentationModel<SchoolClassDTO> {
         this.description = description;
     }
 
-    public SchoolClassDTO(String name, String description, Integer institutionId) {
+    public SchoolClassDTO(String name, String description, List<Integer> examSetsForSchoolClass, List<Long> usersInSchoolClass, Integer institutionId) {
         this.name = name;
         this.description = description;
         this.institutionId = institutionId;
+        this.examSetsForSchoolClass = examSetsForSchoolClass;
+        this.usersInClass = usersInSchoolClass;
     }
 
     public String getName() {

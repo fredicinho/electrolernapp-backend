@@ -39,7 +39,7 @@ public class QuestionController {
 
     @PostMapping("")
     @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<QuestionDTO> newQuestion(@Valid @RequestBody QuestionDTO newQuestion) {
+    public ResponseEntity<?> newQuestion(@Valid @RequestBody QuestionDTO newQuestion) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         newQuestion.setCreatedBy(auth.getName());
             QuestionDTO questionDTO = questionService.createNewQuestion(newQuestion);
@@ -49,7 +49,7 @@ public class QuestionController {
                     return ResponseEntity
                             .status(HttpStatus.CONFLICT)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .body(questionDTO);
+                            .body("question already exists");
                 }else
                      return ResponseEntity
                             .status(HttpStatus.CREATED)
