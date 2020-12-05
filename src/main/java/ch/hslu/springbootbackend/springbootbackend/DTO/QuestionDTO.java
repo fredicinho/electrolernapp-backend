@@ -29,7 +29,7 @@ public class QuestionDTO extends RepresentationModel<QuestionDTO> {
 
     private QuestionType questionType;
 
-    private int pointsToAchieve;
+    private double pointsToAchieve;
 
     @JsonIgnore
     private String createdBy;
@@ -53,7 +53,7 @@ public class QuestionDTO extends RepresentationModel<QuestionDTO> {
 
     public QuestionDTO(){}
 
-    public QuestionDTO(Integer id, String questionPhrase, QuestionType questionType, int pointsToAchieve, QuestionLevel questionLevel) {
+    public QuestionDTO(Integer id, String questionPhrase, QuestionType questionType, double pointsToAchieve, QuestionLevel questionLevel) {
         this.id = id;
         this.questionPhrase = questionPhrase;
         this.questionType = questionType;
@@ -61,7 +61,7 @@ public class QuestionDTO extends RepresentationModel<QuestionDTO> {
         this.questionLevel = questionLevel;
     }
 
-    public QuestionDTO(String questionPhrase, QuestionType questionType, List<Answer> possibleAnswer, List<Answer> correctAnswer, List<Integer> statisticsIds, int questionImageId, int answerImageId, int pointsToAchieve, QuestionLevel questionLevel) {
+    public QuestionDTO(String questionPhrase, QuestionType questionType, List<Answer> possibleAnswer, List<Answer> correctAnswer, List<Integer> statisticsIds, int questionImageId, int answerImageId, double pointsToAchieve, QuestionLevel questionLevel) {
         this.questionPhrase = questionPhrase;
         this.questionType = questionType;
         this.possibleAnswers = possibleAnswer;
@@ -153,11 +153,11 @@ public class QuestionDTO extends RepresentationModel<QuestionDTO> {
         this.createdBy = createdBy;
     }
 
-    public int getPointsToAchieve() {
+    public double getPointsToAchieve() {
         return pointsToAchieve;
     }
 
-    public void setPointsToAchieve(int pointsToAchieve) {
+    public void setPointsToAchieve(double pointsToAchieve) {
         this.pointsToAchieve = pointsToAchieve;
     }
 

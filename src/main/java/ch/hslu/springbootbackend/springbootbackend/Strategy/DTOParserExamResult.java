@@ -123,7 +123,7 @@ public class DTOParserExamResult implements DTOParserStrategy {
         return examResultRepository.findAllByUserAndExamSetAndQuestion(this.getUserFromDatabase(examResultDTO.getUsername()), this.getExamSetFromDatabase(examResultDTO.getExamSetId()), this.getQuestionFromDatabase(examResultDTO.getQuestionId()));
     }
 
-    private double calculateScore(List<Answer> correctAnswer, List<Answer> answerToCheck, int maxPoints){
+    private double calculateScore(List<Answer> correctAnswer, List<Answer> answerToCheck, double maxPoints){
         double score = 0;
         double valuePerAnswer = maxPoints/correctAnswer.size();
         for(int i = 0; i < answerToCheck.size(); i++){

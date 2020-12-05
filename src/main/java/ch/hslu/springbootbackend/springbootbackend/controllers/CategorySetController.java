@@ -1,6 +1,7 @@
 package ch.hslu.springbootbackend.springbootbackend.controllers;
 
 import ch.hslu.springbootbackend.springbootbackend.DTO.CategorySetDTO;
+import ch.hslu.springbootbackend.springbootbackend.DTO.CategorySetOverviewDTO;
 import ch.hslu.springbootbackend.springbootbackend.Exception.ResourceNotFoundException;
 import ch.hslu.springbootbackend.springbootbackend.Service.EntityService.CategorySetService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,4 +49,9 @@ public class CategorySetController {
                     .build();
         }
     }
+    @GetMapping("/categorySetOverview/{id}")
+    public CategorySetOverviewDTO getOverviewById(@PathVariable(value = "id") Integer categorySetId) {
+        return categorySetService.getCategorySetOverviewByCategorySetId(categorySetId);
+    }
+
 }

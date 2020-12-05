@@ -27,7 +27,7 @@ public class Question{
 
     private QuestionType questionType;
 
-    private int pointsToAchieve;
+    private double pointsToAchieve;
 
     @ManyToOne(targetEntity = User.class, cascade = CascadeType.ALL)
     private User createdByUser;
@@ -60,7 +60,7 @@ public class Question{
     private QuestionLevel questionLevel;
 
 
-    public Question(String questionPhrase, List<Answer> possibleAnswers, List<Answer> correctAnswers, QuestionType questionType, User user, List<CategorySet> categorySets, Media questionImage, Media answerImage, int pointsToAchieve, List<Profession> professions, QuestionLevel questionLevel) {
+    public Question(String questionPhrase, List<Answer> possibleAnswers, List<Answer> correctAnswers, QuestionType questionType, User user, List<CategorySet> categorySets, Media questionImage, Media answerImage, double pointsToAchieve, List<Profession> professions, QuestionLevel questionLevel) {
         this.questionPhrase = questionPhrase;
         this.possibleAnswers = possibleAnswers;
         this.correctAnswers = correctAnswers;
@@ -73,7 +73,7 @@ public class Question{
         this.professions = professions;
         this.questionLevel = questionLevel;
     }
-    public Question(String questionPhrase, List<Answer> answers, List<Answer>  correctAnswers, QuestionType questionType, int pointsToAchieve, QuestionLevel questionLevel) {
+    public Question(String questionPhrase, List<Answer> answers, List<Answer>  correctAnswers, QuestionType questionType, double pointsToAchieve, QuestionLevel questionLevel) {
         this.setQuestionPhrase(questionPhrase);
         this.setPossibleAnswers(answers);
         this.setCorrectAnswers(correctAnswers);
@@ -190,11 +190,11 @@ public class Question{
         this.createdByUser = createdByUser;
     }
 
-    public int getPointsToAchieve() {
+    public double getPointsToAchieve() {
         return pointsToAchieve;
     }
 
-    public void setPointsToAchieve(int pointsToAchieve) {
+    public void setPointsToAchieve(double pointsToAchieve) {
         this.pointsToAchieve = pointsToAchieve;
     }
 

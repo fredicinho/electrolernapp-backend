@@ -1,6 +1,7 @@
 package ch.hslu.springbootbackend.springbootbackend.controllers;
 
 import ch.hslu.springbootbackend.springbootbackend.DTO.ExamResultDTO;
+import ch.hslu.springbootbackend.springbootbackend.DTO.ExamResultOverviewDTO;
 import ch.hslu.springbootbackend.springbootbackend.DTO.ExamResultUpdateDTO;
 import ch.hslu.springbootbackend.springbootbackend.Exception.ResourceNotFoundException;
 import ch.hslu.springbootbackend.springbootbackend.Service.EntityService.ExamResultService;
@@ -80,6 +81,8 @@ public class ExamResultController {
             return examResultService.getExamResultsByExamSet(examSetId);
         }
     }
+
+
     @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_ADMIN')")
     @GetMapping("/examSetsAndUser")
     public List<ExamResultDTO> getAllExamSetResultsByUserAndExamSet(@RequestParam Integer examSetId, @RequestParam String username) {
@@ -102,6 +105,23 @@ public class ExamResultController {
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(examResultDTO);
         } else {
+            return ResponseEntity.
+                    notFound()
+                    .build();
+        }
+    }
+
+    @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+    @GetMapping("/examResultOverview/{id}")
+    public ResponseEntity<ExamResultOverviewDTO> getExamResultOverviewByExamSet(@PathVariable(value = "id") Integer examSetId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        LOG.warn(String.valueOf(auth.getAuthorities()));
+        if (auth != null) {
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(examResultService.getExamResultOverviewByExamSetAndUser(examSetId, auth.getName()));
+        }else {
             return ResponseEntity.
                     notFound()
                     .build();

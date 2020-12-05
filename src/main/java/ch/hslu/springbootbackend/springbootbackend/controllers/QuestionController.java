@@ -45,7 +45,7 @@ public class QuestionController {
             QuestionDTO questionDTO = questionService.createNewQuestion(newQuestion);
             if(questionDTO != null) {
                 if(questionService.ressourceExists().get()){
-                    questionService.ressourceExists().set(true);
+                    questionService.ressourceExists().set(false);
                     return ResponseEntity
                             .status(HttpStatus.CONFLICT)
                             .contentType(MediaType.APPLICATION_JSON)

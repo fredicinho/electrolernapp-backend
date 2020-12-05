@@ -1,12 +1,13 @@
 package ch.hslu.springbootbackend.springbootbackend.Service.EntityService;
 
 import ch.hslu.springbootbackend.springbootbackend.DTO.CategorySetDTO;
+import ch.hslu.springbootbackend.springbootbackend.DTO.CategorySetOverviewDTO;
+import ch.hslu.springbootbackend.springbootbackend.Entity.Question;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.CategorySet;
 import ch.hslu.springbootbackend.springbootbackend.Exception.ResourceNotFoundException;
 import ch.hslu.springbootbackend.springbootbackend.Repository.CategorySetRepository;
 import ch.hslu.springbootbackend.springbootbackend.controllers.CategoryController;
 import ch.hslu.springbootbackend.springbootbackend.controllers.QuestionController;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -41,6 +42,17 @@ public class CategorySetService {
         return generateCategorySetDTOFromCatagorySet(filteredCategorySets);
     }
 
+    public CategorySetOverviewDTO getCategorySetOverviewByCategorySetId(int categorySetId){
+        CategorySetOverviewDTO categorySetOverviewDTO = new CategorySetOverviewDTO(categorySetId);
+        CategorySet categorySet = categorySetRepository.findById(categorySetId).orElseThrow(() -> new RuntimeException("Error: CategorySet is not found."));
+        List<Question> questionList = categorySet.getQuestionsInSet();
+        int numberOfQuestions = questionList.size();
+        double maximalPoints =  this.getMaximalPointsFromCategorySet(questionList);
+        categorySetOverviewDTO.setNumberOfQuestions(numberOfQuestions);
+        categorySetOverviewDTO.setMaximalNumberOfPoints(maximalPoints);
+        return categorySetOverviewDTO;
+    }
+
     private List<CategorySetDTO> generateCategorySetDTOFromCatagorySet(List<CategorySet> list){
         List<CategorySetDTO> categorySetDTOS = new ArrayList<>();
         for(CategorySet categorySet:list) {
@@ -67,6 +79,14 @@ public class CategorySetService {
             }
         }
         return filteredCategorySet;
+    }
+
+    private double getMaximalPointsFromCategorySet(List<Question> questions){
+        double maximalPoints = 0;
+        for(Question question : questions){
+            maximalPoints = maximalPoints + question.getPointsToAchieve();
+        }
+        return maximalPoints;
     }
 
 }

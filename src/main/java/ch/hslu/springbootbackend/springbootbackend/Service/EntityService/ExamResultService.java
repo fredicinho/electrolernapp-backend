@@ -1,6 +1,7 @@
 package ch.hslu.springbootbackend.springbootbackend.Service.EntityService;
 
 import ch.hslu.springbootbackend.springbootbackend.DTO.ExamResultDTO;
+import ch.hslu.springbootbackend.springbootbackend.DTO.ExamResultOverviewDTO;
 import ch.hslu.springbootbackend.springbootbackend.Entity.ExamResult;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Question;
 import ch.hslu.springbootbackend.springbootbackend.Entity.SchoolClass;
@@ -119,6 +120,38 @@ public class ExamResultService {
         examResult.setExamSet(this.examSetRepository.getOne(examSetId));
         return dtoParserExamResult.generateDTOFromObject(examResultRepository.save(examResult).getId());
 
+    }
+    public ExamResultOverviewDTO getExamResultOverviewByExamSetAndUser(int examSetId, String username){
+        ExamResultOverviewDTO examResultOverviewDTO = new ExamResultOverviewDTO(examSetId, username);
+        ExamSet examSet = examSetRepository.findById(examSetId).orElseThrow(() -> new RuntimeException("ExamSet not found"));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+        List<ExamResult> examResultList = examResultRepository.findAllByExamSetAndUser(examSet, user);
+        examResultOverviewDTO.setMaximalNumberOfPoints(calculateMaximalScore(examSet));
+        examResultOverviewDTO.setAchievedPoints(calculateExamSetScore(examResultList));
+        examResultOverviewDTO.setGrade(calculateGrade(examResultOverviewDTO));
+        return examResultOverviewDTO;
+    }
+
+    private double calculateExamSetScore(List<ExamResult> list){
+        double examResult = 0;
+        for(ExamResult examResult1 : list){
+            examResult = examResult + examResult1.getPointsAchieved();
+        }
+        return examResult;
+    }
+
+    private double calculateMaximalScore(ExamSet list){
+        double maximalPoints = 0;
+        for(Question question : list.getQuestionsInExamSet()){
+            maximalPoints = maximalPoints + question.getPointsToAchieve();
+        }
+        return maximalPoints;
+    }
+
+    private double calculateGrade(ExamResultOverviewDTO examResultOverviewDTO){
+        double pointsAchieved = examResultOverviewDTO.getAchievedPoints();
+        double maximalPoints = examResultOverviewDTO.getMaximalNumberOfPoints();
+        return ((pointsAchieved*5)/maximalPoints)+1;
     }
 
 
