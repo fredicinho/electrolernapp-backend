@@ -1,7 +1,9 @@
 package ch.hslu.springbootbackend.springbootbackend.Strategy;
 
 import ch.hslu.springbootbackend.springbootbackend.DTO.StatisticDTO;
+import ch.hslu.springbootbackend.springbootbackend.DTO.StatisticEvaluationDTO;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Question;
+import ch.hslu.springbootbackend.springbootbackend.Entity.Sets.CategorySet;
 import ch.hslu.springbootbackend.springbootbackend.Entity.Statistic;
 import ch.hslu.springbootbackend.springbootbackend.Entity.User;
 import ch.hslu.springbootbackend.springbootbackend.Repository.QuestionRepository;
@@ -59,6 +61,19 @@ public class DTOParserStatistic implements DTOParserStrategy{
             statisticDTOS.add(generateDTOFromObject(statistic.getStatisticId()));
         }
         return statisticDTOS;
+    }
+
+    public List<StatisticEvaluationDTO> generateEvaluationDTOFromStatistic(List<Statistic> statistics) {
+        List<StatisticEvaluationDTO> statisticEvaluationDTOS = new ArrayList<>();
+        for (Statistic statistic: statistics
+             ) {
+            List<CategorySet> categorySets = statistic.getQuestion().getCategorySet();
+            StatisticEvaluationDTO statisticEvaluationDTO = new StatisticEvaluationDTO(statistic.getStatisticId(),
+                    statistic.getDate(), statistic.getPointsAchieved(), statistic.isMarked(), categorySets.get(0).getCategorySetId(),
+                    categorySets.get(0).getCategory().getId());
+            statisticEvaluationDTOS.add(statisticEvaluationDTO);
+        }
+        return statisticEvaluationDTOS;
     }
 
     private Question getQuestionFromDatabase(int questionId){

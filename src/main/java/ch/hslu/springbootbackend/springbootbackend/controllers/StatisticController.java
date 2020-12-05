@@ -1,6 +1,7 @@
 package ch.hslu.springbootbackend.springbootbackend.controllers;
 
 import ch.hslu.springbootbackend.springbootbackend.DTO.StatisticDTO;
+import ch.hslu.springbootbackend.springbootbackend.DTO.StatisticEvaluationDTO;
 import ch.hslu.springbootbackend.springbootbackend.Service.EntityService.StatisticService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +13,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -20,18 +20,18 @@ import java.util.List;
 @RequestMapping("/api/v1/statistics")
 @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TEACHER') or hasRole('ROLE_USER') ")
 public class StatisticController {
-    private final Logger LOG = LoggerFactory.getLogger(StatisticController.class);
 
+    private final Logger LOG = LoggerFactory.getLogger(StatisticController.class);
 
     @Autowired
     private StatisticService statisticService;
 
     @GetMapping("/User/{id}")
-    public List<StatisticDTO> getStatisticByUserId(@PathVariable(value = "id") long userId) {
+    public List<StatisticEvaluationDTO> getStatisticByUserId(@PathVariable(value = "id") long userId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_USER"))) {
             return statisticService.getByUsername(auth.getName());
-        }else{
+        } else {
             return statisticService.getByUserId(userId);
         }
     }
@@ -52,7 +52,6 @@ public class StatisticController {
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TEACHER')")
     public List<StatisticDTO> getStatisticByQuestionId(@PathVariable(value = "id") Integer questionId){
             return statisticService.getByQuestionId(questionId);
-
     }
 
     @PostMapping("")

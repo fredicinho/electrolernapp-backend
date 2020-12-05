@@ -1,6 +1,7 @@
 package ch.hslu.springbootbackend.springbootbackend.Service.EntityService;
 
 import ch.hslu.springbootbackend.springbootbackend.DTO.StatisticDTO;
+import ch.hslu.springbootbackend.springbootbackend.DTO.StatisticEvaluationDTO;
 import ch.hslu.springbootbackend.springbootbackend.Entity.User;
 import ch.hslu.springbootbackend.springbootbackend.Repository.QuestionRepository;
 import ch.hslu.springbootbackend.springbootbackend.Repository.StatisticRepository;
@@ -31,13 +32,13 @@ public class StatisticService {
     DTOParserStatistic dtoParserStatistic;
 
 
-    public List<StatisticDTO> getByUserId(long userId){
-        return dtoParserStatistic.generateDTOsFromObjects(statisticRepository.findByUserId(userId));
+    public List<StatisticEvaluationDTO> getByUserId(long userId){
+        return dtoParserStatistic.generateEvaluationDTOFromStatistic(statisticRepository.findByUserId(userId));
     }
-    public List<StatisticDTO> getByUsername(String username){
+    public List<StatisticEvaluationDTO> getByUsername(String username){
         Optional<User> userOptional = userRepository.findByUsername(username);
         if(userOptional.isPresent()) {
-            return dtoParserStatistic.generateDTOsFromObjects(statisticRepository.findByUserId(userOptional.get().getId()));
+            return dtoParserStatistic.generateEvaluationDTOFromStatistic(statisticRepository.findByUserId(userOptional.get().getId()));
         }else {
             return null;
         }
