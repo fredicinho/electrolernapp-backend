@@ -287,7 +287,7 @@ public class CsvController {
         String[] csvHeader = {"id", "username", "email", "profession", "roles", "schoolClassesIn"};
         String[] nameMapping = {"id", "username", "email", "profession", "roles", "schoolClassesIn"};
 
-        //csvWriter.write(csvHeader);
+        csvWriter.writeHeader(nameMapping);
         for (UserDTO user : listUserDTO) {
             csvWriter.write(user, nameMapping);
         }
@@ -313,7 +313,7 @@ public class CsvController {
         //String[] csvHeader = {"id", "username", "email", "profession", "roles", "schoolClassesIn"};
         String[] nameMapping = {"id", "questionPhrase", "possibleAnswers", "correctAnswers", "questionType", "pointsToAchieve", "categorySetIds", "questionImageId", "answerImageId", "questionLevel", "professionsList" };
 
-        //csvWriter.write(csvHeader);
+        csvWriter.writeHeader(nameMapping);
         for (QuestionDTO question : listQuestionDto) {
             csvWriter.write(question, nameMapping);
         }
@@ -339,7 +339,7 @@ public class CsvController {
         //String[] csvHeader = {"id", "username", "email", "profession", "roles", "schoolClassesIn"};
         String[] nameMapping = {"examSetId", "title", "startDate", "endDate", "questionsInExamSet", "schoolClassesInExamSet", "createdBy", "description" };
 
-        //csvWriter.write(csvHeader);
+        csvWriter.writeHeader(nameMapping);
         for (ExamSetDTO examSetDTO : examSetDTOS) {
             csvWriter.write(examSetDTO, nameMapping);
         }
@@ -364,7 +364,7 @@ public class CsvController {
         //String[] csvHeader = {"id", "username", "email", "profession", "roles", "schoolClassesIn"};
         String[] nameMapping = {"examResultId", "pointsAchieved", "username", "questionId", "examSetId", "sendedAnswers", "changedByTeacher"};
 
-        //csvWriter.write(csvHeader);
+        csvWriter.writeHeader(nameMapping);
         for (ExamResultDTO examResultDTO : examResultDTOS) {
             csvWriter.write(examResultDTO, nameMapping);
         }
