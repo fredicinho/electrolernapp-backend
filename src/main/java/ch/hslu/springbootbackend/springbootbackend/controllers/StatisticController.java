@@ -1,6 +1,7 @@
 package ch.hslu.springbootbackend.springbootbackend.controllers;
 
 import ch.hslu.springbootbackend.springbootbackend.DTO.StatisticDTO;
+import ch.hslu.springbootbackend.springbootbackend.DTO.StatisticEvaluationDTO;
 import ch.hslu.springbootbackend.springbootbackend.Service.EntityService.StatisticService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,11 +27,11 @@ public class StatisticController {
     private StatisticService statisticService;
 
     @GetMapping("/User/{id}")
-    public List<StatisticDTO> getStatisticByUserId(@PathVariable(value = "id") long userId) {
+    public List<StatisticEvaluationDTO> getStatisticByUserId(@PathVariable(value = "id") long userId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_USER"))) {
             return statisticService.getByUsername(auth.getName());
-        }else{
+        } else {
             return statisticService.getByUserId(userId);
         }
     }
@@ -51,7 +52,6 @@ public class StatisticController {
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TEACHER')")
     public List<StatisticDTO> getStatisticByQuestionId(@PathVariable(value = "id") Integer questionId){
             return statisticService.getByQuestionId(questionId);
-
     }
 
     @PostMapping("")
