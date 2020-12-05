@@ -81,6 +81,23 @@ public class SchoolClassController {
         }
     }
 
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_TEACHER')")
+    @GetMapping("/{id}")
+    public ResponseEntity<SchoolClassDTO> getSchoolClassesById(@PathVariable(value = "id") int schoolClassId) {
+        SchoolClassDTO schoolClassDTO = schoolClassService.getSchoolClassById(schoolClassId);
+        if(schoolClassDTO != null) {
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(schoolClassDTO);
+        }
+        else{
+            return ResponseEntity.
+                    notFound()
+                    .build();
+        }
+    }
+
     @GetMapping("/examSet")
     public List<SchoolClassDTO> getSchoolClassesByExamSet(@RequestParam int examSetId) {
         return schoolClassService.getAllSchoolClassesByExamSet(examSetId);

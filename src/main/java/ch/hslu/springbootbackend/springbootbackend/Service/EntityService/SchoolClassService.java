@@ -113,6 +113,10 @@ public class SchoolClassService {
         return schoolClassDTOS;
     }
 
+    public SchoolClassDTO getSchoolClassById(int schoolClassId) {
+        return dtoParserSchoolClass.generateDTOFromObject(schoolClassId);
+    }
+
 
     public AtomicBoolean getRessourceExists() {
         return ressourceExists;
