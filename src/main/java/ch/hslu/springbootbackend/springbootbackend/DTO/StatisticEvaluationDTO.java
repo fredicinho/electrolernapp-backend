@@ -9,14 +9,16 @@ public class StatisticEvaluationDTO extends RepresentationModel<StatisticEvaluat
     private boolean isMarked;
     private int categoryId;
     private int categorySetId;
+    private int questionId;
 
-    public StatisticEvaluationDTO(int statisticId, Date date, int pointsAchieved, boolean isMarked, int categoryId, int categorySetId) {
+    public StatisticEvaluationDTO(int statisticId, Date date, int pointsAchieved, boolean isMarked, int categoryId, int categorySetId, int questionId) {
         this.statisticId = statisticId;
         this.date = date;
         this.pointsAchieved = pointsAchieved;
         this.isMarked = isMarked;
         this.categoryId = categoryId;
         this.categorySetId = categorySetId;
+        this.questionId = questionId;
     }
 
     public int getCategoryId() {
@@ -67,15 +69,12 @@ public class StatisticEvaluationDTO extends RepresentationModel<StatisticEvaluat
         isMarked = marked;
     }
 
-    @Override
-    public String toString() {
-        return "StatisticEvaluationDTO{" +
-                "statisticId=" + statisticId +
-                ", date=" + date +
-                ", pointsAchieved=" + pointsAchieved +
-                ", isMarked=" + isMarked +
-                ", categoryId=" + categoryId +
-                ", categorySetId=" + categorySetId +
-                '}';
+    public int getQuestionId() {
+        return questionId;
     }
+
+    public void setQuestionId(int questionId) {
+        this.questionId = questionId;
+    }
+
 }

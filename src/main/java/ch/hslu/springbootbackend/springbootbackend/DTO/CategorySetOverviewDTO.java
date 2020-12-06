@@ -8,12 +8,14 @@ public class CategorySetOverviewDTO {
 
     private double maximalNumberOfPoints;
 
+    private String title;
+
+    private int categoryId;
+
     public CategorySetOverviewDTO(){}
 
     public CategorySetOverviewDTO(int categorySetId) {
         this.categorySetId = categorySetId;
-        this.numberOfQuestions = numberOfQuestions;
-        this.maximalNumberOfPoints = maximalNumberOfPoints;
     }
 
     public int getNumberOfQuestions() {
@@ -40,5 +42,19 @@ public class CategorySetOverviewDTO {
         this.categorySetId = categorySetId;
     }
 
+    public String getTitle() {
+        return title;
+    }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public int getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
+    }
 }

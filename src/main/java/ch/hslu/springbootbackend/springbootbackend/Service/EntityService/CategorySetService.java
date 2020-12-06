@@ -27,7 +27,7 @@ public class CategorySetService {
 
     public CategorySetDTO getCategorySetDTOById(Integer id) throws ResourceNotFoundException {
         CategorySet categorySet = categorySetRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Question not found for this id :: " + id )
+                () -> new ResourceNotFoundException("Question not found for this id :: " + id)
         );
         CategorySetDTO categorySetDTO = new CategorySetDTO(categorySet.getCategorySetId(), categorySet.getTitle(), categorySet.getCategorySetNumber());
         categorySetDTO.add(linkTo(methodOn(CategoryController.class).getCategoryById(id)).withRel("questionsInSet"));
@@ -35,27 +35,38 @@ public class CategorySetService {
         return categorySetDTO;
     }
 
-    public List<CategorySetDTO> getCategorySetByCategoryId (Integer categoryId){
+    public List<CategorySetDTO> getCategorySetByCategoryId(Integer categoryId) {
         List<CategorySet> categorySets = categorySetRepository.findByCategoryId(categoryId);
         List<CategorySet> filteredCategorySets = this.filterEmptyCategorySets(categorySets);
         System.out.println("Filtered CategorySets");
         return generateCategorySetDTOFromCatagorySet(filteredCategorySets);
     }
 
-    public CategorySetOverviewDTO getCategorySetOverviewByCategorySetId(int categorySetId){
+    public CategorySetOverviewDTO getCategorySetOverviewByCategorySetId(int categorySetId) {
         CategorySetOverviewDTO categorySetOverviewDTO = new CategorySetOverviewDTO(categorySetId);
         CategorySet categorySet = categorySetRepository.findById(categorySetId).orElseThrow(() -> new RuntimeException("Error: CategorySet is not found."));
         List<Question> questionList = categorySet.getQuestionsInSet();
         int numberOfQuestions = questionList.size();
-        double maximalPoints =  this.getMaximalPointsFromCategorySet(questionList);
+        double maximalPoints = this.getMaximalPointsFromCategorySet(questionList);
         categorySetOverviewDTO.setNumberOfQuestions(numberOfQuestions);
         categorySetOverviewDTO.setMaximalNumberOfPoints(maximalPoints);
+        categorySetOverviewDTO.setTitle(categorySet.getTitle());
+        categorySetOverviewDTO.setCategoryId(categorySet.getCategory().getId());
         return categorySetOverviewDTO;
     }
 
-    private List<CategorySetDTO> generateCategorySetDTOFromCatagorySet(List<CategorySet> list){
+    public List<CategorySetOverviewDTO> getAllCategorySetOverviews() {
+        List<CategorySet> allCategorySets = this.filterEmptyCategorySets(categorySetRepository.findAll());
+        List<CategorySetOverviewDTO> categorySetOverviewDtos = new ArrayList<>();
+        for (CategorySet categorySet : allCategorySets) {
+            categorySetOverviewDtos.add(this.getCategorySetOverviewByCategorySetId(categorySet.getCategorySetId()));
+        }
+        return categorySetOverviewDtos;
+    }
+
+    private List<CategorySetDTO> generateCategorySetDTOFromCatagorySet(List<CategorySet> list) {
         List<CategorySetDTO> categorySetDTOS = new ArrayList<>();
-        for(CategorySet categorySet:list) {
+        for (CategorySet categorySet : list) {
             CategorySetDTO categorySetDTO = new CategorySetDTO(categorySet.getCategorySetId(), categorySet.getTitle(), categorySet.getCategorySetNumber());
             categorySetDTO.add(linkTo(methodOn(CategoryController.class).getCategoryById(categorySet.getCategorySetId())).withRel("category"));
             categorySetDTO.add(linkTo(methodOn(QuestionController.class).getQuestionsByCategorySet(categorySet.getCategorySetId())).withRel("questionsInSet"));
@@ -73,7 +84,7 @@ public class CategorySetService {
     private List<CategorySet> filterEmptyCategorySets(List<CategorySet> categorySets) {
         List<CategorySet> filteredCategorySet = new ArrayList<>();
         for (CategorySet categorySet : categorySets
-             ) {
+        ) {
             if (!categorySet.getQuestionsInSet().isEmpty()) {
                 filteredCategorySet.add(categorySet);
             }
@@ -81,9 +92,9 @@ public class CategorySetService {
         return filteredCategorySet;
     }
 
-    private double getMaximalPointsFromCategorySet(List<Question> questions){
+    private double getMaximalPointsFromCategorySet(List<Question> questions) {
         double maximalPoints = 0;
-        for(Question question : questions){
+        for (Question question : questions) {
             maximalPoints = maximalPoints + question.getPointsToAchieve();
         }
         return maximalPoints;

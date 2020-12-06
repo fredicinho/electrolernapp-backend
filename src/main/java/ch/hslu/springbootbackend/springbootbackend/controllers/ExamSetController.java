@@ -58,7 +58,7 @@ public class ExamSetController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_USER"))) {
             return examSetService.getExamSetsByUser(auth.getName());
-        }else {
+        } else {
             return examSetService.getAllExamSets();
         }
     }

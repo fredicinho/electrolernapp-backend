@@ -69,8 +69,8 @@ public class DTOParserStatistic implements DTOParserStrategy{
              ) {
             List<CategorySet> categorySets = statistic.getQuestion().getCategorySet();
             StatisticEvaluationDTO statisticEvaluationDTO = new StatisticEvaluationDTO(statistic.getStatisticId(),
-                    statistic.getDate(), statistic.getPointsAchieved(), statistic.isMarked(), categorySets.get(0).getCategorySetId(),
-                    categorySets.get(0).getCategory().getId());
+                    statistic.getDate(), statistic.getPointsAchieved(), statistic.isMarked(),
+                    categorySets.get(0).getCategory().getId(),categorySets.get(0).getCategorySetId(), statistic.getQuestion().getId());
             statisticEvaluationDTOS.add(statisticEvaluationDTO);
         }
         return statisticEvaluationDTOS;
