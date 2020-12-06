@@ -12,6 +12,7 @@ import org.apache.commons.csv.CSVRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,6 +37,8 @@ public class CsvUserService implements CsvService{
     ProfessionRepository professionRepository;
     @Autowired
     SchoolClassRepository schoolClassRepository;
+    @Autowired
+    PasswordEncoder encoder;
 
     private final Logger LOG = LoggerFactory.getLogger(CsvUserService.class);
     private ConcurrentHashMap<String, User> currentCreatedUser;
@@ -98,7 +101,7 @@ public class CsvUserService implements CsvService{
     private User createUserFromCSV(CSVRecord csvRecord){
         String username = csvRecord.get("username");
         String email = csvRecord.get("email");
-        String password = csvRecord.get("password");
+        String password = encoder.encode(csvRecord.get("password"));
         String profession = csvRecord.get("profession");
         String role = csvRecord.get("role");
         Set<Role> roleSet = new HashSet<>();
