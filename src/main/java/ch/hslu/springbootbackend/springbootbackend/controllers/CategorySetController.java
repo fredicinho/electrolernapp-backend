@@ -49,9 +49,15 @@ public class CategorySetController {
                     .build();
         }
     }
+
     @GetMapping("/categorySetOverview/{id}")
     public CategorySetOverviewDTO getOverviewById(@PathVariable(value = "id") Integer categorySetId) {
         return categorySetService.getCategorySetOverviewByCategorySetId(categorySetId);
+    }
+
+    @GetMapping("/categorySetOverview/")
+    public List<CategorySetOverviewDTO> getAllOverviews() {
+        return categorySetService.getAllCategorySetOverviews();
     }
 
 }
