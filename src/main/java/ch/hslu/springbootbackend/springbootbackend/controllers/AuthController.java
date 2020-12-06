@@ -26,10 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -61,25 +58,23 @@ public class AuthController {
 	@PostMapping("/signin")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
-		Authentication authentication = authenticationManager.authenticate(
+		Authentication auth = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
-		SecurityContextHolder.getContext().setAuthentication(authentication);
-		String jwt = jwtUtils.generateJwtToken(authentication);
-		
-		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-		List<String> roles = userDetails.getAuthorities().stream()
-				.map(item -> item.getAuthority())
-				.collect(Collectors.toList());
+		SecurityContextHolder.getContext().setAuthentication(auth);
+		String jwt = jwtUtils.generateJwtToken(auth);
+
+		User user = userRepository.findByUsername(auth.getName()).orElseThrow(() -> new RuntimeException("Error: User is not found."));
+		List<String> roles = mapRolesToString(user.getRoles());
 		if(roles.contains("ROLE_EXAM")){
-			User user = userRepository.findByUsername(loginRequest.getUsername()).orElseThrow(() -> new RuntimeException("Error: User is not found."));
-			userRepository.save(removeExamRole(user));
+			user = userRepository.save(removeExamRole(user));
+			roles = this.mapRolesToString(user.getRoles());
 		}
 
 		return ResponseEntity.ok(new JwtResponse(jwt,
-												 userDetails.getId(), 
-												 userDetails.getUsername(), 
-												 userDetails.getEmail(), 
+												 user.getId(),
+												 user.getUsername(),
+												 user.getEmail(),
 												 roles));
 	}
 
@@ -112,31 +107,26 @@ public class AuthController {
 			user = addExamRole(user);
 			expirationTime = examSetService.getTimeForExam(examSetId);
 			jwt = jwtUtils.generateJwtToken(authentication, expirationTime);
+			List<String> roles = mapRolesToString(user.getRoles());
+
+			return ResponseEntity.ok(new JwtResponse(jwt,
+					user.getId(),
+					user.getUsername(),
+					user.getEmail(),
+					roles));
 		}else{
-			jwt = jwtUtils.generateJwtToken(authentication);
 			return ResponseEntity.
 					badRequest()
 					.build();
 		}
 
-
-		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-		List<String> roles = userDetails.getAuthorities().stream()
-				.map(item -> item.getAuthority())
-				.collect(Collectors.toList());
-
-		return ResponseEntity.ok(new JwtResponse(jwt,
-				userDetails.getId(),
-				userDetails.getUsername(),
-				userDetails.getEmail(),
-				roles));
 	}
 
 	@PreAuthorize("hasRole('ROLE_EXAM')")
 	@PostMapping("/endExam")
 	public ResponseEntity<?> endExam(@RequestParam int examSetId) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		User user = userRepository.findByUsername(auth.getName()).orElseThrow(() -> new RuntimeException("Error: User is not found."));;
+		User user = userRepository.findByUsername(auth.getName()).orElseThrow(() -> new RuntimeException("Error: User is not found."));
 		String jwt;
 		user = removeExamRole(user);
 		jwt = jwtUtils.generateJwtToken(auth);
@@ -251,6 +241,14 @@ public class AuthController {
 			}
 		}
 		return exists;
+	}
+
+	private List<String> mapRolesToString(Set<Role> roleList){
+		List<String> roleAsString = new ArrayList<>();
+		for(Role role : roleList){
+			roleAsString.add(role.getName().toString());
+		}
+		return roleAsString;
 	}
 
 
