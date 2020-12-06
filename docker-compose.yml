@@ -9,7 +9,6 @@ services:
       MARIADB_DATABASE: db_electrolernapp
       MARIADB_USER: electrolernapp
       MARIADB_PASSWORD: electrolernapp2020
-        - TZ = Europe/Paris
     ports:
       - 3306:3306
     volumes:

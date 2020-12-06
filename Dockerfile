@@ -10,6 +10,7 @@ COPY src /build/src/
 
 WORKDIR /build/
 
+ENV TZ=Europe/Paris
 
 RUN mvn clean install -Dspring.profiles.active=$SPRING_ACTIVE_PROFILE && mvn package -B -e -Dspring.profiles.active=$SPRING_ACTIVE_PROFILE
 
