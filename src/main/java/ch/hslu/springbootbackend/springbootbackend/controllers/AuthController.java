@@ -108,7 +108,6 @@ public class AuthController {
 			expirationTime = examSetService.getTimeForExam(examSetId);
 			jwt = jwtUtils.generateJwtToken(authentication, expirationTime);
 			List<String> roles = mapRolesToString(user.getRoles());
-
 			return ResponseEntity.ok(new JwtResponse(jwt,
 					user.getId(),
 					user.getUsername(),
@@ -136,6 +135,7 @@ public class AuthController {
 		List<String> roles = userDetails.getAuthorities().stream()
 				.map(item -> item.getAuthority())
 				.collect(Collectors.toList());
+		roles.remove("ROLE_EXAM");
 
 		return ResponseEntity.ok(new JwtResponse(jwt,
 				userDetails.getId(),
