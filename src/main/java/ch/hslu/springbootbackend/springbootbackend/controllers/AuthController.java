@@ -130,17 +130,12 @@ public class AuthController {
 		user = removeExamRole(user);
 		jwt = jwtUtils.generateJwtToken(auth);
 
-
-		UserDetailsImpl userDetails = (UserDetailsImpl) auth.getPrincipal();
-		List<String> roles = userDetails.getAuthorities().stream()
-				.map(item -> item.getAuthority())
-				.collect(Collectors.toList());
-		roles.remove("ROLE_EXAM");
+		List<String> roles = mapRolesToString(user.getRoles());
 
 		return ResponseEntity.ok(new JwtResponse(jwt,
-				userDetails.getId(),
-				userDetails.getUsername(),
-				userDetails.getEmail(),
+				user.getId(),
+				user.getUsername(),
+				user.getEmail(),
 				roles));
 	}
 	//@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TEACHER')")
