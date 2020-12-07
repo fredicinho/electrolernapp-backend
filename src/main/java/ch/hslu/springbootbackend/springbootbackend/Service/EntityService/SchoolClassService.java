@@ -63,10 +63,13 @@ public class SchoolClassService {
             SchoolClass schoolClassNew = this.dtoParserSchoolClass.generateObjectFromDTO(schoolClassDTO);
             schoolClass.setInstitution(schoolClassNew.getInstitution());
             schoolClass.setDescription(schoolClassNew.getDescription());
-            schoolClass.setUsersInClass(schoolClassNew.getUsersInClass());
+            //schoolClass.setUsersInClass(schoolClassNew.getUsersInClass());
+            schoolClass.setUsersInClass(this.updateUsersIn(schoolClassNew.getUsersInClass(), schoolClass));
             schoolClass.setName(schoolClassNew.getName());
             schoolClass.setExamSetsForSchoolClass(schoolClassNew.getExamSetsForSchoolClass());
-            return dtoParserSchoolClass.generateDTOFromObject(schoolClassRepository.save(schoolClass).getId());
+            schoolClass = schoolClassRepository.save(schoolClass);
+            SchoolClassDTO schoolClassDTO1 = dtoParserSchoolClass.generateDTOFromObject(schoolClass.getId());
+            return dtoParserSchoolClass.generateDTOFromObject(schoolClass.getId());
         }else{
             return null;
         }
@@ -126,6 +129,15 @@ public class SchoolClassService {
         this.ressourceExists = ressourceExists;
     }
 
+    private List<User> updateUsersIn(List<User> userNew, SchoolClass schoolClass){
+        for(User user : userNew) {
+            if (!user.getInSchoolClasses().contains(schoolClass)){
+                user.insertSchoolClass(schoolClass);
+            }
+        }
+        return userNew;
+
+    }
 
 
 }
