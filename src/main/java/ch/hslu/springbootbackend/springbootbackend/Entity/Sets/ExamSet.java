@@ -93,6 +93,10 @@ public class ExamSet {
     public void insertSchoolClass(SchoolClass schoolClass){
         this.schoolClassesInExamSet.add(schoolClass);
     }
+
+    public void removeSchoolClass(SchoolClass schoolClass){
+        this.schoolClassesInExamSet.remove(schoolClass);
+    }
     public void insertQuestion(Question question){
         this.questionsInExamSet.add(question);
     }

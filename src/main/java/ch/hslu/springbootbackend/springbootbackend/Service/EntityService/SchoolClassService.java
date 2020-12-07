@@ -66,7 +66,7 @@ public class SchoolClassService {
             //schoolClass.setUsersInClass(schoolClassNew.getUsersInClass());
             schoolClass.setUsersInClass(this.updateUsersIn(schoolClassNew.getUsersInClass(), schoolClass.getUsersInClass(), schoolClass));
             schoolClass.setName(schoolClassNew.getName());
-            schoolClass.setExamSetsForSchoolClass(schoolClassNew.getExamSetsForSchoolClass());
+            schoolClass.setExamSetsForSchoolClass(this.updateExamSetsIn(schoolClassNew.getExamSetsForSchoolClass(), schoolClass.getExamSetsForSchoolClass(), schoolClass));
             schoolClass = schoolClassRepository.save(schoolClass);
             return dtoParserSchoolClass.generateDTOFromObject(schoolClass.getId());
         }else{
@@ -138,7 +138,18 @@ public class SchoolClassService {
             }
         }
         return userNew;
+    }
 
+    private List<ExamSet> updateExamSetsIn(List<ExamSet> examSetsNew, List<ExamSet> examSetsOld, SchoolClass schoolClass){
+        for(ExamSet examSet : examSetsOld){
+            examSet.removeSchoolClass(schoolClass);
+        }
+        for(ExamSet examSet : examSetsNew) {
+            if (!examSet.getSchoolClassesInExamSet().contains(schoolClass)){
+                examSet.insertSchoolClass(schoolClass);
+            }
+        }
+        return examSetsNew;
     }
 
 
