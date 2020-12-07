@@ -64,11 +64,10 @@ public class SchoolClassService {
             schoolClass.setInstitution(schoolClassNew.getInstitution());
             schoolClass.setDescription(schoolClassNew.getDescription());
             //schoolClass.setUsersInClass(schoolClassNew.getUsersInClass());
-            schoolClass.setUsersInClass(this.updateUsersIn(schoolClassNew.getUsersInClass(), schoolClass));
+            schoolClass.setUsersInClass(this.updateUsersIn(schoolClassNew.getUsersInClass(), schoolClass.getUsersInClass(), schoolClass));
             schoolClass.setName(schoolClassNew.getName());
             schoolClass.setExamSetsForSchoolClass(schoolClassNew.getExamSetsForSchoolClass());
             schoolClass = schoolClassRepository.save(schoolClass);
-            SchoolClassDTO schoolClassDTO1 = dtoParserSchoolClass.generateDTOFromObject(schoolClass.getId());
             return dtoParserSchoolClass.generateDTOFromObject(schoolClass.getId());
         }else{
             return null;
@@ -129,7 +128,10 @@ public class SchoolClassService {
         this.ressourceExists = ressourceExists;
     }
 
-    private List<User> updateUsersIn(List<User> userNew, SchoolClass schoolClass){
+    private List<User> updateUsersIn(List<User> userNew, List<User> userOld, SchoolClass schoolClass){
+        for(User user : userOld){
+            user.removeSchoolClass(schoolClass);
+        }
         for(User user : userNew) {
             if (!user.getInSchoolClasses().contains(schoolClass)){
                 user.insertSchoolClass(schoolClass);

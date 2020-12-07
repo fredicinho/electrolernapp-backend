@@ -113,6 +113,9 @@ public class User extends RepresentationModel<User> {
 	public void insertSchoolClass(SchoolClass schoolClass){
 		this.getInSchoolClasses().add(schoolClass);
 	}
+	public void removeSchoolClass(SchoolClass schoolClass){
+		this.getInSchoolClasses().remove(schoolClass);
+	}
 
 	public Set<Statistic> getStatistics() {
 		return statistics;
