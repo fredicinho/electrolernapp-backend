@@ -104,4 +104,17 @@ public class ExamSetDTO extends RepresentationModel<ExamSetDTO> {
     }
 
 
+    @Override
+    public String toString() {
+        return "ExamSetDTO{" +
+                "examSetId=" + examSetId +
+                ", title='" + title + '\'' +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
+                ", questionsInExamSet=" + questionsInExamSet +
+                ", schoolClassesInExamSet=" + schoolClassesInExamSet +
+                ", createdBy='" + createdBy + '\'' +
+                ", description='" + description + '\'' +
+                '}';
+    }
 }

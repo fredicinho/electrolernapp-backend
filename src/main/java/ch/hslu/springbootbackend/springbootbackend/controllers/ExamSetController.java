@@ -28,6 +28,7 @@ public class ExamSetController {
     @PostMapping("")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_TEACHER')" )
     public ResponseEntity<ExamSetDTO> newExamSet(@RequestBody ExamSetDTO newExamSet) {
+        System.out.println(newExamSet.toString());
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         newExamSet.setCreatedBy(auth.getName());
         ExamSetDTO examSetDTO = examSetService.createNewExamSet(newExamSet);

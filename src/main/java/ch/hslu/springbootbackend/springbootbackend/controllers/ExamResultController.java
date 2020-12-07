@@ -16,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -113,20 +114,26 @@ public class ExamResultController {
 
     @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @GetMapping("/examResultOverview/{id}")
-    public ResponseEntity<ExamResultOverviewDTO> getExamResultOverviewByExamSet(@PathVariable(value = "id") Integer examSetId) {
+    public ResponseEntity<List<ExamResultOverviewDTO>> getExamResultOverviewByExamSet(@PathVariable(value = "id") Integer examSetId) throws ResourceNotFoundException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         LOG.warn(String.valueOf(auth.getAuthorities()));
-        if (auth != null) {
+        if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_USER"))) {
+            ExamResultOverviewDTO result = examResultService.getExamResultOverviewByExamSetAndUser(examSetId, auth.getName());
+            List<ExamResultOverviewDTO> results = new ArrayList<>();
+            results.add(result);
             return ResponseEntity
                     .status(HttpStatus.OK)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(examResultService.getExamResultOverviewByExamSetAndUser(examSetId, auth.getName()));
-        }else {
-            return ResponseEntity.
-                    notFound()
-                    .build();
+                    .body(results);
+        } else {
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(examResultService.getExamResultOverviewByExamSet(examSetId));
         }
     }
+
+
 
 
 }

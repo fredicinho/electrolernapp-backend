@@ -13,10 +13,7 @@ import ch.hslu.springbootbackend.springbootbackend.Strategy.DTOParserExamResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class ExamResultService {
@@ -121,6 +118,7 @@ public class ExamResultService {
         return dtoParserExamResult.generateDTOFromObject(examResultRepository.save(examResult).getId());
 
     }
+
     public ExamResultOverviewDTO getExamResultOverviewByExamSetAndUser(int examSetId, String username){
         ExamResultOverviewDTO examResultOverviewDTO = new ExamResultOverviewDTO(examSetId, username);
         ExamSet examSet = examSetRepository.findById(examSetId).orElseThrow(() -> new RuntimeException("ExamSet not found"));
@@ -130,6 +128,22 @@ public class ExamResultService {
         examResultOverviewDTO.setAchievedPoints(calculateExamSetScore(examResultList));
         examResultOverviewDTO.setGrade(calculateGrade(examResultOverviewDTO));
         return examResultOverviewDTO;
+    }
+
+    public List<ExamResultOverviewDTO> getExamResultOverviewByExamSet(int examSetId) throws ResourceNotFoundException {
+        Optional<ExamSet> examResult = examSetRepository.findById(examSetId);
+        if (!examResult.isPresent()) {
+            throw new ResourceNotFoundException("ExamSet with id :: " + examSetId + " doesn't exists!");
+        }
+        List<ExamResult> examResultList = examResultRepository.findAllByExamSet(examResult.get());
+        List<ExamResultOverviewDTO> examResultOverviewDTOS = new ArrayList<>();
+        for (ExamResult examResultItem : examResultList
+             ) {
+            examResultOverviewDTOS.add(this.getExamResultOverviewByExamSetAndUser(examResultItem.getExamSet().getExamSetId(), examResultItem.getUser().getUsername()));
+        }
+        HashSet<ExamResultOverviewDTO> setOfExamResultOverviewDTOs = new HashSet(examResultOverviewDTOS);
+        List<ExamResultOverviewDTO> examResultListDTO = new ArrayList<>(setOfExamResultOverviewDTOs);
+        return examResultListDTO;
     }
 
     private double calculateExamSetScore(List<ExamResult> list){

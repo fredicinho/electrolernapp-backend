@@ -1,5 +1,7 @@
 package ch.hslu.springbootbackend.springbootbackend.DTO;
 
+import java.util.Objects;
+
 public class ExamResultOverviewDTO {
 
     private int examSetId;
@@ -62,5 +64,20 @@ public class ExamResultOverviewDTO {
         this.grade = grade;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ExamResultOverviewDTO that = (ExamResultOverviewDTO) o;
+        return examSetId == that.examSetId &&
+                Double.compare(that.maximalNumberOfPoints, maximalNumberOfPoints) == 0 &&
+                Double.compare(that.achievedPoints, achievedPoints) == 0 &&
+                Double.compare(that.grade, grade) == 0 &&
+                Objects.equals(username, that.username);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(examSetId, username, maximalNumberOfPoints, achievedPoints, grade);
+    }
 }
