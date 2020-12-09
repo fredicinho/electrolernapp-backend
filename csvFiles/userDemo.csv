@@ -1,4 +1,4 @@
 username,email,password,profession,role,schoolClassId
-peterpan3,peterpan4@gmail.com,1234456,Elektroinstallateur,ROLE_ADMIN,1
-fred,fred@gmail.com,fred,Elektroinstallateur,ROLE_ADMIN,1
-fred1,fredd@gmail.com,fred1,Elektroinstallateur,ROLE_USER,1
+peterpan3,peterpan4@gmail.com,1234456,Elektroinstallateur,ROLE_ADMIN,2
+fred,fred@gmail.com,fred,Elektroinstallateur,ROLE_ADMIN,2
+fred1,fredd@gmail.com,fred1,Elektroinstallateur,ROLE_USER,2
