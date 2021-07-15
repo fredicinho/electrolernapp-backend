@@ -1,19 +1,5 @@
-http://wiproh20-owerlen.enterpriselab.ch:8080/
-
-
-GET:
-`api/v1/questions`  -> return all questions
-`api/v1/questions/{ID}` -> return specific question
-
-`api/v1/categories` -> all categories
-`api/v1/categories/{ID}`
-
-`api/v1/statistics/{UserID}` -> return all statistics from user
-`api/v1/statistics/{QuestionID}` -> return all statistics from question (available for user)
-
-PUT 
-`api/v1/statistics` 
-payload: Date, PointsAchieved, UserID, QuestionID, Marked 
+# Single-Page-Application made with Springboot
+![Layeroverview](layers.png)
 
 
 ### Docker
